@@ -12,23 +12,9 @@
 </template>
 
 <script setup lang="ts">
-import PageHeader from "~/components/Layout/LayoutSections/PageHeader.vue"
-import PageFooter from "~/components/Layout/LayoutSections/PageFooter.vue"
-import NotificationsContainer from "~/components/Blocks/Notifications/NotificationsContainer.vue"
-import { useAuthStore } from "@/stores/authStore"
-import { useUserStore } from "@/stores/userStore"
-import { computed } from "vue"
-
-const authStore = useAuthStore()
-const userStore = useUserStore()
-
-/**  прелоадер показывается, если есть хоть одно true-значение в первом массиве,
- * при этом все значения из второго массива == false
-*/
-const globalPreloaderShown = computed(
-  () =>
-    ![authStore.dialogShown].some((value) => !!value)
-)
+import PageHeader from '~/components/Layout/LayoutSections/PageHeader.vue'
+import PageFooter from '~/components/Layout/LayoutSections/PageFooter.vue'
+import NotificationsContainer from '~/components/Blocks/Notifications/NotificationsContainer.vue'
 </script>
 
 <style lang="scss" scoped>
