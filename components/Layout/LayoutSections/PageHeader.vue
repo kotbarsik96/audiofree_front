@@ -384,16 +384,21 @@ function closeMenu(e: Event) {
     height: 100%;
     position: absolute;
     left: 50px;
-    right: 0;
+    right: auto;
     top: 0;
     z-index: 100;
     display: flex;
     align-items: center;
+    overflow: hidden;
+    min-width: 2rem;
+  }
+  &__search.shown {
+    right: 0;
   }
 
   &__search-button {
     position: relative;
-    top: 0;
+    transform: translate(0.75rem, -0.25rem);
     z-index: 50;
     font-size: var(--search-btn-size);
     color: var(--primary-dark);
@@ -402,7 +407,7 @@ function closeMenu(e: Event) {
   &__search-input-wrapper {
     position: absolute;
     z-index: 20;
-    left: -5px;
+    left: 0;
     right: 110%;
     background-color: var(--white);
     overflow: hidden;
