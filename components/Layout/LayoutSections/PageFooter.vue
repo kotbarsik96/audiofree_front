@@ -71,15 +71,15 @@
 </template>
 
 <script setup lang="ts">
-import AuthDialog from "~/components/Blocks/Dialog/AuthDialog.vue"
-import SocialsList from "~/components/Blocks/SocialsList.vue"
-import contacts from "@/enums/footer/contacts"
-import FreeCall from "~/components/Blocks/FreeCall.vue"
-import ButtonIcon from "~/components/Blocks/ButtonIcon.vue"
-import LogoText from "~/components/Blocks/LogoText.vue"
-import { useAuthStore } from "@/stores/authStore"
-import { storeToRefs } from "pinia"
-import { ref } from "vue"
+import AuthDialog from '~/components/Blocks/Dialog/AuthDialog.vue'
+import SocialsList from '~/components/Blocks/SocialsList.vue'
+import contacts from '@/enums/footer/contacts'
+import FreeCall from '~/components/Blocks/FreeCall.vue'
+import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
+import LogoText from '~/components/Blocks/LogoText.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
 
 const { tab } = storeToRefs(useAuthStore())
 
@@ -87,43 +87,43 @@ const authDialogShown = ref(false)
 
 const columns = [
   {
-    title: "Личный кабинет",
+    title: 'Личный кабинет',
     items: [
       {
-        title: "Войти в аккаунт",
+        title: 'Войти в аккаунт',
         action: login,
       },
       {
-        title: "Зарегистрироваться",
+        title: 'Зарегистрироваться',
         action: signup,
       },
       {
-        title: "Отложенные товары",
+        title: 'Отложенные товары',
         to: '/favorites',
       },
       {
-        title: "Ваши заказы",
+        title: 'Ваши заказы',
         to: '/profile',
       },
     ],
   },
   {
-    title: "Магазин",
+    title: 'Магазин',
     items: [
       {
-        title: "Доставка и оплата",
+        title: 'Доставка и оплата',
         to: '/delivery-payment',
       },
       {
-        title: "Гарантия и возврат",
+        title: 'Гарантия и возврат',
         to: '/guarantees-refund',
       },
       {
-        title: "Пункты самовывоза",
+        title: 'Пункты самовывоза',
         to: '/pickup-places',
       },
       {
-        title: "Контакты",
+        title: 'Контакты',
         to: '/contacts',
       },
     ],
@@ -131,11 +131,11 @@ const columns = [
 ]
 
 function signup() {
-  tab.value = "signup"
+  tab.value = 'signup'
   authDialogShown.value = true
 }
 function login() {
-  tab.value = "login"
+  tab.value = 'login'
   authDialogShown.value = true
 }
 </script>
@@ -145,7 +145,7 @@ function login() {
   color: var(--white);
 
   &__main {
-    padding: 70px 0 50px 0;
+    padding: 4.375rem 0 3.125rem 0;
     background-color: var(--primary-dark);
   }
 
@@ -153,15 +153,16 @@ function login() {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 40px;
+    gap: 1.875rem;
   }
 
   &__column-link {
-    @include fRegular(14);
+    @include fontSize(14);
   }
 
   &__column-title {
-    @include fMedium(18);
+    @include fontSize(18);
+    font-weight: 500;
     margin-bottom: 50px;
   }
 
@@ -197,11 +198,12 @@ function login() {
   }
 
   &__contact-item-title {
-    @include fRegular(14);
+    @include fontSize(14);
   }
 
   &__contact-item-detail {
-    @include fBold(14);
+    @include fontSize(14);
+    font-weight: 700;
   }
 
   &__socials {
@@ -218,7 +220,89 @@ function login() {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    @include fRegular(14);
+    @include fontSize(14);
+  }
+
+  @include adaptive(tablet-big) {
+    &__main {
+      padding: 2.375rem 0 1.125rem 0;
+    }
+
+    &__main-container {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    &__column {
+      border-bottom: 1px solid var(--border-footer-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 1.875rem;
+      margin: 0 var(--container-unpadding);
+
+      &:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+      }
+    }
+
+    &__contacts-list {
+      align-items: center;
+    }
+
+    &__contact-item {
+      text-align: center;
+      align-items: center;
+
+      :deep(.btn-icon) {
+        display: none;
+      }
+    }
+
+    &__column-title {
+      @include fontSize(24);
+      margin-bottom: 1.5rem;
+    }
+
+    &__column {
+      text-align: center;
+    }
+
+    &__socials {
+      padding-left: 0;
+    }
+
+    &__bottom {
+      border-top: 1px solid var(--border-footer-color);
+      background-color: var(--primary-dark);
+      padding-top: 0;
+    }
+
+    &__bottom-container {
+      flex-direction: column;
+      align-items: stretch;
+
+      > div {
+        padding: 0.625rem 0;
+        margin: 0 var(--container-unpadding);
+        border-bottom: 1px solid var(--border-footer-color);
+        text-align: center;
+
+        :deep(.logo-text) {
+          display: inline-flex;
+          margin: 0 auto;
+        }
+
+        &:nth-child(2) {
+          padding-bottom: 0.325rem;
+        }
+        &:last-child {
+          border-bottom: 0;
+          align-items: center;
+        }
+      }
+    }
   }
 }
 </style>

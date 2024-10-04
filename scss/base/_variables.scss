@@ -1,4 +1,9 @@
 :root {
+  // размеры
+  --container-width: 1170px;
+  --container-padding-x: 15px;
+  --container-unpadding: calc(var(--container-padding-x) * -1);
+
   // шрифты
   --font-roboto-flex: RobotoFlex, sans-serif;
 
@@ -14,6 +19,7 @@
   --stroke: #e7e7e7;
   --red: #da0101;
   --breadcrumbs-color: #b3b3b3;
+  --border-footer-color: #383050;
 
   // transitions
   --general-transition: all 0.25s ease;

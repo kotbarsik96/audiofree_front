@@ -116,7 +116,8 @@ function close() {
   }
 
   &__body {
-    @include fMedium(16);
+    @include fontSize(16);
+    font-weight: 500;
     display: flex;
     align-items: center;
     gap: 0.5rem;

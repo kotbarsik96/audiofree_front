@@ -289,7 +289,8 @@ function closeMenu(e: Event) {
       justify-content: center;
       align-items: center;
       gap: 1rem;
-      @include fMedium(18);
+      @include fontSize(18);
+    font-weight: 500;
     }
   }
 
@@ -440,7 +441,8 @@ function closeMenu(e: Event) {
   }
 
   &__logo {
-    @include fBold(18);
+    @include fontSize(18);
+    font-weight: 700;
     color: var(--primary-dark);
   }
 
@@ -491,13 +493,14 @@ function closeMenu(e: Event) {
   }
 
   &__menu-item-inner {
-    @include fRegular(12);
+    @include fontSize(12);
 
     &.--iconed {
       display: flex;
       align-items: center;
       gap: 22px;
-      @include fMedium(14);
+      @include fontSize(14);
+    font-weight: 500;
 
       .icon {
         color: var(--primary);
@@ -506,7 +509,8 @@ function closeMenu(e: Event) {
       }
     }
     &.--close {
-      @include fBold(18);
+      @include fontSize(18);
+    font-weight: 700;
 
       .icon {
         opacity: 1;

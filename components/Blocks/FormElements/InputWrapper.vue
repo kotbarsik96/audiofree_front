@@ -56,12 +56,13 @@ const className = computed(() => {
   position: relative;
   margin-bottom: 0.25rem;
 
-  @include fRegular(14);
+  @include fontSize(14);
 
   &__label {
     cursor: pointer;
     display: inline-block;
-    @include fMedium(12);
+    @include fontSize(12);
+    font-weight: 500;
   }
 
   &__wrap {
@@ -109,7 +110,7 @@ const className = computed(() => {
     width: 100%;
     color: var(--text-color);
     transition: var(--general-transition);
-    @include fRegular(14);
+    @include fontSize(14);
   }
   :deep(.input)::placeholder {
     color: #b9b9b9;

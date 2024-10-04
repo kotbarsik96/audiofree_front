@@ -71,7 +71,8 @@ const attrs = computed(() => {
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
-  @include fBold(14);
+  @include fontSize(14);
+    font-weight: 700;
   transition: var(--general-transition);
 
   &:hover:not(:disabled) {
@@ -102,7 +103,8 @@ const attrs = computed(() => {
   }
 
   &__label {
-    @include fBold(14);
+    @include fontSize(14);
+    font-weight: 700;
   }
 
   &__icon {

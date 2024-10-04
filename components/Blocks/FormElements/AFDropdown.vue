@@ -92,7 +92,7 @@ function updateValue(option: DropdownOption) {
   position: relative;
   transition: var(--general-transition);
   z-index: 50;
-  @include fRegular(14);
+  @include fontSize(14);
 
   &.shown {
     border-radius: var(--s-bradius) var(--s-bradius) 0 0;

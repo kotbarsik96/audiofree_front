@@ -44,7 +44,8 @@ const className = computed(() => {
     align-items: center;
     gap: 9px;
     transition: var(--general-transition);
-    @include fBold(18);
+    @include fontSize(18);
+    font-weight: 700;
 
     .icon {
       width: 21px;
@@ -52,7 +53,7 @@ const className = computed(() => {
   }
 
   &__text {
-    @include fRegular(12);
+    @include fontSize(12);
     line-height: 1;
     transition: var(--general-transition);
   }

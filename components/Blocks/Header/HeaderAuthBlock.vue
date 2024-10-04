@@ -71,7 +71,7 @@ function showDialog(_tab: authTabs) {
 
   &__links {
     color: var(--text-color);
-    @include fRegular(14);
+    @include fontSize(14);
     display: flex;
     align-items: center;
   }

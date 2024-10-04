@@ -75,7 +75,8 @@ const component = computed(() => {
   &__tab-btn {
     flex: 1 1 50%;
     padding: 0.6rem 1rem;
-    @include fMedium(16);
+    @include fontSize(16);
+    font-weight: 500;
     background-color: var(--stroke);
     color: #9a9a9a;
     transition: var(--general-transition);
@@ -91,7 +92,8 @@ const component = computed(() => {
   }
 
   &__title {
-    @include fBold(18);
+    @include fontSize(18);
+    font-weight: 700;
     text-align: center;
     margin-bottom: 1rem;
   }

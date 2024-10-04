@@ -20,9 +20,6 @@ html {
 }
 
 ._container {
-  --container-width: 1170px;
-  --container-padding-x: 15px;
-
   margin: 0 auto;
   width: 100%;
   max-width: calc(var(--container-width) + var(--container-padding-x) * 2);
@@ -31,7 +28,7 @@ html {
 
 ._link {
   text-decoration: none;
-  @include fRegular(14);
+  @include fontSize(14);
   color: var(--text-color);
   transition: var(--general-transition);
 
@@ -46,7 +43,7 @@ html {
 
 ._error {
   color: var(--red);
-  @include fRegular(14);
+  @include fontSize(14);
 }
 
 ._box {

@@ -96,7 +96,7 @@ const className = computed(() => {
     height: auto;
 
     .icon {
-      font-size: 1.25rem;
+      width: 1.75rem;
     }
 
     &.shadow {

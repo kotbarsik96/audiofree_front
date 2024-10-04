@@ -1,3 +1,5 @@
+@use "sass:map";
+
 @mixin adaptive($size) {
   @if $size ==phone-small {
     @media screen and (max-width: 359px) {
@@ -89,4 +91,16 @@
 @mixin fontSize($sizePx, $lineHeight: 130%) {
   font-size: #{calc($sizePx / 16)}rem;
   line-height: $lineHeight;
+}
+
+$fHeadlines: (
+  2: 24px 500,
+);
+@mixin fHeadline($num) {
+  $item: map.get($fHeadlines, $num);
+  $fontSize: nth($item, 1);
+  $fontWeight: nth($item, 2);
+
+  font-weight: $fontWeight;
+  font-size: $fontSize;
 }
