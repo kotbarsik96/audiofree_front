@@ -430,7 +430,7 @@ function closeMenu(e: Event) {
   }
 
   &__menu-btn {
-    font-size: 21px;
+    @include fontSize(21);
     color: var(--primary-dark);
   }
 
@@ -459,10 +459,15 @@ function closeMenu(e: Event) {
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 50;
     opacity: 0;
-    transition: var(--general-transition);
+    transform: translateX(-100%);
+    transition-property: opacity, transform;
+    transition-duration: 0.3s, 0s;
+    transition-delay: 0s, 0.3s;
   }
   .header.shown &__menu-wrapper {
     opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0s;
   }
 
   &__menu {
@@ -497,7 +502,7 @@ function closeMenu(e: Event) {
       .icon {
         color: var(--primary);
         opacity: 0.3;
-        font-size: 21px;
+        width: 21px;
       }
     }
     &.--close {

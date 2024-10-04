@@ -118,7 +118,7 @@ function updateValue(option: DropdownOption) {
 
   &__icon {
     flex: 0 0 10px;
-    font-size: 10px;
+    @include fontSize(10);
     color: var(--white);
     transform: rotate(90deg);
     transition: var(--general-transition);

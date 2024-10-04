@@ -8,31 +8,31 @@
 </template>
 
 <script setup lang="ts">
-import AFIcon from "~/components/Blocks/AFIcon.vue"
-import { computed } from "vue"
-import { defineNuxtLink } from "#app";
+import AFIcon from '~/components/Blocks/AFIcon.vue'
+import { computed } from 'vue'
+import { defineNuxtLink } from '#app'
 
 const props = withDefaults(
   defineProps<{
-    type?: "button" | "submit" | "reset" | "router-link"
-    styleType?: "primary" | "secondary"
+    type?: 'button' | 'submit' | 'reset' | 'nuxt-link'
+    styleType?: 'primary' | 'secondary'
     label?: string
     icon?: string | any
-    iconPos?: "left" | "right"
+    iconPos?: 'left' | 'right'
   }>(),
   {
-    type: "button",
-    iconPos: "left",
-    styleType: "primary",
+    type: 'button',
+    iconPos: 'left',
+    styleType: 'primary',
   }
 )
 
 const component = computed(() => {
   switch (props.type) {
-    case "router-link":
+    case 'nuxt-link':
       return defineNuxtLink({})
     default:
-      return "button"
+      return 'button'
   }
 })
 
@@ -40,19 +40,19 @@ const className = computed(() => {
   return [
     `btn--${props.styleType}`,
     {
-      "btn--icon-right": props.iconPos === "right",
-      "btn--icon-only": !props.label && props.icon,
+      'btn--icon-right': props.iconPos === 'right',
+      'btn--icon-only': !props.label && props.icon,
     },
   ]
 })
 const attrs = computed(() => {
   switch (props.type) {
-    case "router-link":
+    case 'nuxt-link':
       return {}
     default:
       return {
         type: props.type,
-        "aria-label": props.label,
+        'aria-label': props.label,
       }
   }
 })
@@ -83,6 +83,10 @@ const attrs = computed(() => {
     box-shadow: none;
     border-color: #a9a9a9;
     color: var(--text-color);
+
+    &:hover:not(:disabled) {
+      background: rgba(13, 177, 10, 0.5);
+    }
   }
 
   &__inner {
@@ -102,9 +106,9 @@ const attrs = computed(() => {
   }
 
   &__icon {
-    font-size: 20px;
     width: 20px;
     height: 20px;
+    @include fontSize(20);
   }
 
   // modifiers

@@ -11,18 +11,18 @@
 </template>
 
 <script lang="ts" setup>
-import { useGlobalStore } from '~/stores/globalStore';
-import LayoutWrapper from "~/components/Layout/LayoutWrapper.vue";
+import { useGlobalStore } from '~/stores/globalStore'
+import LayoutWrapper from '~/components/Layout/LayoutWrapper.vue'
 
 onMounted(() => {
-  defineIfFirefox();
-});
+  defineIfFirefox()
+})
 
-await useGlobalStore().initApp();
+await useGlobalStore().initApp()
 
 function defineIfFirefox() {
-  const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-  if (isFirefox) document.body.classList.add('firefox');
+  const isFirefox = navigator.userAgent.toLowerCase().includes('firefox')
+  if (isFirefox) document.body.classList.add('firefox')
 }
 </script>
 

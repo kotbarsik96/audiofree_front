@@ -85,3 +85,8 @@
   }
   scrollbar-width: none;
 }
+
+@mixin fontSize($sizePx, $lineHeight: 130%) {
+  font-size: #{calc($sizePx / 16)}rem;
+  line-height: $lineHeight;
+}

@@ -63,7 +63,7 @@ function showDialog(_tab: authTabs) {
   gap: 0.5rem;
 
   &__icon {
-    font-size: 18px;
+    @include fontSize(18);
     width: 18px;
     height: 18px;
     color: var(--primary-dark);

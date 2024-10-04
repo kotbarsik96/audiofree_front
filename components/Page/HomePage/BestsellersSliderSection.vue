@@ -1,5 +1,5 @@
 <template>
-  <section class="section section--theme-colored bestsellers-section">
+  <section class="_section--primary-color bestsellers-section">
     <div class="bestsellers-slider">
       <Swiper
         :class="{ 'swiper-container--one-slide': bestsellers.length <= 1 }"
@@ -28,12 +28,7 @@
               <img :src="product.image.url" />
             </div>
             <div class="bestsellers-slider__button-container">
-              <NuxtLink
-                class="button"
-                to="/"
-              >
-                Купить
-              </NuxtLink>
+              <AFButton class="bestsellers-slider__button" label="Купить" to="/" styleType="secondary" />
             </div>
           </div>
         </SwiperSlide>
@@ -43,6 +38,7 @@
 </template>
 
 <script setup lang="ts">
+import AFButton from '~/components/Blocks/AFButton.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Pagination, EffectFlip } from 'swiper/modules'
 import { Product } from '~/domain/product/Product'
@@ -51,12 +47,15 @@ const productService = new Product()
 
 const titles = ['BESTSELLER', 'MUST HAVE', 'GREAT CHOISE']
 
-const { data, error } = await productService.getBestsellers(titles.length)
+const { data } = await productService.getBestsellers(titles.length)
 
 const bestsellers = computed(() => data.value?.data || [])
 </script>
 
 <style lang="scss" scoped>
+@import '~/scss/plugins/swiper-effect-flip';
+@import '~/scss/plugins/swiper-pagination';
+
 .bestsellers-section {
   padding-top: 90px;
   padding-bottom: 55px;
@@ -126,12 +125,12 @@ const bestsellers = computed(() => data.value?.data || [])
     font-weight: 700;
 
     div:first-child {
-      font-size: 24px;
+      @include fontSize(24);
       line-height: 0px;
     }
 
     div:last-child {
-      font-size: 64px;
+      @include fontSize(64);
       line-height: 75px;
     }
   }
@@ -140,7 +139,7 @@ const bestsellers = computed(() => data.value?.data || [])
     position: absolute;
     z-index: 10;
     text-align: center;
-    font-size: 192px;
+    @include fontSize(192);
     font-weight: 700;
     line-height: 225px;
     color: #fff;
@@ -167,7 +166,7 @@ const bestsellers = computed(() => data.value?.data || [])
     margin-top: 20px;
 
     .button {
-      font-size: 16px;
+      @include fontSize(16);
       line-height: 18px;
       padding: 15px 50px;
       min-width: 255px;
@@ -179,6 +178,10 @@ const bestsellers = computed(() => data.value?.data || [])
         border-color: var(--theme_color_darker);
       }
     }
+  }
+
+  &__button {
+    color: inherit;
   }
 
   @media (max-width: 1159px) {
