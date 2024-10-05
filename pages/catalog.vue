@@ -18,6 +18,22 @@
               v-model:shown="selectShown"
             />
           </div>
+          <div class="catalog__main-body">
+            <div class="catalog__cards">
+              <ProductCard
+                v-for="product in products"
+                :key="product.id"
+                :data="product"
+              />
+            </div>
+          </div>
+          <div class="catalog__pagination">
+            <AFPagination
+              v-if="productsData"
+              :total="productsData.total"
+              :perPage="productsData.per_page"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -25,10 +41,18 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import CatalogFilter from '~/components/Blocks/CatalogFilter.vue'
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import AFSelect from '~/components/Blocks/AFSelect.vue'
 import ChevronRightIcon from '~/assets/images/icons/chevron-right.svg'
+import ProductCard from '~/components/Blocks/Cards/ProductCard.vue'
+import AFPagination from '~/components/Blocks/AFPagination.vue'
+import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
+import { Product } from '~/domain/product/Product'
+import type IPagination from '~/dataAccess/api/IPagination'
+
+const productsService = new Product()
 
 const options = [
   {
@@ -58,7 +82,39 @@ const options = [
 ]
 const sortType = ref(options[0].value)
 
+const productsData = ref<IPagination<ICatalogProduct> | null>(null)
+const products = computed(() => productsData.value?.data)
+
 const selectShown = ref(false)
+
+const { data } = await productsService.getCatalog()
+if (data) productsData.value = data.value
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.catalog {
+  &__inner {
+  }
+
+  &__sidebar {
+  }
+
+  &__main {
+  }
+
+  &__main-header {
+  }
+
+  &__main-body {
+  }
+
+  &__cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  &__pagination {
+  }
+}
+</style>

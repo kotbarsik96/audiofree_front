@@ -15,4 +15,17 @@ export class Product {
 
     return { data, error, status }
   }
+
+  public async getCatalog() {
+    const { data, error, status } = await useAPI<IPagination<ICatalogProduct>>(
+      '/products/catalog',
+      {
+        params: {
+          per_page: 12,
+        },
+      }
+    )
+
+    return { data, error, status }
+  }
 }

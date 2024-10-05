@@ -6,45 +6,46 @@
 </template>
 
 <script setup lang="ts">
-import AFIcon from "~/components/Blocks/AFIcon.vue";
-import { computed } from "vue"
-import { defineNuxtLink } from "#app";
+import AFIcon from '~/components/Blocks/AFIcon.vue'
+import { computed } from 'vue'
+import { defineNuxtLink } from '#app'
 
 const props = withDefaults(
   defineProps<{
-    type?: "button" | "link" | "router-link"
+    type?: 'button' | 'link' | 'router-link'
     icon: string | any
     shadow?: boolean
     badge?: string | number
+    contrast?: boolean
   }>(),
   {
-    type: "button",
+    type: 'button',
   }
 )
 
 const component = computed(() => {
   switch (props.type) {
-    case "button":
+    case 'button':
     default:
-      return "button"
-    case "link":
-      return "a"
-    case "router-link":
+      return 'button'
+    case 'link':
+      return 'a'
+    case 'router-link':
       return defineNuxtLink({})
   }
 })
 const attrs = computed(() => {
   switch (props.type) {
-    case "button":
+    case 'button':
     default:
-      return { type: "button" }
-    case "router-link":
+      return { type: 'button' }
+    case 'router-link':
       return {}
   }
 })
 
 const className = computed(() => {
-  return { shadow: props.shadow }
+  return { shadow: props.shadow, contrast: props.contrast }
 })
 </script>
 
@@ -60,6 +61,10 @@ const className = computed(() => {
   background-color: var(--white);
   color: var(--primary-dark);
   transition: var(--general-transition);
+
+  &.contrast {
+    background-color: #eeeeee;
+  }
 
   .icon {
     font-size: 1.5rem;

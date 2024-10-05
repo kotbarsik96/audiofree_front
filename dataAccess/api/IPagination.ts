@@ -12,7 +12,7 @@ export default interface IPagination<T> {
   }[]
   next_page_url: string
   path: string
-  per_page: number | null
+  per_page: number
   prev_page_url: number | null
   to: number
   total: number

@@ -7,6 +7,10 @@ export default defineNuxtConfig({
 
   modules: ['@pinia/nuxt'],
 
+  devServer: {
+    port: 3002
+  },
+
   vite: {
     css: {
       preprocessorOptions: {

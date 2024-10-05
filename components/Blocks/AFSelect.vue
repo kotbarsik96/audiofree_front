@@ -99,6 +99,7 @@ function toggle() {
   --border-width: 1px;
 
   position: relative;
+  display: inline-block;
   z-index: 50;
   border-radius: 9px;
   background-color: var(--white);
@@ -119,6 +120,7 @@ function toggle() {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.625rem;
   }
 
   &__value-chevron {
@@ -163,6 +165,11 @@ function toggle() {
       gap: 0.625rem;
       color: var(--black);
       border-bottom: 1px solid var(--select-border-color);
+      transition: var(--general-transition);
+
+      &:hover {
+        background-color: var(--stroke);
+      }
 
       .icon {
         width: 1rem;
