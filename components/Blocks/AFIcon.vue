@@ -1,10 +1,15 @@
 <template>
-  <img v-if="typeof icon === 'string'" class="icon" :src="icon" />
-  <component v-else class="icon" :is="icon" />
+  <img
+    v-if="typeof icon === 'string'"
+    class="icon"
+    :style="style"
+    :src="icon"
+  />
+  <component v-else class="icon" :style="style" :is="icon" />
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed } from 'vue'
 
 const props = defineProps<{
   icon: string | any
@@ -12,7 +17,7 @@ const props = defineProps<{
 }>()
 
 const style = computed(() => {
-  return { "--rotate": props.rotate }
+  return { '--rotate': props.rotate }
 })
 </script>
 

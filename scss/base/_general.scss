@@ -10,7 +10,6 @@ html {
   }
 }
 
-
 :root:has(.firefox) {
   @include scrollbarFirefox();
 
@@ -58,5 +57,24 @@ html {
     @extend ._section;
     color: var(--white);
     background-color: var(--primary);
+  }
+}
+
+._page {
+  margin-top: 3.75rem;
+
+  @include adaptive(tablet-big){
+    margin-top: 1.5rem;
+  }
+}
+
+._page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__title {
+    @include fontSize(36);
+    font-weight: 700;
   }
 }

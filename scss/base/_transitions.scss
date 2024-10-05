@@ -34,3 +34,22 @@
     opacity: 1;
   }
 }
+
+.drop-down {
+  &-enter-active,
+  &-leave-active {
+    transition: var(--general-transition);
+  }
+  
+  &-enter-from,
+  &-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  
+  &-enter-to,
+  &-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

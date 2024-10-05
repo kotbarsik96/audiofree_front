@@ -1,20 +1,28 @@
 <template>
   <ul class="breadcrumbs">
     <li v-for="item in breadcrumbs">
-      <NuxtLink class="breadcrumbs__link" :to="item.link">
+      <NuxtLink
+        v-if="item.link"
+        class="breadcrumbs__link _link"
+        :to="item.link"
+      >
         {{ item.label }}
       </NuxtLink>
+      <span v-else> {{ item.label }} </span>
     </li>
   </ul>
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
-  breadcrumbs: {
-    link: string
-    label: string
-  }[]
-}>()
+const breadcrumbs = [
+  {
+    link: '/',
+    label: 'Главная',
+  },
+  {
+    label: 'Каталог',
+  },
+]
 </script>
 
 <style lang="scss" scoped>
@@ -22,10 +30,17 @@ const props = defineProps<{
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  
+
   &__link {
+    display: inline-block;
     color: var(--breadcrumbs-color);
-    
+    @include fontSize(16);
+
+    &::after {
+      content: '/';
+      display: inline-block;
+      margin: 0 0.5rem;
+    }
   }
 }
 </style>
