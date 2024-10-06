@@ -1,6 +1,6 @@
 :root {
   // размеры
-  --container-width: 1170px;
+  --container-width: max(73.125rem, 1170px);
   --container-padding-x: 15px;
   --container-unpadding: calc(var(--container-padding-x) * -1);
 
@@ -12,6 +12,7 @@
   --white: #ffffff;
   --primary: #8b75c8;
   --primary-transparent: rgba(139, 117, 200, 0.5);
+  --primary-darker: #59409d;
   --primary-dark: #251c41;
   --secondary: #97d413;
   --secondary-2: #0db10a;

@@ -22,7 +22,7 @@
       <div class="product-card__rating">
         <AFRating :value="data.rating" />
       </div>
-      <div class="product-card__price">от {{ data.min_price }} ₽</div>
+      <div class="product-card__price">от {{ currency(data.min_price) }}</div>
       <div class="product-card__buttons">
         <AFButton label="Купить в 1 клик" />
         <AFButton label="В корзину" styleType="secondary" />
@@ -39,6 +39,7 @@ import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 import HeartIcon from '~/assets/images/icons/heart.svg'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 import AFButton from '~/components/Blocks/AFButton.vue'
+import { currency } from '~/utils/numbers'
 
 const props = defineProps<{
   data: ICatalogProduct
@@ -62,10 +63,12 @@ const statusText = computed(() => statusMap[props.data.status.value_slug])
   &__inner {
     display: grid;
     grid-template-columns: repeat(2, auto);
+    grid-template-rows: repeat(2, auto) 1fr repeat(2, auto);
     align-items: center;
     justify-content: center;
     padding-bottom: 1.5rem;
     gap: 1.25rem;
+    height: 100%;
   }
 
   &__top {
@@ -118,8 +121,8 @@ const statusText = computed(() => statusMap[props.data.status.value_slug])
 
   &__title {
     grid-column: 1 / -1;
-    @include fontSize(16);
-    font-weight: 400;
+    @include fontSize(14);
+    font-weight: 500;
   }
 
   &__rating {
@@ -128,6 +131,9 @@ const statusText = computed(() => statusMap[props.data.status.value_slug])
 
   &__price {
     grid-column: 2 / 3;
+    @include fontSize(18);
+    font-weight: 700;
+    text-align: right;
   }
 
   &__buttons {
@@ -136,6 +142,17 @@ const statusText = computed(() => statusMap[props.data.status.value_slug])
     align-items: center;
     flex-wrap: wrap;
     gap: 0.75rem;
+
+    :deep(.btn) {
+      flex: 1 1 auto;
+    }
+    :deep(.btn__label) {
+      @include fontSize(13);
+    }
+  }
+
+  @include adaptive(tablet-big){
+    max-width: 20rem;
   }
 }
 </style>

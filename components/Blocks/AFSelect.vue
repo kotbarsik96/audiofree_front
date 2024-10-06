@@ -138,6 +138,7 @@ function toggle() {
     display: flex;
     align-items: center;
     gap: 0.625rem;
+    @include fontSize(16);
   }
 
   &__value-icon {

@@ -1,0 +1,43 @@
+.input-range {
+  position: relative;
+
+  &__scale {
+    cursor: pointer;
+    position: relative;
+    background-color: var(--stroke);
+    border-radius: 60px;
+    height: 1rem;
+    display: flex;
+    align-items: center;
+  }
+
+  &__bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: var(--primary);
+    border-radius: 60px;
+    width: 50%;
+    z-index: 10;
+  }
+
+  &__thumb {
+    position: absolute;
+    border-radius: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1.25rem;
+    height: 1.25rem;
+    touch-action: none;
+    z-index: 20;
+    background-color: var(--white);
+    border: 3px solid var(--primary);
+    transition: var(--general-transition);
+  }
+  &.grabbed &__thumb,
+  &__thumb:hover {
+    background-color: var(--primary-darker);
+    border-color: var(--primary-darker);
+  }
+}

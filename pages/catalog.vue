@@ -56,25 +56,25 @@ const productsService = new Product()
 
 const options = [
   {
-    label: 'По цене (по возрастанию)',
+    label: 'Цена (возрастание)',
     icon: ChevronRightIcon,
     value: 'price_asc',
     iconRotate: '-90deg',
   },
   {
-    label: 'По цене (по убыванию)',
+    label: 'Цена (убывание)',
     icon: ChevronRightIcon,
     value: 'price_desc',
     iconRotate: '90deg',
   },
   {
-    label: 'По популярности (по убыванию)',
+    label: 'Популярность (возрастание)',
     value: 'popular_desc',
     icon: ChevronRightIcon,
     iconRotate: '-90deg',
   },
   {
-    label: 'По популярности (по возрастанию)',
+    label: 'Популярность(убывание)',
     value: 'popular_asc',
     icon: ChevronRightIcon,
     iconRotate: '90deg',
@@ -93,7 +93,12 @@ if (data) productsData.value = data.value
 
 <style lang="scss" scoped>
 .catalog {
+  --column-width: 17rem;
+
   &__inner {
+    display: grid;
+    grid-template-columns: var(--column-width) 1fr;
+    gap: 2rem;
   }
 
   &__sidebar {
@@ -103,6 +108,15 @@ if (data) productsData.value = data.value
   }
 
   &__main-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+
+    :deep(.select) {
+      width: 100%;
+      max-width: 17.5rem;
+    }
   }
 
   &__main-body {
@@ -110,11 +124,16 @@ if (data) productsData.value = data.value
 
   &__cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 1rem;
   }
 
   &__pagination {
+  }
+
+  @include adaptive(tablet-big) {
+    &__cards {
+    }
   }
 }
 </style>

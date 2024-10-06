@@ -107,6 +107,9 @@ const className = computed(() => {
     &.shadow {
       box-shadow: none;
     }
+    &.contrast {
+      background-color: transparent;
+    }
   }
 }
 </style>
