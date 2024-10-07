@@ -9,8 +9,8 @@
       <InputRangeDouble
         v-model:valueMin="filterValues[slug].min"
         v-model:valueMax="filterValues[slug].max"
-        :min="(filters[slug].min as number)"
-        :max="(filters[slug].max as number)"
+        :min="min"
+        :max="max"
       />
     </div>
   </div>
@@ -27,6 +27,9 @@ const props = defineProps<{
 }>()
 
 const { filterValues, filters } = storeToRefs(useCatalogStore())
+
+const min = computed(() => Math.floor(filters.value[props.slug].min as number))
+const max = computed(() => Math.floor(filters.value[props.slug].max as number))
 </script>
 
 <style lang="scss" scoped>

@@ -1,19 +1,21 @@
 <template>
-  <div class="input-range">
-    <div class="input-range__scale" @pointerdown="onPointerdown" ref="scale">
-      <div class="input-range__bar" :style="barStyle"></div>
-      <div
-        class="input-range__thumb"
-        :class="thumbClass.left"
-        :style="thumbStyle.left"
-        ref="thumbLeft"
-      ></div>
-      <div
-        class="input-range__thumb"
-        :class="thumbClass.right"
-        :style="thumbStyle.right"
-        ref="thumbRight"
-      ></div>
+  <div class="input-range input-range--db">
+    <div class="input-range__scale-wrapper">
+      <div class="input-range__scale input-range__scale--db-range" @pointerdown="onPointerdown" ref="scale">
+        <div class="input-range__bar" :style="barStyle"></div>
+        <div
+          class="input-range__thumb"
+          :class="thumbClass.left"
+          :style="thumbStyle.left"
+          ref="thumbLeft"
+        ></div>
+        <div
+          class="input-range__thumb input-range__thumb--right"
+          :class="thumbClass.right"
+          :style="thumbStyle.right"
+          ref="thumbRight"
+        ></div>
+      </div>
     </div>
   </div>
 </template>
@@ -43,7 +45,7 @@ const _valueMin = computed({
     return props.valueMin
   },
   set(value) {
-    emit('update:valueMin', value)
+    emit('update:valueMin', handleValue(value))
   },
 })
 const _valueMax = computed({
@@ -51,10 +53,11 @@ const _valueMax = computed({
     return props.valueMax
   },
   set(value) {
-    emit('update:valueMin', value)
+    emit('update:valueMax', handleValue(value))
   },
 })
 const coverage = computed(() => props.max - props.min)
+const shift = computed(() => props.min / (coverage.value / 100))
 
 /** от ширины шкалы зависит размер заполняющей её полоски и положения ползунков
  * поэтому это значение обновляется при событии resize у window
@@ -98,14 +101,16 @@ const barStyle = computed(() => ({
 watch(_valueMin, () => {
   if (_valueMin.value < props.min) _valueMin.value = props.min
   if (_valueMin.value > _valueMax.value) _valueMin.value = _valueMax.value
-  
-  thumbPositions.value.left = _valueMin.value / (coverage.value / 100)
+
+  thumbPositions.value.left =
+    _valueMin.value / (coverage.value / 100) - shift.value
 })
 watch(_valueMax, () => {
   if (_valueMax.value > props.max) _valueMax.value = props.max
   if (_valueMax.value < _valueMin.value) _valueMax.value = _valueMin.value
 
-  thumbPositions.value.right = _valueMax.value / (coverage.value / 100)
+  thumbPositions.value.right =
+    _valueMax.value / (coverage.value / 100) - shift.value
 })
 
 onMounted(() => {
@@ -120,6 +125,10 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', onWindowResize)
 })
+
+function handleValue(value: number) {
+  return Math.floor(value)
+}
 
 function onWindowResize() {
   updateScaleWidth()
@@ -138,6 +147,12 @@ function getClosestThumb(percent: number): 'left' | 'right' {
     closestThumb = 'right'
 
   return closestThumb
+}
+function getPositionData(eventPosition: number) {
+  let percent = eventPosition / (scaleWidth.value / 100)
+  const closestThumb = getClosestThumb(percent)
+
+  return { percent, closestThumb }
 }
 function moveThumb(
   closestThumb: 'left' | 'right',
@@ -158,21 +173,20 @@ function onPointerdown(event: PointerEvent) {
   event.preventDefault()
 
   const startPosition = event.clientX - getCoords(scale.value).left
-  const eventPositionPercent = startPosition / (scaleWidth.value / 100)
-  const closestThumb = getClosestThumb(eventPositionPercent)
+  const { percent, closestThumb } = getPositionData(startPosition)
   grabbed.value[closestThumb] = true
 
   document.addEventListener('pointermove', onPointermove)
   document.addEventListener('pointerup', onPointerup)
 
-  moveThumb(closestThumb, eventPositionPercent)
+  moveThumb(closestThumb, percent)
 
   function onPointermove(moveEvent: PointerEvent) {
     if (!scale.value) return
 
     const movePosition = moveEvent.clientX - getCoords(scale.value).left
-    const movePositionPercent = movePosition / (scaleWidth.value / 100)
-    moveThumb(closestThumb, movePositionPercent)
+    const { percent: movePercent } = getPositionData(movePosition)
+    moveThumb(closestThumb, movePercent)
   }
   function onPointerup() {
     document.removeEventListener('pointermove', onPointermove)

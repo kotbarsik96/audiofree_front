@@ -1,6 +1,12 @@
 .input-range {
+  --thumb-size: 1.25rem;
+
   position: relative;
 
+  &__scale-wrapper {
+    background-color: var(--stroke);
+    border-radius: 60px;
+  }
   &__scale {
     cursor: pointer;
     position: relative;
@@ -9,6 +15,10 @@
     height: 0.35rem;
     display: flex;
     align-items: center;
+  }
+  &__scale--db-range {
+    width: calc(100% - var(--thumb-size));
+    background-color: transparent;
   }
 
   &__bar {
@@ -20,21 +30,21 @@
     border-radius: 60px;
     width: 50%;
     z-index: 10;
+    transform: translateX(calc(var(--thumb-size) / 2));
   }
 
   &__thumb {
     position: absolute;
     border-radius: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    width: 1.25rem;
-    height: 1.25rem;
+    width: var(--thumb-size);
+    height: var(--thumb-size);
     touch-action: none;
     z-index: 20;
     background-color: var(--white);
     border: 3px solid var(--primary);
     transition-property: background-color, border-color;
-    transition-duration: .2s;
+    transition-duration: 0.2s;
   }
   &__thumb.grabbed,
   &__thumb:hover {
