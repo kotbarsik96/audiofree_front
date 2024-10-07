@@ -1,4 +1,4 @@
-export default interface IFiltersList {
+export default interface IFilterItem {
   id?: number
   name: string
   slug: string
@@ -9,4 +9,6 @@ export default interface IFiltersList {
     value: string
     value_slug: string
   }[]
+  min?: number
+  max?: number
 }

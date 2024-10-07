@@ -54,7 +54,11 @@ const _valueMax = computed({
     emit('update:valueMin', value)
   },
 })
+const coverage = computed(() => props.max - props.min)
 
+/** от ширины шкалы зависит размер заполняющей её полоски и положения ползунков
+ * поэтому это значение обновляется при событии resize у window
+ */
 const scaleWidth = ref(0)
 
 const grabbed = ref({
@@ -64,9 +68,8 @@ const grabbed = ref({
 
 const thumbPositions = ref({
   left: 0,
-  right: 0,
+  right: 100,
 })
-
 const thumbClass = computed(() => ({
   left: {
     grabbed: grabbed.value.left,
@@ -75,35 +78,35 @@ const thumbClass = computed(() => ({
     grabbed: grabbed.value.right,
   },
 }))
-
 const thumbStyle = computed(() => ({
   left: {
-    left: thumbPositions.value.left,
+    left: `${thumbPositions.value.left}%`,
   },
   right: {
-    left: thumbPositions.value.right,
+    left: `${thumbPositions.value.right}%`,
   },
 }))
 
 const barStyle = computed(() => ({
   width: `${Math.ceil(
-    (scaleWidth.value / 100) *
-      (thumbPositions.value.right - thumbPositions.value.left)
+    thumbPositions.value.right - thumbPositions.value.left
   )}%`,
+  left: `${thumbPositions.value.left}%`,
 }))
 
-watch(
-  () => props.valueMin,
-  () => {
-    if (_valueMin.value !== props.valueMin) _valueMin.value = props.valueMin
-  }
-)
-watch(
-  () => props.valueMax,
-  () => {
-    if (_valueMax.value !== props.valueMax) _valueMax.value = props.valueMax
-  }
-)
+// проверить корректность новых значений
+watch(_valueMin, () => {
+  if (_valueMin.value < props.min) _valueMin.value = props.min
+  if (_valueMin.value > _valueMax.value) _valueMin.value = _valueMax.value
+  
+  thumbPositions.value.left = _valueMin.value / (coverage.value / 100)
+})
+watch(_valueMax, () => {
+  if (_valueMax.value > props.max) _valueMax.value = props.max
+  if (_valueMax.value < _valueMin.value) _valueMax.value = _valueMin.value
+
+  thumbPositions.value.right = _valueMax.value / (coverage.value / 100)
+})
 
 onMounted(() => {
   if (scale.value) scale.value.ondragstart = () => false
@@ -121,10 +124,61 @@ onUnmounted(() => {
 function onWindowResize() {
   updateScaleWidth()
 }
-function onPointerdown() {}
 function updateScaleWidth() {
   if (scale.value) scaleWidth.value = scale.value.offsetWidth
   else scaleWidth.value = 0
+}
+
+function getClosestThumb(percent: number): 'left' | 'right' {
+  let closestThumb: 'left' | 'right' = 'left'
+  if (
+    thumbPositions.value.right - percent <=
+    percent - thumbPositions.value.left
+  )
+    closestThumb = 'right'
+
+  return closestThumb
+}
+function moveThumb(
+  closestThumb: 'left' | 'right',
+  eventPositionPercent: number
+) {
+  switch (closestThumb) {
+    case 'left':
+      _valueMin.value = (coverage.value / 100) * eventPositionPercent
+      break
+    case 'right':
+      _valueMax.value = (coverage.value / 100) * eventPositionPercent
+      break
+  }
+}
+function onPointerdown(event: PointerEvent) {
+  if (!scale.value) return
+
+  event.preventDefault()
+
+  const startPosition = event.clientX - getCoords(scale.value).left
+  const eventPositionPercent = startPosition / (scaleWidth.value / 100)
+  const closestThumb = getClosestThumb(eventPositionPercent)
+  grabbed.value[closestThumb] = true
+
+  document.addEventListener('pointermove', onPointermove)
+  document.addEventListener('pointerup', onPointerup)
+
+  moveThumb(closestThumb, eventPositionPercent)
+
+  function onPointermove(moveEvent: PointerEvent) {
+    if (!scale.value) return
+
+    const movePosition = moveEvent.clientX - getCoords(scale.value).left
+    const movePositionPercent = movePosition / (scaleWidth.value / 100)
+    moveThumb(closestThumb, movePositionPercent)
+  }
+  function onPointerup() {
+    document.removeEventListener('pointermove', onPointermove)
+    document.removeEventListener('pointerup', onPointerup)
+    grabbed.value[closestThumb] = false
+  }
 }
 </script>
 

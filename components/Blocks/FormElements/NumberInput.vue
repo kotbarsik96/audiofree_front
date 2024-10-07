@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -22,7 +22,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: "input", value: number): void
+  (e: 'input', value: number): void
 }>()
 
 const _maxFractionDigits = computed(() =>
@@ -55,16 +55,16 @@ function onInput(event: Event) {
   handleMinMax()
 
   target.value = emmitableNumber.toString()
-  emit("input", emmitableNumber)
+  emit('input', emmitableNumber)
 
   function handleSymbols() {
-    value = value.replace(symbolsRegexp.value, "")
+    value = value.replace(symbolsRegexp.value, '')
     emmitableNumber = toNumber(value)
   }
   function handleMaxFractionDigits() {
     if (!_maxFractionDigits.value) return
 
-    const fractionDigits = emmitableNumber.toString().split(".")[1]?.length || 0
+    const fractionDigits = emmitableNumber.toString().split('.')[1]?.length || 0
     if (fractionDigits > _maxFractionDigits.value)
       emmitableNumber = toNumber(
         emmitableNumber.toFixed(_maxFractionDigits.value)

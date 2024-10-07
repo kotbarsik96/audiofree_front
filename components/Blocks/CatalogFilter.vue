@@ -14,10 +14,22 @@
           <div class="ct-filter__section-name">
             {{ section.name }}
           </div>
-          <div class="ct-filter__section-body">
-            <CFilterCheckboxes v-if="section.type === 'checkbox'" />
-            <CFilterRadios v-else-if="section.type === 'radio'" />
-            <CFilterRange v-else-if="section.type === 'range'" />
+          <div
+            v-if="!!filterValues[section.slug]"
+            class="ct-filter__section-body"
+          >
+            <CFilterCheckboxes
+              v-if="section.type === 'checkbox'"
+              :slug="section.slug"
+            />
+            <CFilterRadios
+              v-else-if="section.type === 'radio'"
+              :slug="section.slug"
+            />
+            <CFilterRange
+              v-else-if="section.type === 'range'"
+              :slug="section.slug"
+            />
           </div>
         </div>
       </div>
@@ -30,15 +42,11 @@
 import CFilterCheckboxes from '~/components/Blocks/CatalogFilter/CFilterCheckboxes.vue'
 import CFilterRadios from '~/components/Blocks/CatalogFilter/CFilterRadios.vue'
 import FilterIcon from '~/assets/images/icons/filter.svg'
-import { Product } from '~/domain/product/Product'
-import type IFiltersList from '~/domain/product/types/IFiltersList'
 import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
+import { useCatalogStore } from '~/stores/catalogStore'
 
-const productsService = new Product()
-
-const { data } = await productsService.getCatalogFilters()
-
-const filters = ref<IFiltersList[] | null>(data.value)
+const catalogStore = useCatalogStore()
+const { filters, filterValues } = storeToRefs(catalogStore)
 
 const mobileShown = ref(false)
 
@@ -47,6 +55,8 @@ const bodyHeight = ref('0px')
 const className = computed(() => ({
   shown: mobileShown.value,
 }))
+
+await catalogStore.getFilters()
 
 function toggleShown() {
   mobileShown.value = !mobileShown.value

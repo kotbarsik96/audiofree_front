@@ -1,7 +1,7 @@
 import { useAPI } from '#imports'
 import type IPagination from '~/dataAccess/api/IPagination'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
-import type IFiltersList from '~/domain/product/types/IFiltersList'
+import type IFilterItem from '~/domain/product/types/IFilterItem'
 
 export class Product {
   public async getBestsellers(amount: number = 3) {
@@ -31,10 +31,10 @@ export class Product {
   }
 
   public async getCatalogFilters() {
-    const { data, error, status } = await useAPI<IFiltersList[]>(
+    const { data, error, status } = await useAPI<{ data: IFilterItem[] }>(
       '/products/catalog/filters'
     )
 
-    return { data, error, status }
+    return { data: data.value?.data, error, status }
   }
 }
