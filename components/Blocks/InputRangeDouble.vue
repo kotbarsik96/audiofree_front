@@ -1,7 +1,11 @@
 <template>
   <div class="input-range input-range--db">
     <div class="input-range__scale-wrapper">
-      <div class="input-range__scale input-range__scale--db-range" @pointerdown="onPointerdown" ref="scale">
+      <div
+        class="input-range__scale input-range__scale--db-range"
+        @pointerdown="onPointerdown"
+        ref="scale"
+      >
         <div class="input-range__bar" :style="barStyle"></div>
         <div
           class="input-range__thumb"
@@ -158,12 +162,16 @@ function moveThumb(
   closestThumb: 'left' | 'right',
   eventPositionPercent: number
 ) {
+  let nextValue = (coverage.value / 100) * eventPositionPercent
+  if (nextValue < props.min) nextValue = props.min
+  if (nextValue > props.max) nextValue = props.max
+
   switch (closestThumb) {
     case 'left':
-      _valueMin.value = (coverage.value / 100) * eventPositionPercent
+      _valueMin.value = nextValue
       break
     case 'right':
-      _valueMax.value = (coverage.value / 100) * eventPositionPercent
+      _valueMax.value = nextValue
       break
   }
 }
