@@ -3,15 +3,6 @@
     <div class="cf-range__inputs">
       <NumberInput
         class="cf-range__input"
-        :min="-5105"
-        :max="filterValues[slug].max"
-        :max-fraction-digits="2"
-        v-model="test"
-        lazy
-      />
-
-      <NumberInput
-        class="cf-range__input"
         :min="filters[slug].min"
         :max="filterValues[slug].max"
         v-model="filterValues[slug][0]"
@@ -27,11 +18,7 @@
       />
     </div>
     <div class="cf-range__range">
-      <InputRangeDouble
-        v-model="filterValues[slug]"
-        :min="min"
-        :max="max"
-      />
+      <InputRangeDouble v-model="filterValues[slug]" :min="min" :max="max" />
     </div>
   </div>
 </template>
