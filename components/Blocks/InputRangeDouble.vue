@@ -25,15 +25,13 @@ import { computed, onMounted, ref } from 'vue'
 import { getCoords } from '~/utils/getCoords'
 
 const props = defineProps<{
-  valueMin: number
-  valueMax: number
+  modelValue: number[]
   min: number
   max: number
 }>()
 
 const emit = defineEmits<{
-  (emit: 'update:valueMin', value: number): void
-  (emit: 'update:valueMax', value: number): void
+  (emit: 'update:modelValue', value: number[]): void
 }>()
 
 const scale = ref<HTMLElement>()
@@ -42,21 +40,23 @@ const thumbRight = ref<HTMLElement>()
 
 const _valueMin = computed({
   get() {
-    return props.valueMin
+    return props.modelValue[0]
   },
   set(value) {
-    emit('update:valueMin', handleValue(value))
+    emit('update:modelValue', [handleValue(value), _valueMax.value])
   },
 })
 const _valueMax = computed({
   get() {
-    return props.valueMax
+    return props.modelValue[1]
   },
   set(value) {
-    emit('update:valueMax', handleValue(value))
+    emit('update:modelValue', [_valueMin.value, handleValue(value)])
   },
 })
+/** числовое значение 100% */
 const coverage = computed(() => props.max - props.min)
+/** сдвиг до начала ползунка */
 const shift = computed(() => props.min / (coverage.value / 100))
 
 /** от ширины шкалы зависит размер заполняющей её полоски и положения ползунков

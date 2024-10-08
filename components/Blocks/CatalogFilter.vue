@@ -39,6 +39,8 @@
 </template>
 
 <script setup lang="ts">
+import AFButton from '~/components/Blocks/AFButton.vue'
+import AFIcon from '~/components/Blocks/AFIcon.vue'
 import CFilterCheckboxes from '~/components/Blocks/CatalogFilter/CFilterCheckboxes.vue'
 import CFilterRadios from '~/components/Blocks/CatalogFilter/CFilterRadios.vue'
 import FilterIcon from '~/assets/images/icons/filter.svg'

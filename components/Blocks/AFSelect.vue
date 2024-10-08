@@ -103,12 +103,12 @@ function toggle() {
   z-index: 50;
   border-radius: 9px;
   background-color: var(--white);
-  border: var(--border-width) solid var(--select-border-color);
+  border: var(--border-width) solid var(--input-border-color);
   @include fontSize(16);
   transition: var(--general-transition);
 
   &.shown {
-    border-color: var(--select-border-color-active);
+    border-color: var(--input-border-color-active);
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
@@ -151,7 +151,7 @@ function toggle() {
     top: 100%;
     left: calc(var(--border-width) * -1);
     right: calc(var(--border-width) * -1);
-    border: 1px solid var(--select-border-color);
+    border: 1px solid var(--input-border-color);
     border-top: 0px;
     border-bottom-left-radius: var(--border-radius);
     border-bottom-right-radius: var(--border-radius);
@@ -165,7 +165,7 @@ function toggle() {
       align-items: center;
       gap: 0.625rem;
       color: var(--black);
-      border-bottom: 1px solid var(--select-border-color);
+      border-bottom: 1px solid var(--input-border-color);
       transition: var(--general-transition);
 
       &:hover {
@@ -184,7 +184,7 @@ function toggle() {
     }
   }
   &.shown &__options {
-    border-color: var(--select-border-color-active);
+    border-color: var(--input-border-color-active);
   }
 }
 </style>

@@ -24,8 +24,10 @@
   --rating-fill-color: #ffc107;
   --breadcrumbs-color: #b3b3b3;
   --border-footer-color: #383050;
-  --select-border-color: #dadada;
-  --select-border-color-active: var(--primary);
+  --input-border-color: #dadada;
+  --input-border-color-active: var(--primary);
+  --input-placeholder-color: #808080;
+  --input-text-color: var(--black);
 
   // transitions
   --general-transition: all 0.25s ease;

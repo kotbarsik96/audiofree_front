@@ -1,14 +1,34 @@
 <template>
   <div v-if="!!filterValues[slug]" class="cf-range">
-    <!-- <div class="cf-range__inputs">
-      <NumberInput :min="filters[slug].min" :max="filterValues[slug].max" />
+    <div class="cf-range__inputs">
+      <NumberInput
+        class="cf-range__input"
+        :min="-5105"
+        :max="filterValues[slug].max"
+        :max-fraction-digits="2"
+        v-model="test"
+        lazy
+      />
+
+      <NumberInput
+        class="cf-range__input"
+        :min="filters[slug].min"
+        :max="filterValues[slug].max"
+        v-model="filterValues[slug][0]"
+        lazy
+      />
       <div class="cf-range__inputs-delimeter">–</div>
-      <NumberInput :min="filterValues[slug].min" :max="filters[slug].max" />
-    </div> -->
+      <NumberInput
+        class="cf-range__input"
+        :min="filterValues[slug].min"
+        :max="filters[slug].max"
+        v-model="filterValues[slug][1]"
+        lazy
+      />
+    </div>
     <div class="cf-range__range">
       <InputRangeDouble
-        v-model:valueMin="filterValues[slug].min"
-        v-model:valueMax="filterValues[slug].max"
+        v-model="filterValues[slug]"
         :min="min"
         :max="max"
       />
@@ -26,6 +46,8 @@ const props = defineProps<{
   slug: string
 }>()
 
+const test = ref()
+
 const { filterValues, filters } = storeToRefs(useCatalogStore())
 
 const min = computed(() => Math.floor(filters.value[props.slug].min as number))
@@ -39,6 +61,10 @@ const max = computed(() => Math.floor(filters.value[props.slug].max as number))
     gap: 0.75rem;
     align-items: center;
     margin-bottom: 2rem;
+  }
+
+  &__input {
+    max-width: 6.25rem;
   }
 
   &__inputs-delimeter {

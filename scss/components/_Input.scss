@@ -1,0 +1,14 @@
+.input {
+  border-radius: 9px;
+  border: 1px solid var(--input-border-color);
+  padding: 0.7rem 1rem;
+  color: var(--input-text-color);
+  width: 100%;
+  outline: none;
+  background-color: var(--white);
+  @include fontSize(16);
+
+  &::placeholder {
+    color: var(--input-placeholder-color);
+  }
+}

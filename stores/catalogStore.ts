@@ -26,10 +26,7 @@ export const useCatalogStore = defineStore('catalogStore', () => {
             filterValues.value[filterItem.slug] = []
           }
           if (filterItem.type === 'range') {
-            filterValues.value[filterItem.slug] = {
-              min: filterItem.min,
-              max: filterItem.max,
-            }
+            filterValues.value[filterItem.slug] = [filterItem.min, filterItem.max]
           }
         }
       })
