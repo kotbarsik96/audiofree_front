@@ -2,7 +2,8 @@ export default interface IFilterItem {
   id?: number
   name: string
   slug: string
-  type: 'checkbox' | 'radio' | 'range'
+  type: 'checkbox' | 'checkbox_boolean' | 'radio' | 'range'
+  booleanCheckbox?: boolean
   values: {
     id?: number
     slug?: string

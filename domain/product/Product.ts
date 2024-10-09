@@ -22,7 +22,7 @@ export class Product {
       '/products/catalog',
       {
         params: {
-          per_page: 12,
+          per_page: 9,
         },
       }
     )

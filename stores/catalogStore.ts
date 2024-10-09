@@ -22,11 +22,22 @@ export const useCatalogStore = defineStore('catalogStore', () => {
     if (filtersArr.value) {
       filtersArr.value.forEach((filterItem) => {
         if (!filterValues.value[filterItem.slug]) {
-          if (filterItem.type === 'checkbox') {
-            filterValues.value[filterItem.slug] = []
-          }
-          if (filterItem.type === 'range') {
-            filterValues.value[filterItem.slug] = [filterItem.min, filterItem.max]
+          switch (filterItem.type) {
+            case 'radio':
+              filterValues.value[filterItem.slug] = filterItem.values[0]?.value_slug || ''
+              break
+            case 'checkbox':
+              filterValues.value[filterItem.slug] = []
+              break
+            case 'checkbox_boolean':
+              filterValues.value[filterItem.slug] = false
+              break
+            case 'range':
+              filterValues.value[filterItem.slug] = [
+                filterItem.min,
+                filterItem.max,
+              ]
+              break
           }
         }
       })

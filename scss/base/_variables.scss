@@ -31,4 +31,7 @@
 
   // transitions
   --general-transition: all 0.25s ease;
+  --spoiler-body-transition-property: max-height, padding;
+  --spoiler-body-transition-duration: 0.25s;
+  --spoiler-body-transition-tfunc: ease;
 }

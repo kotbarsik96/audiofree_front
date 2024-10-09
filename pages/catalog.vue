@@ -6,18 +6,18 @@
           <CatalogFilter />
           <!-- карточка ads -->
         </aside>
-        <div class="catalog__main">
-          <div class="catalog__main-header">
-            <div class="_page-header">
-              <BreadCrumbs />
-              <h1 class="_page-header__title">Каталог</h1>
-            </div>
-            <AFSelect
-              :options="options"
-              v-model="sortType"
-              v-model:shown="selectShown"
-            />
+        <div class="catalog__page-header">
+          <div class="_page-header">
+            <BreadCrumbs />
+            <h1 class="_page-header__title">Каталог</h1>
           </div>
+          <AFSelect
+            :options="options"
+            v-model="sortType"
+            v-model:shown="selectShown"
+          />
+        </div>
+        <div class="catalog__main">
           <div class="catalog__main-body">
             <div class="catalog__cards">
               <ProductCard
@@ -98,20 +98,21 @@ if (data) productsData.value = data.value
   &__inner {
     display: grid;
     grid-template-columns: var(--column-width) 1fr;
-    gap: 2rem;
+    grid-template-rows: repeat(2, auto);
+    gap: 1.25rem 2rem;
+    padding-bottom: 5rem;
   }
 
   &__sidebar {
+    grid-row: 1 / -1;
   }
 
-  &__main {
-  }
-
-  &__main-header {
+  &__page-header {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    margin-bottom: 1.25rem;
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
 
     :deep(.select) {
       width: 100%;
@@ -119,20 +120,58 @@ if (data) productsData.value = data.value
     }
   }
 
-  &__main-body {
+  &__main {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
   }
 
   &__cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
     gap: 1rem;
+    justify-content: center;
+
+    :deep(.product-card) {
+      margin: 0 auto;
+    }
   }
 
   &__pagination {
+    margin-top: 4.75rem;
   }
 
   @include adaptive(tablet-big) {
-    &__cards {
+    &__page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: -1.25rem;
+      gap: 1rem;
+
+      .select {
+        margin: 0 auto;
+        max-width: 25rem;
+      }
+    }
+
+    &__inner {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding-bottom: 2rem;
+    }
+
+    &__sidebar {
+      grid-column: 1 / -1;
+      grid-row: span 1;
+    }
+
+    &__page-header {
+      grid-column: 1 / -1;
+      grid-row: 1 / 2;
+    }
+
+    &__main {
+      grid-column: 1 / -1;
+      grid-row: span 1;
     }
   }
 }
