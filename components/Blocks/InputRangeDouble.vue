@@ -73,10 +73,10 @@ const grabbed = ref({
   right: false,
 })
 
-const thumbPositions = ref({
-  left: 0,
-  right: 100,
-})
+const thumbPositions = computed(() => ({
+  left: _valueMin.value / (coverage.value / 100) - shift.value,
+  right: _valueMax.value / (coverage.value / 100) - shift.value,
+}))
 const thumbClass = computed(() => ({
   left: {
     grabbed: grabbed.value.left,
@@ -105,16 +105,10 @@ const barStyle = computed(() => ({
 watch(_valueMin, () => {
   if (_valueMin.value < props.min) _valueMin.value = props.min
   if (_valueMin.value > _valueMax.value) _valueMin.value = _valueMax.value
-
-  thumbPositions.value.left =
-    _valueMin.value / (coverage.value / 100) - shift.value
 })
 watch(_valueMax, () => {
   if (_valueMax.value > props.max) _valueMax.value = props.max
   if (_valueMax.value < _valueMin.value) _valueMax.value = _valueMin.value
-
-  thumbPositions.value.right =
-    _valueMax.value / (coverage.value / 100) - shift.value
 })
 
 onMounted(() => {
