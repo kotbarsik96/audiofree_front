@@ -34,8 +34,8 @@ export const useCatalogStore = defineStore('catalogStore', () => {
               break
             case 'range':
               filterValues.value[filterItem.slug] = [
-                filterItem.min,
-                filterItem.max,
+                Math.floor(filterItem.min || 0),
+                Math.floor(filterItem.max || 0),
               ]
               break
           }

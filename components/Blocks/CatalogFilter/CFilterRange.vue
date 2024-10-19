@@ -3,7 +3,8 @@
     <div class="cf-range__inputs">
       <NumberInput
         class="cf-range__input"
-        :min="filters[slug].min"
+        :min="Math.floor(filters[slug].min || 0)"
+        :maxFractionDigits="2"
         :max="filterValues[slug].max"
         v-model="filterValues[slug][0]"
         lazy
@@ -12,7 +13,8 @@
       <NumberInput
         class="cf-range__input"
         :min="filterValues[slug].min"
-        :max="filters[slug].max"
+        :maxFractionDigits="2"
+        :max="Math.floor(filters[slug].max || 0)"
         v-model="filterValues[slug][1]"
         lazy
       />
@@ -32,8 +34,6 @@ import { storeToRefs } from '#imports'
 const props = defineProps<{
   slug: string
 }>()
-
-const test = ref()
 
 const { filterValues, filters } = storeToRefs(useCatalogStore())
 

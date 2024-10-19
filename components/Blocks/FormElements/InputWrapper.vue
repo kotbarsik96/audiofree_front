@@ -77,8 +77,6 @@ const className = computed(() => {
     color: var(--primary);
     width: var(--input-icon-size);
     height: var(--input-icon-size);
-    width: var(--input-icon-size);
-    height: var(--input-icon-size);
     transition: var(--general-transition);
   }
   &__icon + :deep(.input) {

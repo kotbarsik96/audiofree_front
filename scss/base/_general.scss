@@ -106,3 +106,14 @@ html {
     box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.1);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::after,
+  *::before {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
