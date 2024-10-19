@@ -4,6 +4,7 @@ import { Product } from '~/domain/product/Product'
 import type IFilterItem from '~/domain/product/types/IFilterItem'
 
 export const useCatalogStore = defineStore('catalogStore', () => {
+  const router = useRouter()
   const productsService = new Product()
 
   const filtersArr = ref<IFilterItem[] | null>()
@@ -19,12 +20,16 @@ export const useCatalogStore = defineStore('catalogStore', () => {
   async function getFilters() {
     const { data } = await productsService.getCatalogFilters()
     filtersArr.value = data
+    mapFilterValuesToInputs()
+  }
+  function mapFilterValuesToInputs() {
     if (filtersArr.value) {
       filtersArr.value.forEach((filterItem) => {
         if (!filterValues.value[filterItem.slug]) {
           switch (filterItem.type) {
             case 'radio':
-              filterValues.value[filterItem.slug] = filterItem.values[0]?.value_slug || ''
+              filterValues.value[filterItem.slug] =
+                filterItem.values[0]?.value_slug || ''
               break
             case 'checkbox':
               filterValues.value[filterItem.slug] = []
