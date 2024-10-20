@@ -4,7 +4,7 @@
       <AFRadio
         :label="item.value"
         :value="item.value_slug"
-        v-model="filterValues[slug]"
+        v-model="state"
       />
     </li>
   </ul>
@@ -12,13 +12,23 @@
 
 <script setup lang="ts">
 import AFRadio from '~/components/Blocks/FormElements/AFRadio.vue'
-import { useCatalogStore } from '~/stores/catalogStore'
+import { injectStrict } from '~/utils/general'
+import { FiltersDataKey } from '~/domain/product/catalog/IInjectFiltersData'
 
 const props = defineProps<{
   slug: string
 }>()
 
-const { filterValues, filters } = useCatalogStore()
+const state = computed({
+  get() {
+    return filterValues.value[props.slug]
+  },
+  set(v) {
+    updateFilters(props.slug, v)
+  },
+})
+
+const { filterValues, filters, updateFilters } = injectStrict(FiltersDataKey)
 </script>
 
 <style lang="scss" scoped>

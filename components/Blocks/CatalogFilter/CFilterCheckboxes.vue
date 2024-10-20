@@ -5,12 +5,12 @@
         v-if="type === 'checkbox'"
         :value="item.value_slug"
         :label="item.value"
-        v-model="filterValues[slug]"
+        v-model="state"
       />
       <AFCheckbox
         v-if="type === 'checkbox_boolean'"
         :label="item.value"
-        v-model="filterValues[slug]"
+        v-model="state"
       />
     </li>
   </ul>
@@ -18,14 +18,24 @@
 
 <script setup lang="ts">
 import AFCheckbox from '~/components/Blocks/FormElements/AFCheckbox.vue'
-import { useCatalogStore } from '~/stores/catalogStore'
+import { injectStrict } from '~/utils/general'
+import { FiltersDataKey } from '~/domain/product/catalog/IInjectFiltersData'
 
 const props = defineProps<{
   slug: string
   type: 'checkbox' | 'checkbox_boolean'
 }>()
 
-const { filterValues, filters } = useCatalogStore()
+const { filters, filterValues, updateFilters } = injectStrict(FiltersDataKey)
+
+const state = computed({
+  get(){
+    return filterValues.value[props.slug]
+  },
+  set(v){
+    updateFilters(props.slug, v)
+  }
+})
 </script>
 
 <style lang="scss" scoped>

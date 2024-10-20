@@ -1,17 +1,15 @@
 import { defineStore } from '#imports'
 import { ref, computed } from '#imports'
-import { Product } from '~/domain/product/Product'
 import type IFilterItem from '~/domain/product/types/IFilterItem'
 
 export const useCatalogStore = defineStore('catalogStore', () => {
   const router = useRouter()
   const route = useRoute()
-  const productsService = new Product()
 
-  const filtersArr = ref<IFilterItem[] | null>()
+  const filtersArr = ref<IFilterItem[]>([])
   const filters = computed(() => {
     let obj: Record<string, IFilterItem> = {}
-    filtersArr.value?.forEach((filterItem) => {
+    filtersArr.value.forEach((filterItem) => {
       obj[filterItem.slug] = filterItem
     })
     return obj
@@ -20,8 +18,9 @@ export const useCatalogStore = defineStore('catalogStore', () => {
 
   watch(filterValues, updateUrlQuery, { deep: true })
 
-  async function getFilters() {
-    const { data } = await productsService.getCatalogFilters()
+  mapFilterValuesToInputs()
+
+  function setFilters(data: IFilterItem[]) {
     filtersArr.value = data
     mapFilterValuesToInputs()
   }
@@ -30,44 +29,44 @@ export const useCatalogStore = defineStore('catalogStore', () => {
    * если нет - выставит первые из filterValues (для radio, range)
    */
   function mapFilterValuesToInputs() {
-    if (filtersArr.value) {
-      filtersArr.value.forEach((filterItem) => {
-        const slug = filterItem.slug
+    filtersArr.value.forEach((filterItem) => {
+      const slug = filterItem.slug
 
-        switch (filterItem.type) {
-          case 'radio':
-            filterValues.value[slug] =
-              route.query[slug] || filterItem.values[0]?.value_slug || ''
-            break
-          case 'checkbox':
-            filterValues.value[slug] =
-              typeof route.query[slug] === 'string'
-                ? [route.query[slug]]
-                : route.query[slug] || []
-            break
-          case 'checkbox_boolean':
-            filterValues.value[slug] =
-              route.query[slug] === 'false' ? false : !!route.query[slug]
-            break
-          case 'range':
-            let [min, max] = getRangeValues(slug, filterItem)
-            filterValues.value[slug] = [Math.floor(min), Math.floor(max)]
-            break
-        }
-      })
-    }
+      switch (filterItem.type) {
+        case 'radio':
+          filterValues.value[slug] =
+            route.query[slug] || filterItem.values[0]?.value_slug || ''
+          break
+        case 'checkbox':
+          filterValues.value[slug] =
+            typeof route.query[slug] === 'string'
+              ? [route.query[slug]]
+              : route.query[slug] || []
+          break
+        case 'checkbox_boolean':
+          filterValues.value[slug] =
+            route.query[slug] === 'false' ? false : !!route.query[slug]
+          break
+        case 'range':
+          let [min, max] = getRangeValues(slug, filterItem)
+          filterValues.value[slug] = [Math.floor(min), Math.floor(max)]
+          break
+      }
+    })
   }
   function getRangeValues(slug: string, filterItem: IFilterItem): number[] {
     let rangeValues
 
-    // пришёл массив двух чисел (но в query они в виде строк)
+    // в query пришёл массив двух числе (там они в виде строк)
     if (Array.isArray(route.query[slug]))
       rangeValues = route.query[slug].map((str) => Number(str))
-    // пришло только одно строковое число
-    else {
+    // в query только одно строковое число
+    else if (!!route.query[slug]) {
       const num = Number(route.query[slug]) || 0
       rangeValues = [num, num]
     }
+    // в query нет ничего - выставить значения из фильтров
+    else rangeValues = [filterItem.min || 0, filterItem.max || 0]
 
     // далее проверить, что не меньше min и не больше max, и не перекрывают друг друга
     if (filterItem.min && rangeValues[0] < filterItem.min)
@@ -88,6 +87,6 @@ export const useCatalogStore = defineStore('catalogStore', () => {
   return {
     filters,
     filterValues,
-    getFilters,
+    setFilters,
   }
 })

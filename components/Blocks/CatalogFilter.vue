@@ -43,11 +43,18 @@
               </div>
             </div>
           </div>
-          <AFButton
-            class="ct-filter__button"
-            styleType="secondary"
-            label="Очистить фильтр"
-          />
+          <div class="ct-filter__buttons">
+            <AFButton
+              class="ct-filter__button"
+              label="Применить фильтр"
+              @click="execute"
+            />
+            <AFButton
+              class="ct-filter__button"
+              styleType="secondary"
+              label="Очистить фильтр"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -61,22 +68,22 @@ import CFilterCheckboxes from '~/components/Blocks/CatalogFilter/CFilterCheckbox
 import CFilterRadios from '~/components/Blocks/CatalogFilter/CFilterRadios.vue'
 import FilterIcon from '~/assets/images/icons/filter.svg'
 import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
-import { useCatalogStore } from '~/stores/catalogStore'
+import type IFilterItem from '~/domain/product/types/IFilterItem'
+import { provide } from 'vue'
+import { FiltersDataKey } from '~/domain/product/catalog/IInjectFiltersData'
+import type { LocationQuery, LocationQueryValue } from 'vue-router'
 
-const catalogStore = useCatalogStore()
-const { filters, filterValues } = storeToRefs(catalogStore)
+const route = useRoute()
+const router = useRouter()
 
 const bodyEl = ref<HTMLElement>()
 
 const mobileShown = ref(false)
-
 const bodyMobileHeight = ref('0px')
 
 const className = computed(() => ({
   shown: mobileShown.value,
 }))
-
-await catalogStore.getFilters()
 
 watch(mobileShown, () => {
   if (mobileShown.value)
@@ -84,8 +91,119 @@ watch(mobileShown, () => {
   else bodyMobileHeight.value = '0px'
 })
 
+const filterValues = ref(mapFilterValuesFromQuery())
+const { data: filtersArr, execute } = await useAPI<{ data: IFilterItem[] }>(
+  `/products/catalog/update-filters`,
+  {
+    method: 'POST',
+    body: filterValues,
+    watch: false,
+    // onRequest({ options }) {
+    //   options.body = filterValues.value
+    // },
+  }
+)
+// filtersArr, но в виде объекта, где slug каждого элемента массива - ключ
+const filters = computed(() => {
+  let obj: Record<string, IFilterItem> = {}
+  filtersArr.value?.data.forEach((filterItem) => {
+    obj[filterItem.slug] = filterItem
+  })
+  return obj
+})
+
+provide(FiltersDataKey, {
+  filters,
+  filterValues,
+  updateFilters(slug: string, value: any) {
+    filterValues.value[slug] = value
+  },
+})
+
+watch(filterValues, updateUrlQuery)
+
 function toggleShown() {
   mobileShown.value = !mobileShown.value
+}
+// берёт текущие выставленные в query значения
+function mapFilterValuesFromQuery() {
+  // указать те возможные ключи в query, которые не являются slug'ами для фильтров
+  const reservedKeys = ['per_page', 'page']
+
+  let obj: Record<string, any> = {}
+  Object.entries(route.query).forEach(([slug, value]) => {
+    if (reservedKeys.includes(slug)) return
+    obj[slug] = parseStringValue(value)
+  })
+  return obj
+}
+// выставит полученные из запроса значения в фильтры
+function mapFiltersArrToInputs() {
+  filtersArr.value?.data.forEach((filterItem) => {
+    const slug = filterItem.slug
+
+    if (!filterValues.value[slug]) {
+      switch (filterItem.type) {
+        case 'radio':
+          filterValues.value[slug] = filterItem.values[0]?.value_slug
+          break
+        case 'range':
+          let [min, max] = getRangeValues(slug, filterItem)
+          filterValues.value[slug] = [Math.floor(min), Math.floor(max)]
+          break
+      }
+    }
+  })
+}
+function getRangeValues(slug: string, filterItem: IFilterItem): number[] {
+  let rangeValues
+
+  // в query пришёл массив двух числе (там они в виде строк)
+  if (Array.isArray(route.query[slug]))
+    rangeValues = route.query[slug].map((str) => Number(str))
+  // в query только одно строковое число
+  else if (!!route.query[slug]) {
+    const num = Number(route.query[slug]) || 0
+    rangeValues = [num, num]
+  }
+  // в query нет ничего - выставить значения из фильтров
+  else rangeValues = [filterItem.min || 0, filterItem.max || 0]
+
+  // далее проверить, что не меньше min и не больше max, и не перекрывают друг друга
+  if (filterItem.min && rangeValues[0] < filterItem.min)
+    rangeValues[0] = filterItem.min
+  if (filterItem.max && rangeValues[1] > filterItem.max)
+    rangeValues[1] = filterItem.max
+  if (rangeValues[0] > rangeValues[1]) rangeValues[0] = rangeValues[1]
+
+  return rangeValues
+}
+/** если value - строка, пытается парсить её в false, true, Number(). При неудаче вернёт строку
+ * если value - массив, проделает вышеописанное с его значениями
+ */
+function parseStringValue(
+  value: LocationQueryValue | LocationQueryValue[]
+): string | number | LocationQueryValue | LocationQueryValue[] {
+  let _value: any = value
+
+  if (typeof value === 'string') {
+    if (value === 'false') _value = false
+    else if (value === 'true') _value = true
+    else {
+      const num = Number(value)
+      _value = isNaN(num) ? value : num
+    }
+  }
+  if (Array.isArray(value))
+    _value = value.map((subValue) =>
+      parseStringValue(subValue)
+    ) as LocationQueryValue[]
+
+  return _value
+}
+function updateUrlQuery() {
+  const query = Object.assign(route.query, filterValues.value)
+  router.push({ name: route.name, query })
 }
 </script>
 
@@ -135,10 +253,16 @@ function toggleShown() {
     margin-bottom: 1.25rem;
   }
 
-  &__button {
+  &__buttons {
+    display: flex;
+    flex-direction: column;
+    margin: 0 1rem;
+    gap: 0.625rem;
+    max-width: 250px;
     margin: 0 auto;
-    display: block;
+  }
 
+  &__button {
     :deep(span) {
       font-weight: 500;
     }

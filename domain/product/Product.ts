@@ -29,12 +29,4 @@ export class Product {
 
     return { data, error, status }
   }
-
-  public async getCatalogFilters() {
-    const { data, error, status } = await useAPI<{ data: IFilterItem[] }>(
-      '/products/catalog/filters'
-    )
-
-    return { data: data.value?.data, error, status }
-  }
 }
