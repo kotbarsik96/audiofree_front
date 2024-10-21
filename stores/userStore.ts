@@ -23,9 +23,9 @@ export const useUserStore = defineStore('user', () => {
     isLoading.value = true;
 
     const { user, error, status } = await userService.getUser();
-    console.log(user.value);
-    console.log(status.value);
-    console.error(error.value);
+    // console.log(user.value);
+    // console.log(status.value);
+    // console.error(error.value);
 
     isLoading.value = false;
   }

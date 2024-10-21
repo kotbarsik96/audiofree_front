@@ -71,7 +71,7 @@ import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
 import type IFilterItem from '~/domain/product/types/IFilterItem'
 import { provide } from 'vue'
 import { FiltersDataKey } from '~/domain/product/catalog/IInjectFiltersData'
-import type { LocationQuery, LocationQueryValue } from 'vue-router'
+import type { LocationQueryValue } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
@@ -91,13 +91,33 @@ watch(mobileShown, () => {
   else bodyMobileHeight.value = '0px'
 })
 
-const filterValues = ref(mapFilterValuesFromQuery())
+/** вернёт route.query, но некоторые строки распрарсит в number и boolean
+ * также не будет включать в себя per_page и page
+ */
+const routeQueryParsed = computed(() => {
+  // указать те возможные ключи в query, которые не являются slug'ами для фильтров
+  const reservedKeys = ['per_page', 'page']
+
+  let obj: Record<string, any> = {}
+  Object.entries(route.query).forEach(([slug, value]) => {
+    if (reservedKeys.includes(slug)) return
+    obj[slug] = parseStringValue(value)
+  })
+  return obj
+})
+
+// значения фильтров, выставляемые пользователем
+const filterValues = useState<Record<string, any>>('filter-values', () => ({}))
+
 const { data: filtersArr, execute } = await useAPI<{ data: IFilterItem[] }>(
   `/products/catalog/update-filters`,
   {
     method: 'POST',
-    body: filterValues,
+    body: routeQueryParsed,
     watch: false,
+    async onResponse({ response }) {
+      mapFiltersArrToInputs(response._data.data || [])
+    },
     // onRequest({ options }) {
     //   options.body = filterValues.value
     // },
@@ -120,36 +140,43 @@ provide(FiltersDataKey, {
   },
 })
 
-watch(filterValues, updateUrlQuery)
+watch(filterValues, updateUrlQuery, { deep: true })
 
 function toggleShown() {
   mobileShown.value = !mobileShown.value
 }
-// берёт текущие выставленные в query значения
-function mapFilterValuesFromQuery() {
-  // указать те возможные ключи в query, которые не являются slug'ами для фильтров
-  const reservedKeys = ['per_page', 'page']
-
-  let obj: Record<string, any> = {}
-  Object.entries(route.query).forEach(([slug, value]) => {
-    if (reservedKeys.includes(slug)) return
-    obj[slug] = parseStringValue(value)
-  })
-  return obj
-}
-// выставит полученные из запроса значения в фильтры
-function mapFiltersArrToInputs() {
-  filtersArr.value?.data.forEach((filterItem) => {
+/** заполнит пустые/отсутствующие поля в filterValues данными
+ * сначала попробует взять из routeQueryParsed
+ * если там данных по slug'у нет, возьмёт первое значение из arr[arr.indexOf(filterItem)]
+ */
+function mapFiltersArrToInputs(arr: IFilterItem[]) {
+  arr.forEach((filterItem) => {
     const slug = filterItem.slug
 
-    if (!filterValues.value[slug]) {
+    if (
+      !filterValues.value[slug] &&
+      typeof filterValues.value[slug] !== 'boolean'
+    ) {
+      const valueInQuery = routeQueryParsed.value[slug]
+
       switch (filterItem.type) {
         case 'radio':
-          filterValues.value[slug] = filterItem.values[0]?.value_slug
+          filterValues.value[slug] =
+            valueInQuery || filterItem.values[0]?.value_slug
           break
         case 'range':
           let [min, max] = getRangeValues(slug, filterItem)
           filterValues.value[slug] = [Math.floor(min), Math.floor(max)]
+          break
+        case 'checkbox':
+          if (Array.isArray(valueInQuery))
+            filterValues.value[slug] = valueInQuery
+          else filterValues.value[slug] = []
+          break
+        case 'checkbox_boolean':
+          if (typeof valueInQuery === 'boolean')
+            filterValues.value[slug] = valueInQuery
+          else filterValues.value[slug] = false
           break
       }
     }
@@ -158,13 +185,13 @@ function mapFiltersArrToInputs() {
 function getRangeValues(slug: string, filterItem: IFilterItem): number[] {
   let rangeValues
 
-  // в query пришёл массив двух числе (там они в виде строк)
-  if (Array.isArray(route.query[slug]))
-    rangeValues = route.query[slug].map((str) => Number(str))
-  // в query только одно строковое число
-  else if (!!route.query[slug]) {
-    const num = Number(route.query[slug]) || 0
-    rangeValues = [num, num]
+  const valueInQuery = routeQueryParsed.value[slug]
+
+  // в query массив двух чисел
+  if (Array.isArray(valueInQuery)) rangeValues = valueInQuery
+  // в query только одно число
+  else if (!!valueInQuery) {
+    rangeValues = [valueInQuery, valueInQuery]
   }
   // в query нет ничего - выставить значения из фильтров
   else rangeValues = [filterItem.min || 0, filterItem.max || 0]
@@ -202,7 +229,14 @@ function parseStringValue(
   return _value
 }
 function updateUrlQuery() {
-  const query = Object.assign(route.query, filterValues.value)
+  const query = toValue(filterValues)
+
+  const slugs = Object.keys(filters.value)
+  Object.entries(route.query).forEach(([key, value]) => {
+    if (slugs.includes(key)) return
+    query[key] = value
+  })
+
   router.push({ name: route.name, query })
 }
 </script>
