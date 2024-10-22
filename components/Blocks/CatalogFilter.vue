@@ -47,7 +47,7 @@
             <AFButton
               class="ct-filter__button"
               label="Применить фильтр"
-              @click="execute"
+              @click="applyFilter"
             />
             <AFButton
               class="ct-filter__button"
@@ -73,7 +73,6 @@ import { provide } from 'vue'
 import { FiltersDataKey } from '~/domain/product/catalog/IInjectFiltersData'
 import type { LocationQueryValue } from 'vue-router'
 
-let count = 1
 const route = useRoute()
 const router = useRouter()
 
@@ -254,7 +253,12 @@ async function updateUrlQuery() {
 
   // сначала нужно очистить query, иначе будут дублироваться некоторые значения
   await router.replace({ query: {} })
-  router.push({ query })
+  await router.push({ query })
+}
+async function applyFilter(){
+  clearTimeout(filterValuesTimeout)
+  await updateUrlQuery()
+  execute()
 }
 </script>
 
