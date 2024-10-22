@@ -48,6 +48,7 @@ const _value = computed({
   }
 
   &__box {
+    flex-shrink: 0;
     border-radius: 5px;
     border: 1px solid var(--stroke);
     display: inline-flex;

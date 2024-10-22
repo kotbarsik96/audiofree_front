@@ -73,6 +73,7 @@ import { provide } from 'vue'
 import { FiltersDataKey } from '~/domain/product/catalog/IInjectFiltersData'
 import type { LocationQueryValue } from 'vue-router'
 
+let count = 1
 const route = useRoute()
 const router = useRouter()
 
@@ -91,16 +92,16 @@ watch(mobileShown, () => {
   else bodyMobileHeight.value = '0px'
 })
 
-/** вернёт route.query, но некоторые строки распрарсит в number и boolean
- * также не будет включать в себя per_page и page
+/** вернёт route.query с изменениями:
+ * распарсит строки чисел в number, 'false'/'true' в boolean
+ * массивы сделает строкой вида: key=value1,value2,value3
  */
 const routeQueryParsed = computed(() => {
-  // указать те возможные ключи в query, которые не являются slug'ами для фильтров
-  const reservedKeys = ['per_page', 'page']
+  // const reservedKeys = ['per_page', 'page']
 
   let obj: Record<string, any> = {}
   Object.entries(route.query).forEach(([slug, value]) => {
-    if (reservedKeys.includes(slug)) return
+    // if (reservedKeys.includes(slug)) return
     obj[slug] = parseStringValue(value)
   })
   return obj
@@ -110,17 +111,13 @@ const routeQueryParsed = computed(() => {
 const filterValues = useState<Record<string, any>>('filter-values', () => ({}))
 
 const { data: filtersArr, execute } = await useAPI<{ data: IFilterItem[] }>(
-  `/products/catalog/update-filters`,
+  `/products/catalog/filters`,
   {
-    method: 'POST',
-    body: routeQueryParsed,
+    query: routeQueryParsed,
     watch: false,
     async onResponse({ response }) {
       mapFiltersArrToInputs(response._data.data || [])
     },
-    // onRequest({ options }) {
-    //   options.body = filterValues.value
-    // },
   }
 )
 // filtersArr, но в виде объекта, где slug каждого элемента массива - ключ
@@ -140,7 +137,9 @@ provide(FiltersDataKey, {
   },
 })
 
-watch(filterValues, updateUrlQuery, { deep: true })
+let filterValuesTimeout: ReturnType<typeof setTimeout>
+
+watch(filterValues, onFilterValuesUpdate, { deep: true })
 
 function toggleShown() {
   mobileShown.value = !mobileShown.value
@@ -153,48 +152,58 @@ function mapFiltersArrToInputs(arr: IFilterItem[]) {
   arr.forEach((filterItem) => {
     const slug = filterItem.slug
 
-    if (
-      !filterValues.value[slug] &&
-      typeof filterValues.value[slug] !== 'boolean'
-    ) {
-      const valueInQuery = routeQueryParsed.value[slug]
+    if (typeof filterValues.value[slug] === 'undefined') {
+      let valueInQuery = routeQueryParsed.value[slug]
 
       switch (filterItem.type) {
         case 'radio':
+          valueInQuery = parseToType<string>(valueInQuery, 'string')
           filterValues.value[slug] =
             valueInQuery || filterItem.values[0]?.value_slug
           break
         case 'range':
           let [min, max] = getRangeValues(slug, filterItem)
-          filterValues.value[slug] = [Math.floor(min), Math.floor(max)]
+          filterValues.value[slug] = [Math.ceil(min), Math.floor(max)]
           break
         case 'checkbox':
-          if (Array.isArray(valueInQuery))
-            filterValues.value[slug] = valueInQuery
-          else filterValues.value[slug] = []
+          valueInQuery = parseToType<any[]>(valueInQuery, 'array')
+          filterValues.value[slug] = valueInQuery || []
           break
         case 'checkbox_boolean':
-          if (typeof valueInQuery === 'boolean')
-            filterValues.value[slug] = valueInQuery
-          else filterValues.value[slug] = false
+          valueInQuery = parseToType<boolean>(valueInQuery, 'boolean')
+          filterValues.value[slug] = valueInQuery || false
           break
       }
+    }
+
+    /** далее проверит поля range на соответствие min и max */
+    if (filterItem.type === 'range') {
+      if (filterItem.min && filterValues.value[slug][0] < filterItem.min)
+        filterValues.value[slug][0] = Math.ceil(filterItem.min)
+      if (filterItem.max && filterValues.value[slug][1] > filterItem.max)
+        filterValues.value[slug][1] = Math.floor(filterItem.max)
     }
   })
 }
 function getRangeValues(slug: string, filterItem: IFilterItem): number[] {
   let rangeValues
 
-  const valueInQuery = routeQueryParsed.value[slug]
-
-  // в query массив двух чисел
-  if (Array.isArray(valueInQuery)) rangeValues = valueInQuery
-  // в query только одно число
-  else if (!!valueInQuery) {
-    rangeValues = [valueInQuery, valueInQuery]
+  let valueInQuery = routeQueryParsed.value[slug]
+  // пришла строка вида '100,200' - сделать [100, 200]
+  if (typeof valueInQuery === 'string') {
+    valueInQuery = valueInQuery
+      .split(',')
+      .map((str) => Number(str))
+      .filter((num) => num)
   }
+
+  // в query массив чисел
+  if (Array.isArray(valueInQuery) && valueInQuery.length > 0)
+    rangeValues = valueInQuery
   // в query нет ничего - выставить значения из фильтров
   else rangeValues = [filterItem.min || 0, filterItem.max || 0]
+
+  if (rangeValues.length === 1) rangeValues[1] = rangeValues[0]
 
   // далее проверить, что не меньше min и не больше max, и не перекрывают друг друга
   if (filterItem.min && rangeValues[0] < filterItem.min)
@@ -222,22 +231,30 @@ function parseStringValue(
     }
   }
   if (Array.isArray(value))
-    _value = value.map((subValue) =>
-      parseStringValue(subValue)
-    ) as LocationQueryValue[]
+    _value = value.map((subValue) => parseStringValue(subValue)).join(',')
 
   return _value
 }
-function updateUrlQuery() {
+function onFilterValuesUpdate() {
+  if (filterValuesTimeout) clearTimeout(filterValuesTimeout)
+  filterValuesTimeout = setTimeout(updateUrlQuery, 1500)
+}
+async function updateUrlQuery() {
   const query = toValue(filterValues)
 
   const slugs = Object.keys(filters.value)
-  Object.entries(route.query).forEach(([key, value]) => {
+  Object.entries(routeQueryParsed.value).forEach(([key, value]) => {
     if (slugs.includes(key)) return
-    query[key] = value
+
+    // числа преобразовать в строки
+    if (Array.isArray(value) && value.some((v) => typeof v === 'number'))
+      query[key] = value.map((v) => (typeof v === 'number' ? v.toString() : v))
+    else query[key] = value
   })
 
-  router.push({ name: route.name, query })
+  // сначала нужно очистить query, иначе будут дублироваться некоторые значения
+  await router.replace({ query: {} })
+  router.push({ query })
 }
 </script>
 
