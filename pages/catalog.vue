@@ -48,11 +48,12 @@ import AFSelect from '~/components/Blocks/AFSelect.vue'
 import ChevronRightIcon from '~/assets/images/icons/chevron-right.svg'
 import ProductCard from '~/components/Blocks/Cards/ProductCard.vue'
 import AFPagination from '~/components/Blocks/AFPagination.vue'
+import { useRoute } from 'vue-router'
+import { parseRouteQuery } from "~/utils/general"
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
-import { Product } from '~/domain/product/Product'
 import type IPagination from '~/dataAccess/api/IPagination'
 
-const productsService = new Product()
+const route = useRoute()
 
 const options = [
   {
@@ -82,13 +83,21 @@ const options = [
 ]
 const sortType = ref(options[0].value)
 
-const productsData = ref<IPagination<ICatalogProduct> | null>(null)
 const products = computed(() => productsData.value?.data)
+
+const urlQuery = computed(() => ({
+  ...parseRouteQuery(route.query),
+  per_page: 9,
+}))
 
 const selectShown = ref(false)
 
-const { data } = await productsService.getCatalog()
-if (data) productsData.value = data.value
+const { data: productsData, execute } = await useAPI<
+  IPagination<ICatalogProduct>
+>('/products/catalog', {
+  query: urlQuery,
+  watch: false
+})
 </script>
 
 <style lang="scss" scoped>
@@ -98,7 +107,7 @@ if (data) productsData.value = data.value
   &__inner {
     display: grid;
     grid-template-columns: var(--column-width) 1fr;
-    grid-template-rows: repeat(2, auto);
+    grid-template-rows: auto 1fr;
     gap: 1.25rem 2rem;
     padding-bottom: 5rem;
   }

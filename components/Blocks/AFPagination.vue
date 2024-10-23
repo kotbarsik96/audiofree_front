@@ -14,7 +14,7 @@
         <NuxtLink
           class="pagination__link"
           :class="{ active: page === currentPage }"
-          :to="getUrl(page)"
+          :to="getUrl(page, route.query)"
         >
           {{ page }}
         </NuxtLink>
@@ -45,6 +45,7 @@ import { computed } from 'vue'
 import { useRoute } from '#app'
 import AFIcon from '~/components/Blocks/AFIcon.vue'
 import ChevronRightIcon from '~/assets/images/icons/chevron-right.svg'
+import type { LocationQuery } from 'vue-router'
 
 const props = withDefaults(
   defineProps<{
@@ -80,11 +81,11 @@ const visiblePages = computed(() => {
 const toPrevPage = computed(() => {
   const page = Number(route.query.page) - 1
 
-  if (page < 1) return null
+  if (isNaN(page) || page < 1) return null
 
   return {
-    name: route.name,
     query: {
+      ...route.query,
       page,
     },
   }
@@ -92,11 +93,11 @@ const toPrevPage = computed(() => {
 const toNextPage = computed(() => {
   const page = Number(route.query.page) + 1
 
-  if (page > pages.value) return null
+  if (isNaN(page) || page > pages.value) return null
 
   return {
-    name: route.name,
     query: {
+      ...route.query,
       page,
     },
   }
@@ -104,18 +105,18 @@ const toNextPage = computed(() => {
 const toLastPage = computed(() => {
   const page = pages.value
 
-  if (visiblePages.value.includes(page)) return null
+  if (isNaN(page) || visiblePages.value.includes(page)) return null
 
   return {
-    name: route.name,
     query: {
+      ...route.query,
       page,
     },
   }
 })
 
-function getUrl(page: number) {
-  return { name: route.name, query: { page } }
+function getUrl(page: number, routeQuery: LocationQuery) {
+  return { query: { ...routeQuery, page } }
 }
 </script>
 
@@ -147,7 +148,7 @@ function getUrl(page: number) {
     transition: var(--general-transition);
     min-width: 2.9rem;
     text-align: center;
-    
+
     &:hover {
       background-color: var(--primary-transparent);
       color: var(--white);

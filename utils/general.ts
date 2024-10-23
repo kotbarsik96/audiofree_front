@@ -1,5 +1,6 @@
 import { inject } from 'vue'
 import type { InjectionKey } from 'vue'
+import type { LocationQueryValue, RouteQueryAndHash } from 'vue-router'
 
 export function delay(timeoutMs: number) {
   return new Promise((resolve) => {
@@ -45,4 +46,40 @@ export function parseToType<T>(
     }
   }
   return _value
+}
+
+/** если value - строка, пытается парсить её в false, true, Number(). При неудаче вернёт строку
+ *
+ * если value - массив, проделает вышеописанное с его значениями
+ */
+export function parseStringValue(
+  value: LocationQueryValue | LocationQueryValue[]
+): string | number | LocationQueryValue | LocationQueryValue[] {
+  let _value: any = value
+
+  if (typeof value === 'string') {
+    if (value === 'false') _value = false
+    else if (value === 'true') _value = true
+    else {
+      const num = Number(value)
+      _value = isNaN(num) ? value : num
+    }
+  }
+  if (Array.isArray(value))
+    _value = value.map((subValue) => parseStringValue(subValue)).join(',')
+
+  return _value
+}
+
+/** вернёт routeQuery с изменениями:
+ * распарсит строки чисел в number, 'false'/'true' в boolean
+ *
+ * массивы сделает строкой вида: key=value1,value2,value3
+ */
+export function parseRouteQuery(routeQuery: RouteQueryAndHash) {
+  let obj: Record<string, any> = {}
+  Object.entries(routeQuery).forEach(([slug, value]) => {
+    obj[slug] = parseStringValue(value)
+  })
+  return obj
 }

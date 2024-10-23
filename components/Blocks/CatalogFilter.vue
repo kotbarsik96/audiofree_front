@@ -71,7 +71,7 @@ import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
 import type IFilterItem from '~/domain/product/types/IFilterItem'
 import { provide } from 'vue'
 import { FiltersDataKey } from '~/domain/product/catalog/IInjectFiltersData'
-import type { LocationQueryValue } from 'vue-router'
+import { parseRouteQuery } from '~/utils/general'
 
 const route = useRoute()
 const router = useRouter()
@@ -91,20 +91,7 @@ watch(mobileShown, () => {
   else bodyMobileHeight.value = '0px'
 })
 
-/** вернёт route.query с изменениями:
- * распарсит строки чисел в number, 'false'/'true' в boolean
- * массивы сделает строкой вида: key=value1,value2,value3
- */
-const routeQueryParsed = computed(() => {
-  // const reservedKeys = ['per_page', 'page']
-
-  let obj: Record<string, any> = {}
-  Object.entries(route.query).forEach(([slug, value]) => {
-    // if (reservedKeys.includes(slug)) return
-    obj[slug] = parseStringValue(value)
-  })
-  return obj
-})
+const routeQueryParsed = computed(() => parseRouteQuery(route.query))
 
 // значения фильтров, выставляемые пользователем
 const filterValues = useState<Record<string, any>>('filter-values', () => ({}))
@@ -213,27 +200,6 @@ function getRangeValues(slug: string, filterItem: IFilterItem): number[] {
 
   return rangeValues
 }
-/** если value - строка, пытается парсить её в false, true, Number(). При неудаче вернёт строку
- * если value - массив, проделает вышеописанное с его значениями
- */
-function parseStringValue(
-  value: LocationQueryValue | LocationQueryValue[]
-): string | number | LocationQueryValue | LocationQueryValue[] {
-  let _value: any = value
-
-  if (typeof value === 'string') {
-    if (value === 'false') _value = false
-    else if (value === 'true') _value = true
-    else {
-      const num = Number(value)
-      _value = isNaN(num) ? value : num
-    }
-  }
-  if (Array.isArray(value))
-    _value = value.map((subValue) => parseStringValue(subValue)).join(',')
-
-  return _value
-}
 function onFilterValuesUpdate() {
   if (filterValuesTimeout) clearTimeout(filterValuesTimeout)
   filterValuesTimeout = setTimeout(updateUrlQuery, 1500)
@@ -242,12 +208,14 @@ async function updateUrlQuery() {
   const query = toValue(filterValues)
 
   const slugs = Object.keys(filters.value)
-  Object.entries(routeQueryParsed.value).forEach(([key, value]) => {
+  Object.entries(route.query).forEach(([key, value]) => {
     if (slugs.includes(key)) return
 
     // числа преобразовать в строки
     if (Array.isArray(value) && value.some((v) => typeof v === 'number'))
-      query[key] = value.map((v) => (typeof v === 'number' ? v.toString() : v))
+      query[key] = value.map((v: any) =>
+        typeof v === 'number' ? v.toString() : v
+      )
     else query[key] = value
   })
 
@@ -255,7 +223,7 @@ async function updateUrlQuery() {
   await router.replace({ query: {} })
   await router.push({ query })
 }
-async function applyFilter(){
+async function applyFilter() {
   clearTimeout(filterValuesTimeout)
   await updateUrlQuery()
   execute()
