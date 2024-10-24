@@ -1,11 +1,15 @@
 import { parseRouteQuery } from '~/utils/general'
 import type IFilterItem from '~/domain/product/types/IFilterItem'
+import type IPagination from '~/dataAccess/api/IPagination'
+import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 
 export const useProductsCatalogStore = defineStore(
   'productsCatalogStore',
   () => {
     const route = useRoute()
     const router = useRouter()
+
+    const currentPage = computed(() => route.query.page)
 
     // filtersArr, но в виде объекта, где slug каждого элемента массива - ключ
     const filters = computed(() => {
@@ -21,26 +25,38 @@ export const useProductsCatalogStore = defineStore(
       'filter-values',
       () => ({})
     )
-    const routeQueryParsed = computed(() => parseRouteQuery(route.query))
 
-    const { data: filtersArr, execute } = useAPI<{ data: IFilterItem[] }>(
-      `/products/catalog/filters`,
-      {
-        query: routeQueryParsed,
-        immediate: false,
-        watch: false,
-        async onResponse({ response }) {
-          mapFiltersArrToInputs(response._data.data || [])
-        },
-      }
-    )
+    const urlQuery = computed<Record<string, any>>(() => ({
+      ...parseRouteQuery(route.query),
+      per_page: 9,
+    }))
+
+    const { data: filtersArr, execute: fetchFilters } = useAPI<{
+      data: IFilterItem[]
+    }>(`/products/catalog/filters`, {
+      query: urlQuery,
+      immediate: false,
+      watch: false,
+      async onResponse({ response }) {
+        mapFiltersArrToInputs(response._data.data || [])
+      },
+    })
+    const { data: productsData, execute: fetchProducts } = useAPI<
+      IPagination<ICatalogProduct>
+    >('/products/catalog', {
+      query: urlQuery,
+      watch: false,
+    })
+
+    const products = computed(() => productsData.value?.data || [])
 
     let filterValuesTimeout: ReturnType<typeof setTimeout>
 
     watch(filterValues, onFilterValuesUpdate, { deep: true })
+    watch(currentPage, () => fetchProducts())
 
     /** заполнит пустые/отсутствующие поля в filterValues данными
-     * сначала попробует взять из routeQueryParsed
+     * сначала попробует взять из urlQuery
      * если там данных по slug'у нет, возьмёт первое значение из arr[arr.indexOf(filterItem)]
      */
     function mapFiltersArrToInputs(arr: IFilterItem[]) {
@@ -48,7 +64,7 @@ export const useProductsCatalogStore = defineStore(
         const slug = filterItem.slug
         const filterValue = filterValues.value[slug]
 
-        let valueInQuery = routeQueryParsed.value[slug]
+        let valueInQuery = urlQuery.value[slug]
 
         switch (filterItem.type) {
           case 'radio':
@@ -93,7 +109,7 @@ export const useProductsCatalogStore = defineStore(
     function getRangeValues(slug: string, filterItem: IFilterItem): number[] {
       let rangeValues
 
-      let valueInQuery = routeQueryParsed.value[slug]
+      let valueInQuery = urlQuery.value[slug]
       // пришла строка вида '100,200' - сделать [100, 200]
       if (typeof valueInQuery === 'string') {
         valueInQuery = valueInQuery
@@ -145,13 +161,18 @@ export const useProductsCatalogStore = defineStore(
     async function applyFilter() {
       clearTimeout(filterValuesTimeout)
       await updateUrlQuery()
-      await execute()
+      await fetchFilters()
+      await router.push({ query: { ...route.query, page: 1 } })
+      await fetchProducts()
     }
 
     return {
       filters,
       filterValues,
       applyFilter,
+      fetchProducts,
+      productsData,
+      products,
     }
   }
 )

@@ -42,7 +42,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from '#app'
 import AFIcon from '~/components/Blocks/AFIcon.vue'
 import ChevronRightIcon from '~/assets/images/icons/chevron-right.svg'
 import type { LocationQuery } from 'vue-router'
@@ -59,6 +58,7 @@ const props = withDefaults(
 )
 
 const route = useRoute()
+const router = useRouter()
 
 const pages = computed(() => Math.ceil(props.total / props.perPage))
 const currentPage = computed(() => Number(route.query.page) || 1)
@@ -115,8 +115,18 @@ const toLastPage = computed(() => {
   }
 })
 
+watch(() => route.query.page, checkIfCorrectPage)
+
+onMounted(() => checkIfCorrectPage())
+
 function getUrl(page: number, routeQuery: LocationQuery) {
   return { query: { ...routeQuery, page } }
+}
+function checkIfCorrectPage() {
+  if (currentPage.value < 1)
+    router.replace({ query: { ...route.query, page: 1 } })
+  if (currentPage.value > pages.value)
+    router.replace({ query: { ...route.query, page: pages.value } })
 }
 </script>
 

@@ -6,7 +6,7 @@
           <CatalogFilter />
           <!-- карточка ads -->
         </aside>
-        <div class="catalog__page-header">
+        <div class="catalog__page-header" id="">
           <div class="_page-header">
             <BreadCrumbs />
             <h1 class="_page-header__title">Каталог</h1>
@@ -18,8 +18,15 @@
           />
         </div>
         <div class="catalog__main">
+          <div class="catalog__pagination">
+            <AFPagination
+              v-if="productsData"
+              :total="productsData.total"
+              :perPage="productsData.per_page"
+            />
+          </div>
           <div class="catalog__main-body">
-            <div class="catalog__cards">
+            <div class="catalog__cards" ref="cardsListEl">
               <ProductCard
                 v-for="product in products"
                 :key="product.id"
@@ -41,19 +48,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import CatalogFilter from '~/components/Blocks/CatalogFilter.vue'
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import AFSelect from '~/components/Blocks/AFSelect.vue'
 import ChevronRightIcon from '~/assets/images/icons/chevron-right.svg'
 import ProductCard from '~/components/Blocks/Cards/ProductCard.vue'
 import AFPagination from '~/components/Blocks/AFPagination.vue'
-import { useRoute } from 'vue-router'
-import { parseRouteQuery } from '~/utils/general'
-import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
-import type IPagination from '~/dataAccess/api/IPagination'
 
 const route = useRoute()
+
+const cardsListEl = ref<HTMLElement>()
 
 const options = [
   {
@@ -84,18 +89,15 @@ const options = [
 const sortType = ref(options[0].value)
 const selectShown = ref(false)
 
-const urlQuery = computed(() => ({
-  ...parseRouteQuery(route.query),
-  per_page: 9,
-}))
+const catalogStore = useProductsCatalogStore()
+const { products, productsData } = storeToRefs(catalogStore)
 
-const { data: productsData, execute } = await useAPI<
-  IPagination<ICatalogProduct>
->('/products/catalog', {
-  query: urlQuery,
-  watch: false,
-})
-const products = computed(() => productsData.value?.data)
+watch(
+  () => route.query.page,
+  () => {
+    if (cardsListEl.value) cardsListEl.value.scrollIntoView()
+  }
+)
 </script>
 
 <style lang="scss" scoped>
@@ -130,21 +132,16 @@ const products = computed(() => productsData.value?.data)
   &__main {
     grid-column: 2 / 3;
     grid-row: 2 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: 2.75rem;
   }
 
   &__cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
-    justify-content: center;
-
-    :deep(.product-card) {
-      margin: 0 auto;
-    }
-  }
-
-  &__pagination {
-    margin-top: 4.75rem;
+    scroll-margin: 150px;
   }
 
   @include adaptive(tablet-big) {
@@ -179,6 +176,10 @@ const products = computed(() => productsData.value?.data)
     &__main {
       grid-column: 1 / -1;
       grid-row: span 1;
+    }
+
+    &__cards {
+      justify-content: center;
     }
   }
 }
