@@ -1,6 +1,6 @@
 <template>
   <ul class="cf-checkboxes">
-    <li v-for="item in filters[slug].values" class="cf-checkboxes__item">
+    <li v-for="item in filtersData.filters.value[slug].values" class="cf-checkboxes__item">
       <AFCheckbox
         v-if="type === 'checkbox'"
         :value="item.value_slug"
@@ -17,22 +17,21 @@
 </template>
 
 <script setup lang="ts">
-import { useProductsCatalogStore } from '~/stores/productsCatalogStore'
 import AFCheckbox from '~/components/Blocks/FormElements/AFCheckbox.vue'
+import type { IInjectFiltersData } from '~/domain/product/catalog/IInjectFiltersData'
 
 const props = defineProps<{
   slug: string
   type: 'checkbox' | 'checkbox_boolean'
+  filtersData: IInjectFiltersData
 }>()
-
-const { filters, filterValues } = storeToRefs(useProductsCatalogStore())
 
 const state = computed({
   get() {
-    return filterValues.value[props.slug]
+    return props.filtersData.filterValues.value[props.slug]
   },
   set(v) {
-    filterValues.value[props.slug] = v
+    props.filtersData.updateFilters(props.slug, v)
   },
 })
 </script>
