@@ -49,7 +49,7 @@ import ChevronRightIcon from '~/assets/images/icons/chevron-right.svg'
 import ProductCard from '~/components/Blocks/Cards/ProductCard.vue'
 import AFPagination from '~/components/Blocks/AFPagination.vue'
 import { useRoute } from 'vue-router'
-import { parseRouteQuery } from "~/utils/general"
+import { parseRouteQuery } from '~/utils/general'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 import type IPagination from '~/dataAccess/api/IPagination'
 
@@ -82,22 +82,20 @@ const options = [
   },
 ]
 const sortType = ref(options[0].value)
-
-const products = computed(() => productsData.value?.data)
+const selectShown = ref(false)
 
 const urlQuery = computed(() => ({
   ...parseRouteQuery(route.query),
   per_page: 9,
 }))
 
-const selectShown = ref(false)
-
 const { data: productsData, execute } = await useAPI<
   IPagination<ICatalogProduct>
 >('/products/catalog', {
   query: urlQuery,
-  watch: false
+  watch: false,
 })
+const products = computed(() => productsData.value?.data)
 </script>
 
 <style lang="scss" scoped>

@@ -17,24 +17,23 @@
 </template>
 
 <script setup lang="ts">
+import { useProductsCatalogStore } from '~/stores/productsCatalogStore'
 import AFCheckbox from '~/components/Blocks/FormElements/AFCheckbox.vue'
-import { injectStrict } from '~/utils/general'
-import { FiltersDataKey } from '~/domain/product/catalog/IInjectFiltersData'
 
 const props = defineProps<{
   slug: string
   type: 'checkbox' | 'checkbox_boolean'
 }>()
 
-const { filters, filterValues, updateFilters } = injectStrict(FiltersDataKey)
+const { filters, filterValues } = storeToRefs(useProductsCatalogStore())
 
 const state = computed({
-  get(){
+  get() {
     return filterValues.value[props.slug]
   },
-  set(v){
-    updateFilters(props.slug, v)
-  }
+  set(v) {
+    filterValues.value[props.slug] = v
+  },
 })
 </script>
 

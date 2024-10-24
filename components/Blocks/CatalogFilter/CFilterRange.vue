@@ -28,29 +28,28 @@
 <script setup lang="ts">
 import NumberInput from '~/components/Blocks/FormElements/NumberInput.vue'
 import InputRangeDouble from '~/components/Blocks/InputRangeDouble.vue'
-import { FiltersDataKey } from '~/domain/product/catalog/IInjectFiltersData'
-import { injectStrict } from '~/utils/general'
+import { useProductsCatalogStore } from '~/stores/productsCatalogStore'
 
 const props = defineProps<{
   slug: string
 }>()
 
-const { filterValues, filters, updateFilters } = injectStrict(FiltersDataKey)
+const { filterValues, filters } = storeToRefs(useProductsCatalogStore())
 
 const state = computed({
-  get(){
+  get() {
     return filterValues.value[props.slug]
   },
-  set(v){
-    updateFilters(props.slug, v)
-  }
+  set(v) {
+    filterValues.value[props.slug] = v
+  },
 })
 const stateMin = computed({
   get() {
     return state.value[0]
   },
   set(v) {
-    updateFilters(props.slug, [v, stateMax.value])
+    filterValues.value[props.slug] = [v, stateMax.value]
   },
 })
 const stateMax = computed({
@@ -58,7 +57,7 @@ const stateMax = computed({
     return state.value[1]
   },
   set(v) {
-    updateFilters(props.slug, [stateMin.value, v])
+    filterValues.value[props.slug] = [stateMin.value, v]
   },
 })
 
