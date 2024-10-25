@@ -72,11 +72,10 @@ import CFilterRadios from '~/components/Blocks/CatalogFilter/CFilterRadios.vue'
 import FilterIcon from '~/assets/images/icons/filter.svg'
 import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
 import type IFilterItem from '~/domain/product/types/IFilterItem'
-import type { IInjectFiltersData } from "~/domain/product/catalog/IInjectFiltersData"
+import type { IInjectFiltersData } from '~/domain/product/catalog/IInjectFiltersData'
 
 const route = useRoute()
 const router = useRouter()
-
 
 const urlQuery = computed<Record<string, any>>(() => ({
   ...parseRouteQuery(route.query),
@@ -92,14 +91,17 @@ const className = computed(() => ({
   shown: mobileShown.value,
 }))
 
+// значения фильтров, выставляемые пользователем
+const filterValues = useState<Record<string, any>>('filter-values', () => ({}))
+
 const { data: filtersArr, execute: fetchFilters } = await useAPI<{
   data: IFilterItem[]
 }>(`/products/catalog/filters`, {
   query: urlQuery,
   watch: false,
-  // async onResponse({ response }) { прикол вот здесь =)
-  //   mapFiltersArrToInputs(response._data.data || [])
-  // },
+  async onResponse({ response }) {
+    mapFiltersArrToInputs(response._data.data || [])
+  },
 })
 
 // filtersArr, но в виде объекта, где slug каждого элемента массива - ключ
@@ -110,9 +112,6 @@ const filters = computed(() => {
   })
   return obj
 })
-
-// значения фильтров, выставляемые пользователем
-const filterValues = useState<Record<string, any>>('filter-values', () => ({}))
 
 watch(mobileShown, () => {
   if (mobileShown.value)
@@ -126,9 +125,9 @@ let filterValuesTimeout: ReturnType<typeof setTimeout>
 const filtersInjectProps: IInjectFiltersData = {
   filters,
   filterValues,
-  updateFilters(slug: string, value: any){
+  updateFilters(slug: string, value: any) {
     filterValues.value[slug] = value
-  }
+  },
 }
 
 function toggleShown() {
