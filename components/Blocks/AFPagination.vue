@@ -9,7 +9,7 @@
         <AFIcon :icon="ChevronRightIcon" rotate="180deg" />
       </NuxtLink>
     </div>
-    <ul class="pagination__list">
+    <ul v-if="visiblePages.length > 0" class="pagination__list">
       <li v-for="page in visiblePages" :key="page">
         <NuxtLink
           class="pagination__link"
@@ -63,6 +63,8 @@ const router = useRouter()
 const pages = computed(() => Math.ceil(props.total / props.perPage))
 const currentPage = computed(() => Number(route.query.page) || 1)
 const visiblePages = computed(() => {
+  if(!pages.value) return []
+
   const onPrev: number[] = []
   const onNext: number[] = []
 
@@ -81,7 +83,7 @@ const visiblePages = computed(() => {
 const toPrevPage = computed(() => {
   const page = Number(route.query.page) - 1
 
-  if (isNaN(page) || page < 1) return null
+  if (isNaN(Number(page)) || page < 1) return null
 
   return {
     query: {
@@ -105,7 +107,7 @@ const toNextPage = computed(() => {
 const toLastPage = computed(() => {
   const page = pages.value
 
-  if (isNaN(page) || visiblePages.value.includes(page)) return null
+  if (isNaN(Number(page)) || visiblePages.value.includes(page)) return null
 
   return {
     query: {
