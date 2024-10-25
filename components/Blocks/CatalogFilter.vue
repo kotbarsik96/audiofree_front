@@ -71,16 +71,16 @@ import CFilterCheckboxes from '~/components/Blocks/CatalogFilter/CFilterCheckbox
 import CFilterRadios from '~/components/Blocks/CatalogFilter/CFilterRadios.vue'
 import FilterIcon from '~/assets/images/icons/filter.svg'
 import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
+import { useProductsCatalogStore } from '~/stores/productsCatalogStore'
 import type IFilterItem from '~/domain/product/types/IFilterItem'
 import type { IInjectFiltersData } from '~/domain/product/catalog/IInjectFiltersData'
 
 const route = useRoute()
 const router = useRouter()
 
-const urlQuery = computed<Record<string, any>>(() => ({
-  ...parseRouteQuery(route.query),
-  per_page: 9,
-}))
+const catalogStore = useProductsCatalogStore()
+const { fetchProducts } = catalogStore
+const { urlQuery } = storeToRefs(catalogStore)
 
 const bodyEl = ref<HTMLElement>()
 
@@ -241,7 +241,7 @@ async function applyFilter() {
   await updateUrlQuery()
   await fetchFilters()
   await router.push({ query: { ...route.query, page: 1 } })
-  // await fetchProducts()
+  await fetchProducts()
 }
 </script>
 

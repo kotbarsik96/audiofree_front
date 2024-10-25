@@ -57,8 +57,7 @@
 .blur {
   &-enter-active,
   &-leave-active {
-    // transition: var(--general-transition);
-    transition: all 2s ease;
+    transition: var(--general-transition);
   }
   
   &-enter-from,

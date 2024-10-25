@@ -31,32 +31,30 @@
 <script setup lang="ts">
 import AFPagination from '~/components/Blocks/AFPagination.vue'
 import ProductCard from '~/components/Blocks/Cards/ProductCard.vue'
-import type IPagination from '~/dataAccess/api/IPagination'
-import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
+import { useProductsCatalogStore } from '~/stores/productsCatalogStore'
 
 const route = useRoute()
-const currentPage = computed<number>(() => Number(route.query.page))
+const currentPage = computed<number>(() => Number(route.query.page) || 0)
+let lastPage = currentPage.value
 
 const el = ref<HTMLElement>()
 
-const urlQuery = computed<Record<string, any>>(() => ({
-  ...parseRouteQuery(route.query),
-  per_page: 9,
-}))
+const catalogStore = useProductsCatalogStore()
+const { fetchProducts } = catalogStore
+const { productsData } = storeToRefs(catalogStore)
+await fetchProducts()
 
-const { data: productsData, execute: fetchProducts } = await useAPI<
-  IPagination<ICatalogProduct>
->('/products/catalog', {
-  query: urlQuery,
-  watch: false,
-})
 const products = computed(() => productsData.value?.data)
 const productsKey = computed(() =>
   (products.value || []).map((el) => el.id).join('')
 )
 watch(currentPage, onPageChange)
 
-function onPageChange() {
+function onPageChange(newPage: number) {
+  if (newPage === lastPage || !newPage) return
+
+  lastPage = newPage
+
   fetchProducts()
   if (el.value) el.value.scrollIntoView()
 }
