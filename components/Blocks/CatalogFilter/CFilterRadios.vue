@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import AFRadio from '~/components/Blocks/FormElements/AFRadio.vue'
-import type { IInjectFiltersData } from "~/domain/product/catalog/IInjectFiltersData";
+import type { IInjectFiltersData } from "~/domain/product/types/IInjectFiltersData";
 
 const props = defineProps<{
   slug: string

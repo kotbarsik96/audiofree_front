@@ -1,5 +1,5 @@
 <template>
-  <div class="select" :class="{ shown: _shown }" v-click-away="close">
+  <div class="select" :class="{ shown }" v-click-away="close">
     <div class="select__value" @click="toggle">
       <div class="select__value-text">
         <AFIcon
@@ -13,7 +13,7 @@
       <AFIcon class="select__value-chevron" :icon="ChevronRightIcon" />
     </div>
     <Transition name="drop-down">
-      <ul v-show="_shown" class="select__options">
+      <ul v-show="shown" class="select__options">
         <li
           v-for="option in _options"
           :key="option.value"
@@ -37,11 +37,16 @@ import ChevronRightIcon from '~/assets/images/icons/chevron-right.svg'
 import vClickAway from '~/directives/vClickAway'
 import AFIcon from '~/components/Blocks/AFIcon.vue'
 
-const props = defineProps<{
-  options: (string | ISelectOption)[]
-  modelValue?: string | number
-  shown?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    options: (string | ISelectOption)[]
+    modelValue?: string | number
+    placeholder?: string
+  }>(),
+  {
+    placeholder: 'Выбрать',
+  }
+)
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: typeof props.modelValue): void
@@ -67,28 +72,22 @@ const _value = computed({
 const currentOption = computed(
   () =>
     _options.value.find((opt) => opt.value === _value.value) || {
-      label: 'Выбрать',
+      label: props.placeholder,
       icon: undefined,
     }
 )
-const _shown = computed({
-  get() {
-    return props.shown
-  },
-  set(value) {
-    emit('update:shown', value)
-  },
-})
+
+const shown = ref(false)
 
 function updateValue(option: ISelectOption) {
   _value.value = option.value
   close()
 }
 function close() {
-  _shown.value = false
+  shown.value = false
 }
 function toggle() {
-  _shown.value = !_shown.value
+  shown.value = !shown.value
 }
 </script>
 

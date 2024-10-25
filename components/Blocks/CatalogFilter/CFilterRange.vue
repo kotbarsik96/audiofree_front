@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import NumberInput from '~/components/Blocks/FormElements/NumberInput.vue'
 import InputRangeDouble from '~/components/Blocks/InputRangeDouble.vue'
-import type { IInjectFiltersData } from '~/domain/product/catalog/IInjectFiltersData'
+import type { IInjectFiltersData } from '~/domain/product/types/IInjectFiltersData'
 
 const props = defineProps<{
   slug: string

@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import AFCheckbox from '~/components/Blocks/FormElements/AFCheckbox.vue'
-import type { IInjectFiltersData } from '~/domain/product/catalog/IInjectFiltersData'
+import type { IInjectFiltersData } from '~/domain/product/types/IInjectFiltersData'
 
 const props = defineProps<{
   slug: string

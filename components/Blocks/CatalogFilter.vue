@@ -73,7 +73,7 @@ import FilterIcon from '~/assets/images/icons/filter.svg'
 import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
 import { useProductsCatalogStore } from '~/stores/productsCatalogStore'
 import type IFilterItem from '~/domain/product/types/IFilterItem'
-import type { IInjectFiltersData } from '~/domain/product/catalog/IInjectFiltersData'
+import type { IInjectFiltersData } from '~/domain/product/types/IInjectFiltersData'
 
 const route = useRoute()
 const router = useRouter()
