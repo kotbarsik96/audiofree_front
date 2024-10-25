@@ -6,7 +6,7 @@
           <CatalogFilter />
           <!-- карточка ads -->
         </aside>
-        <div class="catalog__page-header" id="">
+        <div class="catalog__page-header">
           <div class="_page-header">
             <BreadCrumbs />
             <h1 class="_page-header__title">Каталог</h1>
@@ -32,10 +32,6 @@ import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import AFSelect from '~/components/Blocks/AFSelect.vue'
 import ChevronRightIcon from '~/assets/images/icons/chevron-right.svg'
 import CatalogBody from '~/components/Page/CatalogPage/CatalogBody.vue'
-
-const route = useRoute()
-
-const cardsListEl = ref<HTMLElement>()
 
 const options = [
   {
@@ -65,13 +61,6 @@ const options = [
 ]
 const sortType = ref(options[0].value)
 const selectShown = ref(false)
-
-watch(
-  () => route.query.page,
-  () => {
-    if (cardsListEl.value) cardsListEl.value.scrollIntoView()
-  }
-)
 </script>
 
 <style lang="scss" scoped>

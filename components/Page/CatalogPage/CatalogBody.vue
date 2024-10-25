@@ -1,5 +1,5 @@
 <template>
-  <div class="catalog-body">
+  <div class="catalog-body" ref="el">
     <div class="catalog-body__pagination">
       <AFPagination
         v-if="productsData"
@@ -7,12 +7,16 @@
         :perPage="productsData.per_page"
       />
     </div>
-    <div class="catalog-body__products" ref="cardsListEl">
-      <ProductCard
-        v-for="product in products"
-        :key="product.id"
-        :data="product"
-      />
+    <div class="catalog-body__products-wrapper">
+      <Transition name="blur">
+        <div class="catalog-body__products" :key="productsKey">
+          <ProductCard
+            v-for="product in products"
+            :key="product.id"
+            :data="product"
+          />
+        </div>
+      </Transition>
     </div>
     <div class="catalog-body__pagination">
       <AFPagination
@@ -31,8 +35,9 @@ import type IPagination from '~/dataAccess/api/IPagination'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 
 const route = useRoute()
+const currentPage = computed<number>(() => Number(route.query.page))
 
-const currentPage = computed(() => route.query.page)
+const el = ref<HTMLElement>()
 
 const urlQuery = computed<Record<string, any>>(() => ({
   ...parseRouteQuery(route.query),
@@ -46,17 +51,38 @@ const { data: productsData, execute: fetchProducts } = await useAPI<
   watch: false,
 })
 const products = computed(() => productsData.value?.data)
-watch(currentPage, () => fetchProducts())
+const productsKey = computed(() =>
+  (products.value || []).map((el) => el.id).join('')
+)
+watch(currentPage, onPageChange)
+
+function onPageChange() {
+  fetchProducts()
+  if (el.value) el.value.scrollIntoView()
+}
 </script>
 
 <style lang="scss" scoped>
 .catalog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2.75rem;
+  scroll-margin: 150px;
+  position: relative;
+
+  &__products-wrapper {
+    position: relative;
+  }
+
   &__products {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    scroll-margin: 150px;
     flex: 1 1 auto;
+
+    :deep(.product-card) {
+      height: auto;
+    }
 
     @include adaptive(tablet-big) {
       justify-content: center;
