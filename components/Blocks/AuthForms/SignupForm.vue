@@ -13,7 +13,11 @@
           {{ errors.email[0] }}
         </template>
       </InputWrapper>
-      <PasswordInput class="auth-form__input" v-model="password" autocomplete="new-password">
+      <PasswordInput
+        class="auth-form__input"
+        v-model="password"
+        autocomplete="new-password"
+      >
         <template v-if="errors?.password" #error>
           {{ errors.password[0] }}
         </template>
@@ -32,53 +36,62 @@
 </template>
 
 <script setup lang="ts">
-import InputWrapper from "~/components/Blocks/FormElements/InputWrapper.vue"
-import TextInput from "~/components/Blocks/FormElements/TextInput.vue"
-import AFButton from "~/components/Blocks/AFButton.vue"
-import UserIcon from "@/assets/images/icons/user.svg"
-import MailIcon from "@/assets/images/icons/mail.svg"
-import PasswordInput from "~/components/Blocks/FormElements/PasswordInput.vue"
-import { ref } from "vue"
-import { storeToRefs } from "pinia"
-import { useAuthStore } from "@/stores/authStore"
-import { useUserStore } from "@/stores/userStore"
-import { User } from "~/domain/user/User"
-import type { IErrors } from "~/dataAccess/api/IErrors"
-import { useNotifications } from "@/composables/useNotifications"
+import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
+import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
+import AFButton from '~/components/Blocks/AFButton.vue'
+import UserIcon from '@/assets/images/icons/user.svg'
+import MailIcon from '@/assets/images/icons/mail.svg'
+import PasswordInput from '~/components/Blocks/FormElements/PasswordInput.vue'
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '@/stores/authStore'
+import { useUserStore } from '@/stores/userStore'
+import type { IErrors } from '~/dataAccess/api/IErrors'
+import { useNotifications } from '@/composables/useNotifications'
 
-const userService = new User()
-const { token } = storeToRefs(useUserStore())
-const { email, dialogShown } = storeToRefs(useAuthStore())
+const { $afFetch } = useNuxtApp()
+const { email, dialogShown, isLoading } = storeToRefs(useAuthStore())
 const { addNotification } = useNotifications()
 
-const name = ref("")
-const password = ref("")
-const passwordRepeat = ref("")
+const { jwt } = storeToRefs(useUserStore())
+
+const name = ref('')
+const password = ref('')
+const passwordRepeat = ref('')
 const errors = ref<IErrors>()
-const isLoading = ref(false)
 
 async function onSubmit() {
   isLoading.value = true
 
-  // const response = await userService.signup({
-  //   email: email.value,
-  //   name: name.value,
-  //   password: password.value,
-  //   password_confirmation: passwordRepeat.value,
-  // })
-  // if (response?.errors) errors.value = response.errors
-  // else if (response) {
-  //   token.value = response.payload.data.token
-  //   dialogShown.value = false
-  //   if (response.payload.message) addNotification("info", response.payload.message)
-  // }
+  try {
+    await $afFetch('/signup', {
+      method: 'POST',
+      body: {
+        email: email.value,
+        name: name.value,
+        password: password.value,
+        password_confirmation: passwordRepeat.value,
+      },
+      onResponse({ response }) {
+        if (response._data.data) {
+          jwt.value = response._data.data.token
+          dialogShown.value = false
+          if (response._data.message)
+            addNotification('info', response._data.message)
+        }
+      },
+      onResponseError({ response }) {
+        errors.value = response._data.errors
+      },
+    })
+  } catch (e) {}
 
   isLoading.value = false
 }
 </script>
 
 <style lang="scss" scoped>
-@import "@/scss/components/_AuthForm";
+@import '@/scss/components/_AuthForm';
 
 .signup-form {
   min-height: 19rem;

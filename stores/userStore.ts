@@ -1,53 +1,43 @@
-import { useNotifications } from '@/composables/useNotifications';
-import type IUser from '~/domain/user/types/IUser';
-import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
-import { User } from '~/domain/user/User';
+import { useNotifications } from '@/composables/useNotifications'
+import type IUser from '~/domain/user/types/IUser'
+import { defineStore } from 'pinia'
+import { computed } from 'vue'
+import { AppKeys } from '~/enums/AppKeys'
 
 export const useUserStore = defineStore('user', () => {
-  const userService = new User();
-  const { addNotification } = useNotifications();
+  const jwt = useCookie(AppKeys.JWT)
+  const { $afFetch } = useNuxtApp()
+  const { addNotification } = useNotifications()
 
-  const token = ref<string>("");
-  const user = ref<IUser>();
-  const isLoading = ref(false);
-  const isAuth = computed(() => !!user.value);
+  const { data: user, execute: getUser } = useAPI<{ data: IUser }>(
+    '/profile/user',
+    {
+      immediate: false,
+      watch: false,
+    }
+  )
+  const isAuth = computed(() => !!user.value)
 
-  // watch(token, () => {
-  //   lStorageSetItem(LStorageKeys.JWT, token.value)
-  //   userService.setTokenHeader()
-  //   getUser()
-  // })
-
-  async function getUser() {
-    isLoading.value = true;
-
-    const { user, error, status } = await userService.getUser();
-    // console.log(user.value);
-    // console.log(status.value);
-    // console.error(error.value);
-
-    isLoading.value = false;
+  async function logout() {
+    jwt.value = null
+    await $afFetch('/logout', {
+      method: 'POST',
+      onResponse({ response }) {
+        addNotification('info', response._data.message)
+        user.value = null
+      },
+    })
   }
-  // async function logout() {
-  //   isLoading.value = true
-
-  //   const response = await userService.logout()
-  //   token.value = ""
-  //   user.value = undefined
-  //   if (response?.payload?.message)
-  //     addNotification("info", response.payload.message)
-
-  //   isLoading.value = false
-  // }
+  function updateJwt(_jwt: string | null) {
+    jwt.value = _jwt
+  }
 
   return {
-    token,
+    jwt,
     user,
-    getUser,
     isAuth,
-    // isLoading,
-    // getUser,
-    // logout,
-  };
-});
+    getUser,
+    logout,
+    updateJwt,
+  }
+})

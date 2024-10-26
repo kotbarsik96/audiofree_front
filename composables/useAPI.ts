@@ -1,15 +1,15 @@
-import { useFetch, useNuxtApp, type UseFetchOptions } from '#app';
+import { useFetch, useNuxtApp, type UseFetchOptions } from '#app'
 
 export function useAPI<T>(
   url: string | (() => string),
   options?: UseFetchOptions<T>
 ) {
   return useFetch(url, {
-    ...options, 
+    ...options,
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
-    $fetch: useNuxtApp().$api as any,
-  });
+    $fetch: useNuxtApp().$afFetch,
+  })
 }

@@ -30,48 +30,62 @@
 </template>
 
 <script setup lang="ts">
-import InputWrapper from "~/components/Blocks/FormElements/InputWrapper.vue"
-import TextInput from "~/components/Blocks/FormElements/TextInput.vue"
-import AFButton from "~/components/Blocks/AFButton.vue"
-import MailIcon from "@/assets/images/icons/mail.svg"
-import PasswordInput from "~/components/Blocks/FormElements/PasswordInput.vue"
-import { ref } from "vue"
-import { storeToRefs } from "pinia"
-import { User } from "~/domain/user/User"
-import { useAuthStore } from "@/stores/authStore"
-import type { IErrors } from "~/dataAccess/api/IErrors"
-import { useUserStore } from "@/stores/userStore"
-import { useNotifications } from "@/composables/useNotifications"
+import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
+import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
+import AFButton from '~/components/Blocks/AFButton.vue'
+import MailIcon from '@/assets/images/icons/mail.svg'
+import PasswordInput from '~/components/Blocks/FormElements/PasswordInput.vue'
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '@/stores/authStore'
+import type { IErrors } from '~/dataAccess/api/IErrors'
+import { useNotifications } from '@/composables/useNotifications'
 
-const userService = new User()
-const { token } = storeToRefs(useUserStore())
+const { $afFetch } = useNuxtApp()
 const { tab, email, dialogShown } = storeToRefs(useAuthStore())
+const userStore = useUserStore()
+const { updateJwt, getUser } = userStore
+const { jwt } = storeToRefs(userStore)
 const { addNotification } = useNotifications()
 
-const password = ref("")
+const password = ref('')
 const errors = ref<IErrors>()
 const isLoading = ref(false)
 
 async function onSubmit() {
   isLoading.value = true
 
-  // const response = await userService.login({
-  //   email: email.value,
-  //   password: password.value,
-  // })
-  // if (response?.errors) errors.value = response.errors
-  // else if (response?.payload) {
-  //   token.value = response.payload.data.token
-  //   dialogShown.value = false
-  //   if (response.payload.message) addNotification("info", response.payload.message)
-  // }
+  try {
+    await $afFetch('/login', {
+      method: 'POST',
+      body: {
+        email: email.value,
+        password: password.value,
+      },
+      async onResponse({ response }) {
+        if (response._data.data) {
+          updateJwt(response._data.data.token)
+          dialogShown.value = false
+          if (response._data.message)
+            addNotification('info', response._data.message)
+          await nextTick()
+          await getUser()
+        }
+      },
+      onResponseError({ response }) {
+        errors.value = response._data.errors
+        if (response._data.message)
+          addNotification('error', response._data.message)
+      },
+    })
+  } catch (e) {}
 
   isLoading.value = false
 }
 </script>
 
 <style lang="scss" scoped>
-@import "@/scss/components/_AuthForm";
+@import '@/scss/components/_AuthForm';
 
 .login-form {
   min-height: 12rem;

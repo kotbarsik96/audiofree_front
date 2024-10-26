@@ -26,8 +26,6 @@
         <component :is="component" />
       </Transition>
     </div>
-
-    <GlobalPreloader v-if="isLoading" />
   </div>
 </template>
 
@@ -35,13 +33,10 @@
 import LoginForm from "~/components/Blocks/AuthForms/LoginForm.vue"
 import ResetPasswordForm from "~/components/Blocks/AuthForms/ResetPasswordForm.vue"
 import SignupForm from "~/components/Blocks/AuthForms/SignupForm.vue"
-import GlobalPreloader from "~/components/Blocks/GlobalPreloader.vue"
 import { useAuthStore } from "@/stores/authStore"
-import { useUserStore } from "@/stores/userStore"
 import { storeToRefs } from "pinia"
 import { computed } from "vue"
 
-const { isLoading } = storeToRefs(useUserStore())
 const { tab } = storeToRefs(useAuthStore())
 
 const component = computed(() => {
