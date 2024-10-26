@@ -9,7 +9,7 @@ export const useUserStore = defineStore('user', () => {
   const { $afFetch } = useNuxtApp()
   const { addNotification } = useNotifications()
 
-  const { data: user, execute: getUser } = useAPI<{ data: IUser }>(
+  const { data: user, execute: _getUser } = useAPI<{ data: IUser }>(
     '/profile/user',
     {
       immediate: false,
@@ -27,6 +27,9 @@ export const useUserStore = defineStore('user', () => {
         user.value = null
       },
     })
+  }
+  function getUser() {
+    if (jwt.value) _getUser()
   }
   function updateJwt(_jwt: string | null) {
     jwt.value = _jwt

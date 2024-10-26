@@ -45,7 +45,6 @@ const { $afFetch } = useNuxtApp()
 const { tab, email, dialogShown } = storeToRefs(useAuthStore())
 const userStore = useUserStore()
 const { updateJwt, getUser } = userStore
-const { jwt } = storeToRefs(userStore)
 const { addNotification } = useNotifications()
 
 const password = ref('')

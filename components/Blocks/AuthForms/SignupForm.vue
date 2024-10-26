@@ -51,6 +51,8 @@ import { useNotifications } from '@/composables/useNotifications'
 
 const { $afFetch } = useNuxtApp()
 const { email, dialogShown, isLoading } = storeToRefs(useAuthStore())
+const userStore = useUserStore()
+const { getUser } = userStore
 const { addNotification } = useNotifications()
 
 const { jwt } = storeToRefs(useUserStore())
@@ -72,12 +74,14 @@ async function onSubmit() {
         password: password.value,
         password_confirmation: passwordRepeat.value,
       },
-      onResponse({ response }) {
+      async onResponse({ response }) {
         if (response._data.data) {
           jwt.value = response._data.data.token
           dialogShown.value = false
           if (response._data.message)
             addNotification('info', response._data.message)
+          await nextTick()
+          await getUser()
         }
       },
       onResponseError({ response }) {

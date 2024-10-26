@@ -86,21 +86,27 @@ export function parseRouteQuery(routeQuery: RouteQueryAndHash) {
 
 /** выведет лог, подписав его сверху и снизу */
 export function debugLog(data: any, wrapperMessage?: string) {
-  console.log(`${wrapperMessage} - start`)
-  console.log(data)
-  console.log(`${wrapperMessage} - end`)
+  if (import.meta.env.MODE === 'development') {
+    console.log(`${wrapperMessage} - start`)
+    console.log(data)
+    console.log(`${wrapperMessage} - end`)
+  }
 }
 
 /** выведет ошибку, подписав его сверху и снизу */
 export function debugError(data: any, wrapperMessage?: string) {
-  console.log(`${wrapperMessage} - start`)
-  console.error(data)
-  console.log(`${wrapperMessage} - end`)
+  if (import.meta.env.MODE === 'development') {
+    console.log(`${wrapperMessage} - start`)
+    console.error(data)
+    console.log(`${wrapperMessage} - end`)
+  }
 }
 
 /** выведет предупреждение, подписав его сверху и снизу */
 export function debugWarn(data: any, wrapperMessage?: string) {
-  console.log(`${wrapperMessage} - start`)
-  console.warn(data)
-  console.log(`${wrapperMessage} - end`)
+  if (import.meta.env.MODE === 'development') {
+    console.log(`${wrapperMessage} - start`)
+    console.warn(data)
+    console.log(`${wrapperMessage} - end`)
+  }
 }
