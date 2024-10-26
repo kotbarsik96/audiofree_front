@@ -5,6 +5,7 @@
         v-if="productsData"
         :total="productsData.total"
         :perPage="productsData.per_page"
+        :disabled="fetchingProducts"
       />
     </div>
     <div class="catalog-body__products-wrapper">
@@ -32,6 +33,7 @@
         v-if="productsData"
         :total="productsData.total"
         :perPage="productsData.per_page"
+        :disabled="fetchingProducts"
       />
     </div>
   </div>
@@ -51,7 +53,7 @@ const el = ref<HTMLElement>()
 
 const catalogStore = useProductsCatalogStore()
 const { fetchProducts } = catalogStore
-const { productsData } = storeToRefs(catalogStore)
+const { productsData, fetchingProducts } = storeToRefs(catalogStore)
 await fetchProducts()
 
 const products = computed(() => productsData.value?.data)
@@ -60,13 +62,20 @@ const productsKey = computed(() =>
 )
 watch(currentPage, onPageChange)
 
-function onPageChange(newPage: number) {
+async function onPageChange(newPage: number) {
   if (newPage === lastPage || !newPage) return
 
   lastPage = newPage
 
-  fetchProducts()
+  await updateProducts()
   if (el.value) el.value.scrollIntoView()
+}
+async function updateProducts() {
+  fetchingProducts.value = true
+  try {
+    await fetchProducts()
+  } catch (err) {}
+  fetchingProducts.value = false
 }
 </script>
 

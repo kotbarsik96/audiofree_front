@@ -50,12 +50,15 @@
             <AFButton
               class="ct-filter__button"
               label="Применить фильтр"
+              :disabled="fetchingProducts"
               @click="applyFilter"
             />
             <AFButton
               class="ct-filter__button"
               styleType="secondary"
               label="Очистить фильтр"
+              :disabled="fetchingProducts"
+              @click="clearFilter"
             />
           </div>
         </div>
@@ -80,7 +83,7 @@ const router = useRouter()
 
 const catalogStore = useProductsCatalogStore()
 const { fetchProducts } = catalogStore
-const { urlQuery } = storeToRefs(catalogStore)
+const { urlQuery, fetchingProducts } = storeToRefs(catalogStore)
 
 const bodyEl = ref<HTMLElement>()
 
@@ -237,11 +240,43 @@ async function updateUrlQuery() {
   await router.push({ query })
 }
 async function applyFilter() {
-  clearTimeout(filterValuesTimeout)
-  await updateUrlQuery()
-  await fetchFilters()
-  await router.push({ query: { ...route.query, page: 1 } })
-  await fetchProducts()
+  fetchingProducts.value = true
+  try {
+    clearTimeout(filterValuesTimeout)
+    await updateUrlQuery()
+    await fetchFilters()
+    await router.push({ query: { ...route.query, page: 1 } })
+    await fetchProducts()
+  } catch (err) {}
+  fetchingProducts.value = false
+}
+function clearFilter() {
+  Object.keys(filterValues.value).forEach((slug) => {
+    const filterData = filters.value[slug]
+    if (typeof filterData === 'undefined') return
+
+    switch (filterData.type) {
+      case 'checkbox':
+        filterValues.value[slug] = []
+        break
+      case 'checkbox_boolean':
+        filterValues.value[slug] = false
+        break
+      case 'radio':
+        filterValues.value[slug] = filterData.values[0] || ''
+        break
+      case 'range':
+        let arr = [
+          Math.floor(filterData.min || 0),
+          Math.floor(filterData.max || 0),
+        ]
+        if (arr[0] > arr[1]) arr[0] = arr[1]
+        filterValues.value[slug] = arr
+        break
+    }
+  })
+
+  applyFilter()
 }
 </script>
 

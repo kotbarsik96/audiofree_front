@@ -1,5 +1,5 @@
 <template>
-  <div class="pagination">
+  <div class="pagination" :class="{ '--disabled': disabled }">
     <div class="pagination__button-wrapper">
       <NuxtLink
         v-if="toPrevPage"
@@ -51,6 +51,7 @@ const props = withDefaults(
     total: number
     perPage: number
     radius?: number // кол-во страниц вокруг текущей
+    disabled?: boolean
   }>(),
   {
     radius: 2,
@@ -63,7 +64,7 @@ const router = useRouter()
 const pages = computed(() => Math.ceil(props.total / props.perPage))
 const currentPage = computed(() => Number(route.query.page) || 1)
 const visiblePages = computed(() => {
-  if(!pages.value) return []
+  if (!pages.value) return []
 
   const onPrev: number[] = []
   const onNext: number[] = []
@@ -138,6 +139,11 @@ function checkIfCorrectPage() {
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  
+  &.--disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 
   &__list {
     display: flex;
