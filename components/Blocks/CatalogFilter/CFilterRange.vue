@@ -1,20 +1,20 @@
 <template>
-  <div v-if="!!filterValues[slug]" class="cf-range">
+  <div v-if="!!filtersData.filterValues.value[slug]" class="cf-range">
     <div class="cf-range__inputs">
       <NumberInput
         class="cf-range__input"
-        :min="Math.floor(filters[slug].min || 0)"
+        :min="Math.floor(filtersData.filters.value[slug].min || 0)"
         :maxFractionDigits="2"
-        :max="filterValues[slug].max"
+        :max="filtersData.filterValues.value[slug].max"
         v-model="stateMin"
         lazy
       />
       <div class="cf-range__inputs-delimeter">–</div>
       <NumberInput
         class="cf-range__input"
-        :min="filterValues[slug].min"
+        :min="filtersData.filterValues.value[slug].min"
         :maxFractionDigits="2"
-        :max="Math.floor(filters[slug].max || 0)"
+        :max="Math.floor(filtersData.filters.value[slug].max || 0)"
         v-model="stateMax"
         lazy
       />
@@ -28,20 +28,19 @@
 <script setup lang="ts">
 import NumberInput from '~/components/Blocks/FormElements/NumberInput.vue'
 import InputRangeDouble from '~/components/Blocks/InputRangeDouble.vue'
-import { useProductsCatalogStore } from '~/stores/productsCatalogStore'
+import type { IInjectFiltersData } from '~/domain/product/types/IInjectFiltersData'
 
 const props = defineProps<{
   slug: string
+  filtersData: IInjectFiltersData
 }>()
-
-const { filterValues, filters } = storeToRefs(useProductsCatalogStore())
 
 const state = computed({
   get() {
-    return filterValues.value[props.slug]
+    return props.filtersData.filterValues.value[props.slug]
   },
   set(v) {
-    filterValues.value[props.slug] = v
+    props.filtersData.updateFilters(props.slug, v)
   },
 })
 const stateMin = computed({
@@ -49,7 +48,7 @@ const stateMin = computed({
     return state.value[0]
   },
   set(v) {
-    filterValues.value[props.slug] = [v, stateMax.value]
+    props.filtersData.updateFilters(props.slug, [v, stateMax.value])
   },
 })
 const stateMax = computed({
@@ -57,12 +56,16 @@ const stateMax = computed({
     return state.value[1]
   },
   set(v) {
-    filterValues.value[props.slug] = [stateMin.value, v]
+    props.filtersData.updateFilters(props.slug, [stateMin.value, v])
   },
 })
 
-const min = computed(() => Math.floor(filters.value[props.slug].min as number))
-const max = computed(() => Math.floor(filters.value[props.slug].max as number))
+const min = computed(() =>
+  Math.floor(props.filtersData.filters.value[props.slug].min as number)
+)
+const max = computed(() =>
+  Math.floor(props.filtersData.filters.value[props.slug].max as number)
+)
 </script>
 
 <style lang="scss" scoped>

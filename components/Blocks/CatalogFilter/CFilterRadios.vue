@@ -1,6 +1,6 @@
 <template>
   <ul class="cf-radios">
-    <li v-for="item in filters[slug].values" class="cf-radios__item">
+    <li v-for="item in filtersData.filters.value[slug].values" class="cf-radios__item">
       <AFRadio :label="item.value" :value="item.value_slug" v-model="state" />
     </li>
   </ul>
@@ -8,22 +8,21 @@
 
 <script setup lang="ts">
 import AFRadio from '~/components/Blocks/FormElements/AFRadio.vue'
-import { useProductsCatalogStore } from '~/stores/productsCatalogStore'
+import type { IInjectFiltersData } from "~/domain/product/types/IInjectFiltersData";
 
 const props = defineProps<{
   slug: string
+  filtersData: IInjectFiltersData
 }>()
 
 const state = computed({
   get() {
-    return filterValues.value[props.slug]
+    return props.filtersData.filterValues.value[props.slug]
   },
   set(v) {
-    filterValues.value[props.slug] = v
+    props.filtersData.updateFilters(props.slug, v)
   },
 })
-
-const { filterValues, filters } = storeToRefs(useProductsCatalogStore())
 </script>
 
 <style lang="scss" scoped>

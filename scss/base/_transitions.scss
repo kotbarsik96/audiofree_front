@@ -53,3 +53,28 @@
     transform: translateY(0);
   }
 }
+
+.blur {
+  &-enter-active,
+  &-leave-active {
+    transition: var(--general-transition);
+  }
+  
+  &-enter-from,
+  &-leave-to {
+    opacity: 0;
+    filter: blur(10px);
+  }
+
+  &-enter-to {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  &-enter-to,
+  &-leave-from {
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
