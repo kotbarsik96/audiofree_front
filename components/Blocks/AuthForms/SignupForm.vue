@@ -1,42 +1,40 @@
 <template>
-  <div class="signup-form">
-    <form class="signup-form__form auth-form" @submit.prevent="onSubmit">
-      <InputWrapper class="auth-form__input" type="email" :icon="UserIcon">
-        <TextInput v-model="name" placeholder="Ваше имя" />
-        <template v-if="errorName" #error>
-          {{ errorName }}
-        </template>
-      </InputWrapper>
-      <InputWrapper class="auth-form__input" :icon="MailIcon">
-        <TextInput v-model="email" placeholder="Email" autocomplete="email" />
-        <template v-if="errorEmail" #error>
-          {{ errorEmail }}
-        </template>
-      </InputWrapper>
-      <PasswordInput
-        class="auth-form__input"
-        v-model="password"
-        autocomplete="new-password"
-      >
-        <template v-if="errorPassword" #error>
-          {{ errorPassword }}
-        </template>
-      </PasswordInput>
-      <PasswordInput
-        class="auth-form__input"
-        v-model="passwordRepeat"
-        placeholder="Пароль еще раз"
-        autocomplete="new-password"
-      >
-        <template v-if="errorPasswordRepeat" #error>
-          {{ errorPasswordRepeat }}
-        </template>
-      </PasswordInput>
-      <div class="auth-form__buttons">
-        <AFButton type="submit" label="Войти" :disabled="isButtonDisabled" />
-      </div>
-    </form>
-  </div>
+  <form class="signup-form__form auth-form" @submit.prevent="onSubmit">
+    <InputWrapper class="auth-form__input" type="email" :icon="UserIcon">
+      <TextInput v-model="name" placeholder="Ваше имя" />
+      <template v-if="errorName" #error>
+        {{ errorName }}
+      </template>
+    </InputWrapper>
+    <InputWrapper class="auth-form__input" :icon="MailIcon">
+      <TextInput v-model="email" placeholder="Email" autocomplete="email" />
+      <template v-if="errorEmail" #error>
+        {{ errorEmail }}
+      </template>
+    </InputWrapper>
+    <PasswordInput
+      class="auth-form__input"
+      v-model="password"
+      autocomplete="new-password"
+    >
+      <template v-if="errorPassword" #error>
+        {{ errorPassword }}
+      </template>
+    </PasswordInput>
+    <PasswordInput
+      class="auth-form__input"
+      v-model="passwordRepeat"
+      placeholder="Пароль еще раз"
+      autocomplete="new-password"
+    >
+      <template v-if="errorPasswordRepeat" #error>
+        {{ errorPasswordRepeat }}
+      </template>
+    </PasswordInput>
+    <div class="auth-form__buttons">
+      <AFButton type="submit" label="Войти" :disabled="isButtonDisabled" />
+    </div>
+  </form>
 </template>
 
 <script setup lang="ts">

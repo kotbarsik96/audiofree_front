@@ -1,9 +1,9 @@
 <template>
-  <div class="auth-form">
+  <div class="auth-window">
     <Transition name="fade-in">
-      <div v-if="tab !== 'reset'" class="auth-form__tabs">
+      <div v-if="tab !== 'reset'" class="auth-window__tabs">
         <button
-          class="auth-form__tab-btn"
+          class="auth-window__tab-btn"
           :class="{ active: tab === 'login' }"
           type="button"
           @click="tab = 'login'"
@@ -11,7 +11,7 @@
           Вход
         </button>
         <button
-          class="auth-form__tab-btn"
+          class="auth-window__tab-btn"
           :class="{ active: tab === 'signup' }"
           type="button"
           @click="tab = 'signup'"
@@ -20,8 +20,8 @@
         </button>
       </div>
     </Transition>
-    <div class="auth-form__body">
-      <div class="auth-form__title">Авторизация</div>
+    <div class="auth-window__body">
+      <div class="auth-window__title">Авторизация</div>
       <Transition name="fade-in" mode="out-in">
         <component :is="component" />
       </Transition>
@@ -62,7 +62,9 @@ const component = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-.auth-form {
+.auth-window {
+  width: 100%;
+
   &__tabs {
     display: flex;
   }
