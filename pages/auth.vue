@@ -2,14 +2,14 @@
   <div class="auth-page">
     <div class="_container">
       <div class="auth-page__box _box">
-        <AuthForm class="auth-page__form" />
+        <AuthWindow class="auth-page__form" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import AuthForm from "~/components/Blocks/AuthForms/AuthForm.vue"
+import AuthWindow from "~/components/Blocks/AuthForms/AuthWindow.vue"
 import { useUserStore } from "@/stores/userStore"
 import { storeToRefs } from "pinia"
 import { watch } from "vue"

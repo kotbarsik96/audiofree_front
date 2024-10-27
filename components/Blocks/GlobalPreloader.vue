@@ -1,16 +1,18 @@
 <template>
-  <Teleport :to="teleportTo" :disabled="!teleportTo">
-    <Transition name="fade-in" appear>
-      <div class="g-preloader">
-        <AFIcon :icon="HeadphonesIcon" />
-      </div>
-    </Transition>
-  </Teleport>
+  <ClientOnly>
+    <Teleport :to="teleportTo" :disabled="!teleportTo">
+      <Transition name="fade-in" appear>
+        <div class="g-preloader">
+          <AFIcon :icon="HeadphonesIcon" />
+        </div>
+      </Transition>
+    </Teleport>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
-import AFIcon from "~/components/Blocks/AFIcon.vue"
-import HeadphonesIcon from "@/assets/images/icons/headphones.svg"
+import AFIcon from '~/components/Blocks/AFIcon.vue'
+import HeadphonesIcon from '@/assets/images/icons/headphones.svg'
 
 const props = defineProps<{
   teleportTo?: string
@@ -39,7 +41,7 @@ const props = defineProps<{
   0% {
     color: var(--primary-dark);
   }
-  100%{ 
+  100% {
     color: var(--text-color);
   }
 }

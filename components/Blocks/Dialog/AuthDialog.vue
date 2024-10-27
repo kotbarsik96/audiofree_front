@@ -1,12 +1,12 @@
 <template>
   <AFDialog class="auth-dialog" v-show="!isAuth" v-model:shown="_shown">
-    <AuthForm />
+    <AuthWindow />
   </AFDialog>
 </template>
 
 <script setup lang="ts">
 import AFDialog from "~/components/Blocks/Dialog/AFDialog.vue"
-import AuthForm from "~/components/Blocks/AuthForms/AuthForm.vue"
+import AuthWindow from "~/components/Blocks/AuthForms/AuthWindow.vue"
 import { computed, watch } from "vue"
 import { storeToRefs } from "pinia"
 import { useUserStore } from "@/stores/userStore"
@@ -41,6 +41,6 @@ watch(isAuth, () => {
 
 <style lang="scss" scoped>
 .auth-dialog {
-  min-width: 25rem;
+  max-width: 25rem;
 }
 </style>

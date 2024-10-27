@@ -110,16 +110,14 @@
               <button
                 class="header-mobile__menu-item-inner --iconed --close"
                 type="button"
+                @click="closeMenu"
               >
                 <AFIcon :icon="ChevronRightIcon" rotate="180deg" />
                 <span>Меню</span>
               </button>
             </li>
             <li class="header-mobile__menu-item">
-              <NuxtLink
-                class="header-mobile__menu-item-inner --iconed"
-                to="/"
-              >
+              <NuxtLink class="header-mobile__menu-item-inner --iconed" to="/">
                 <AFIcon :icon="HeadphonesIcon" />
                 <span>Главная</span>
               </NuxtLink>
@@ -161,6 +159,8 @@
         </nav>
       </div>
     </template>
+
+    <AuthDialog v-model:shown="dialogShown" />
   </header>
 </template>
 
@@ -182,8 +182,11 @@ import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 import HeaderAuthBlock from '~/components/Blocks/Header/HeaderAuthBlock.vue'
 import vClickAway from '@/directives/vClickAway'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
+import AuthDialog from '~/components/Blocks/Dialog/AuthDialog.vue'
 
 const { matches: mediaMatches } = useMatchMedia('max-width: 991px')
+
+const { dialogShown } = storeToRefs(useAuthStore())
 
 const searchValue = ref('')
 
@@ -224,6 +227,7 @@ function closeMenu(e: Event) {
 <style lang="scss" scoped>
 .header {
   --header-height: 165px;
+  z-index: 999;
 
   box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.12);
   position: relative;
@@ -290,7 +294,7 @@ function closeMenu(e: Event) {
       align-items: center;
       gap: 1rem;
       @include fontSize(18);
-    font-weight: 500;
+      font-weight: 500;
     }
   }
 
@@ -505,7 +509,7 @@ function closeMenu(e: Event) {
       align-items: center;
       gap: 22px;
       @include fontSize(14);
-    font-weight: 500;
+      font-weight: 500;
 
       .icon {
         color: var(--primary);
@@ -515,7 +519,7 @@ function closeMenu(e: Event) {
     }
     &.--close {
       @include fontSize(18);
-    font-weight: 700;
+      font-weight: 700;
 
       .icon {
         opacity: 1;

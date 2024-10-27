@@ -8,13 +8,9 @@ export const useGlobalStore = defineStore('global', () => {
   const appInitted = ref(false)
 
   async function initApp() {
-    await Promise.all([getUser()])
+    await Promise.all([userStore.getUser()])
 
     appInitted.value = true
-  }
-
-  async function getUser() {
-    await userStore.getUser()
   }
 
   return {

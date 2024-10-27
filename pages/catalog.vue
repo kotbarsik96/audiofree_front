@@ -11,7 +11,7 @@
             <BreadCrumbs />
             <h1 class="_page-header__title">Каталог</h1>
           </div>
-          <CatalogSorts />
+          <CatalogSorts class="catalog__sorts" />
         </div>
         <div class="catalog__main">
           <CatalogBody />
@@ -97,6 +97,12 @@ import CatalogSorts from '~/components/Page/CatalogPage/CatalogSorts.vue'
     &__main {
       grid-column: 1 / -1;
       grid-row: span 1;
+    }
+  }
+
+  @include adaptive(tablet-big){
+    &__sorts {
+      align-self: center;
     }
   }
 }

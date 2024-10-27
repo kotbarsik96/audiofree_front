@@ -82,6 +82,7 @@ function onPointerdown(event: PointerEvent) {
   inset: 0;
   background-color: var(--white);
   border-radius: 8px;
+  width: 90%;
   max-height: 90%;
   animation: hideDialog 0.3s ease-in-out;
   z-index: 9000;
