@@ -62,15 +62,11 @@ const errorPassword = ref('')
 const globalError = ref('')
 
 const validateAll = useAllValidation([
-  useValidation(
-    email,
-    errorEmail,
-    [emailValidation(), mustPresentValidation()],
-    { deferWatcher: true }
-  ),
-  useValidation(password, errorPassword, [mustPresentValidation()], {
-    deferWatcher: true,
-  }),
+  useValidation(email, errorEmail, [
+    emailValidation(),
+    mustPresentValidation(),
+  ]),
+  useValidation(password, errorPassword, [mustPresentValidation()]),
 ])
 
 watch(email, onInput)

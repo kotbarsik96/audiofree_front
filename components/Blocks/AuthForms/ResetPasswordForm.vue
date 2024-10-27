@@ -48,14 +48,10 @@ const { addNotification } = useNotifications()
 const emailSentMessage = ref()
 const isLoading = ref(false)
 const emailError = ref('')
-const { validate, startWatching } = useValidation(
-  email,
-  emailError,
-  [mustPresentValidation(), emailValidation()],
-  {
-    deferWatcher: true,
-  }
-)
+const { validate, startWatching } = useValidation(email, emailError, [
+  mustPresentValidation(),
+  emailValidation(),
+])
 
 const { $afFetch } = useNuxtApp()
 

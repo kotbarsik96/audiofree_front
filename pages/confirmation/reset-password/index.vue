@@ -54,18 +54,14 @@ const passwordRepeatError = ref('')
 const isLoading = ref(false)
 
 const validation = useAllValidation([
-  useValidation(
-    password,
-    passwordError,
-    [mustPresentValidation(), passwordValidation()],
-    { deferWatcher: true }
-  ),
-  useValidation(
-    passwordRepeat,
-    passwordRepeatError,
-    [mustPresentValidation(), passwordsMatchValidation(password)],
-    { deferWatcher: true }
-  ),
+  useValidation(password, passwordError, [
+    mustPresentValidation(),
+    passwordValidation(),
+  ]),
+  useValidation(passwordRepeat, passwordRepeatError, [
+    mustPresentValidation(),
+    passwordsMatchValidation(password),
+  ]),
 ])
 
 const { $afFetch } = useNuxtApp()

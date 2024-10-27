@@ -57,11 +57,11 @@ export function passwordsMatchValidation(
 type ValidatorCallback = (value: string) => string | false
 
 export interface IValidationOptions {
-  /** отложить watcher валидации до момента вызова startWatching
-   * 
+  /** по умолчанию, watcher валидации откладывается до момента вызова startWatching
+   *
    * при использовании внутри useValidAll, startWatching будет вызван при useValidAll.validate
    */
-  deferWatcher?: boolean
+  watchImmediately?: boolean
 }
 
 /** Выводит ошибку в error.value, если value.value не проходит валидацию по переданным методам
@@ -75,7 +75,7 @@ export function useValidation(
   options?: IValidationOptions
 ) {
   let watcher: WatchHandle | undefined
-  if (!options?.deferWatcher) startWatching()
+  if (options?.watchImmediately) startWatching()
 
   function validate(): boolean {
     let isValid = true
