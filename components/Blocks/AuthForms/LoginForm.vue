@@ -1,5 +1,10 @@
 <template>
   <form class="login-form auth-form" @submit.prevent="onSubmit">
+    <Transition name="fade-in">
+      <div v-if="globalError" class="auth-form__global-error _error">
+        {{ globalError }}
+      </div>
+    </Transition>
     <InputWrapper class="auth-form__input" :icon="MailIcon">
       <TextInput v-model="email" placeholder="Email" autocomplete="username" />
       <template v-if="errorEmail" #error>
@@ -54,6 +59,7 @@ const isLoading = ref(false)
 
 const errorEmail = ref('')
 const errorPassword = ref('')
+const globalError = ref('')
 
 const validateAll = useAllValidation([
   useValidation(
@@ -66,6 +72,9 @@ const validateAll = useAllValidation([
     deferWatcher: true,
   }),
 ])
+
+watch(email, onInput)
+watch(password, onInput)
 
 async function onSubmit() {
   if (!validateAll.validate()) return
@@ -90,16 +99,17 @@ async function onSubmit() {
         }
       },
       onResponseError({ response }) {
-        errorEmail.value = response._data.errors.email?.[0] || ''
+        errorEmail.value = response._data.errors?.email?.[0] || ''
         errorPassword.value = response._data.errors?.password?.[0] || ''
-
-        if (response._data.message)
-          addNotification('error', response._data.message)
+        if (response._data.message) globalError.value = response._data.message
       },
     })
   } catch (e) {}
 
   isLoading.value = false
+}
+function onInput() {
+  globalError.value = ''
 }
 </script>
 

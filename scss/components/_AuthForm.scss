@@ -4,6 +4,11 @@
   align-items: center;
   gap: 20px;
 
+  &__global-error {
+    font-weight: 500;
+    @include fontSize(16);
+  }
+
   &__form {
     width: 100%;
     max-width: 470px;

@@ -121,7 +121,7 @@ async function onSubmit() {
       },
       onResponseError({ response }) {
         errorName.value = response._data.errors?.name?.[0] || ''
-        errorEmail.value = response._data.errors.email?.[0] || ''
+        errorEmail.value = response._data.errors?.email?.[0] || ''
         errorPassword.value = response._data.errors?.password?.[0] || ''
       },
     })
