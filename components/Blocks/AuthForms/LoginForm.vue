@@ -56,11 +56,15 @@ const errorEmail = ref('')
 const errorPassword = ref('')
 
 const validateAll = useAllValidation([
-  useValidation(email, errorEmail, [
-    emailValidation(),
-    mustPresentValidation(),
-  ]),
-  useValidation(password, errorPassword, [mustPresentValidation()]),
+  useValidation(
+    email,
+    errorEmail,
+    [emailValidation(), mustPresentValidation()],
+    { deferWatcher: true }
+  ),
+  useValidation(password, errorPassword, [mustPresentValidation()], {
+    deferWatcher: true,
+  }),
 ])
 
 async function onSubmit() {

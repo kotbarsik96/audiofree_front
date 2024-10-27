@@ -66,17 +66,24 @@ const errorEmail = ref('')
 const errorPassword = ref('')
 const errorPasswordRepeat = ref('')
 const validateAll = useAllValidation([
-  useValidation(email, errorEmail, [
-    emailValidation(),
-    mustPresentValidation(),
-  ]),
-  useValidation(password, errorPassword, [
-    passwordValidation(),
-    mustPresentValidation(),
-  ]),
-  useValidation(passwordRepeat, errorPasswordRepeat, [
-    passwordsMatchValidation(password),
-  ]),
+  useValidation(
+    email,
+    errorEmail,
+    [emailValidation(), mustPresentValidation()],
+    { deferWatcher: true }
+  ),
+  useValidation(
+    password,
+    errorPassword,
+    [passwordValidation(), mustPresentValidation()],
+    { deferWatcher: true }
+  ),
+  useValidation(
+    passwordRepeat,
+    errorPasswordRepeat,
+    [passwordsMatchValidation(password)],
+    { deferWatcher: true }
+  ),
 ])
 
 const isButtonDisabled = computed(

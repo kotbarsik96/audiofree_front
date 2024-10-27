@@ -1,3 +1,5 @@
+import type { WatchHandle } from 'vue'
+
 export function passwordValidation(): ValidatorCallback {
   let minLength = 6
 
@@ -54,13 +56,26 @@ export function passwordsMatchValidation(
 
 type ValidatorCallback = (value: string) => string | false
 
-/** Выводит ошибку в error.value, если value.value не проходит валидацию по переданным методам */
+export interface IValidationOptions {
+  /** отложить watcher валидации до момента вызова startWatching
+   * 
+   * при использовании внутри useValidAll, startWatching будет вызван при useValidAll.validate
+   */
+  deferWatcher?: boolean
+}
+
+/** Выводит ошибку в error.value, если value.value не проходит валидацию по переданным методам
+ *
+ *
+ */
 export function useValidation(
   value: Ref<string>,
   error: Ref<string>,
-  validators: ValidatorCallback[]
+  validators: ValidatorCallback[],
+  options?: IValidationOptions
 ) {
-  watch(value, validate)
+  let watcher: WatchHandle | undefined
+  if (!options?.deferWatcher) startWatching()
 
   function validate(): boolean {
     let isValid = true
@@ -77,8 +92,12 @@ export function useValidation(
     if (isValid) error.value = ''
     return isValid
   }
+  /** Поставит watch на value, если его ещё нет */
+  function startWatching() {
+    if (!watcher) watcher = watch(value, validate)
+  }
 
-  return { validate }
+  return { validate, startWatching }
 }
 
 /** Собирает в себя массив useValidation()
@@ -93,6 +112,7 @@ export function useAllValidation(
   function validate() {
     let isAllValid = true
     for (let validation of validations) {
+      validation.startWatching()
       if (!validation.validate()) isAllValid = false
     }
     return isAllValid
