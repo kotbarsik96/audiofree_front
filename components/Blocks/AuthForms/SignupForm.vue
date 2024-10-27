@@ -33,8 +33,7 @@
         </template>
       </PasswordInput>
       <div class="auth-form__buttons">
-        <!-- <AFButton type="submit" label="Войти" :disabled="isButtonDisabled" /> -->
-        <AFButton type="submit" label="Войти" :disabled="false" />
+        <AFButton type="submit" label="Войти" :disabled="isButtonDisabled" />
       </div>
     </form>
   </div>
@@ -114,12 +113,14 @@ async function onSubmit() {
         }
       },
       onResponseError({ response }) {
-        errorName.value = response._data.errors?.name[0] || ''
-        errorEmail.value = response._data.errors?.email[0] || ''
-        errorPassword.value = response._data.errors?.password[0] || ''
+        errorName.value = response._data.errors?.name?.[0] || ''
+        errorEmail.value = response._data.errors.email?.[0] || ''
+        errorPassword.value = response._data.errors?.password?.[0] || ''
       },
     })
-  } catch (e) {}
+  } catch (e) {
+    console.error(e)
+  }
 
   isLoading.value = false
 }

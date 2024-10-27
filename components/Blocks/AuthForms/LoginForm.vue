@@ -2,8 +2,8 @@
   <form class="login-form auth-form" @submit.prevent="onSubmit">
     <InputWrapper class="auth-form__input" :icon="MailIcon">
       <TextInput v-model="email" placeholder="Email" autocomplete="username" />
-      <template v-if="errors?.email" #error>
-        {{ errors.email[0] }}
+      <template v-if="errorEmail" #error>
+        {{ errorEmail }}
       </template>
     </InputWrapper>
     <PasswordInput
@@ -11,8 +11,8 @@
       autocomplete="current-password"
       v-model="password"
     >
-      <template v-if="errors?.password" #error>
-        {{ errors.password[0] }}
+      <template v-if="errorPassword" #error>
+        {{ errorPassword }}
       </template>
     </PasswordInput>
     <div class="auth-form__buttons">
@@ -42,7 +42,6 @@ import PasswordInput from '~/components/Blocks/FormElements/PasswordInput.vue'
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore'
-import type { IErrors } from '~/dataAccess/api/IErrors'
 import { useNotifications } from '@/composables/useNotifications'
 
 const { $afFetch } = useNuxtApp()
@@ -51,10 +50,22 @@ const userStore = useUserStore()
 const { updateJwt, getUser } = userStore
 const { addNotification } = useNotifications()
 
-const errors = ref<IErrors>()
 const isLoading = ref(false)
 
+const errorEmail = ref('')
+const errorPassword = ref('')
+
+const validateAll = useAllValidation([
+  useValidation(email, errorEmail, [
+    emailValidation(),
+    mustPresentValidation(),
+  ]),
+  useValidation(password, errorPassword, [mustPresentValidation()]),
+])
+
 async function onSubmit() {
+  if (!validateAll.validate()) return
+
   isLoading.value = true
 
   try {
@@ -75,7 +86,9 @@ async function onSubmit() {
         }
       },
       onResponseError({ response }) {
-        errors.value = response._data.errors
+        errorEmail.value = response._data.errors.email?.[0] || ''
+        errorPassword.value = response._data.errors?.password?.[0] || ''
+
         if (response._data.message)
           addNotification('error', response._data.message)
       },
