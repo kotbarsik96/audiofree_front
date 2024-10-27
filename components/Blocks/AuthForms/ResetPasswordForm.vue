@@ -8,12 +8,15 @@
       >
         <InputWrapper class="auth-form__input" :icon="MailIcon">
           <TextInput v-model="email" placeholder="Email" type="email" />
+          <template v-if="emailError" #error>
+            {{ emailError }}
+          </template>
         </InputWrapper>
         <div class="auth-form__buttons">
           <AFButton
             type="submit"
             label="Сбросить пароль"
-            :disabled="isLoading"
+            :disabled="isLoading || !email"
           />
           <AFButton
             styleType="secondary"
@@ -38,22 +41,45 @@ import AFButton from '~/components/Blocks/AFButton.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
-import { User } from '~/domain/user/User'
 
-const userService = new User()
 const { previousTab, tab, email } = storeToRefs(useAuthStore())
+const { addNotification } = useNotifications()
 
 const emailSentMessage = ref()
 const isLoading = ref(false)
+const emailError = ref('')
+const { validate, startWatching } = useValidation(
+  email,
+  emailError,
+  [mustPresentValidation(), emailValidation()],
+  {
+    deferWatcher: true,
+  }
+)
+
+const { $afFetch } = useNuxtApp()
 
 async function send() {
+  startWatching()
+  if (!validate()) return
+
   isLoading.value = true
 
-  // const response = await userService.sendPasswordResetLink({
-  //   email: email.value,
-  // })
-  // if (response?.payload.message)
-  //   emailSentMessage.value = response.payload.message
+  try {
+    await $afFetch('/profile/reset-password/request', {
+      method: 'POST',
+      body: { email: email.value },
+      onResponse({ response }) {
+        if (response.ok && response._data.message) {
+          emailSentMessage.value = response._data.message
+        }
+      },
+      onResponseError({ response }) {
+        if (response._data.message)
+          addNotification('error', response._data.message)
+      },
+    })
+  } catch (e) {}
 
   isLoading.value = false
 }
