@@ -5,7 +5,10 @@ import type { authTabs } from '@/enums/auth/authTabs'
 export const useAuthStore = defineStore('auth', () => {
   const tab = ref<authTabs>('signup')
   const previousTab = ref<authTabs>('signup')
+  const name = ref('')
   const email = ref('')
+  const password = ref('')
+  const passwordRepeat = ref('')
   const dialogShown = ref(false)
   const isLoading = ref(false)
 
@@ -18,7 +21,10 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     tab,
     previousTab,
+    name,
     email,
+    password,
+    passwordRepeat,
     dialogShown,
     isLoading,
     goBack,

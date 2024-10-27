@@ -24,7 +24,11 @@
       >
         Забыли пароль?
       </button>
-      <AFButton type="submit" label="Войти" :disabled="isLoading" />
+      <AFButton
+        type="submit"
+        label="Войти"
+        :disabled="isLoading || !email || !password"
+      />
     </div>
   </form>
 </template>
@@ -42,12 +46,11 @@ import type { IErrors } from '~/dataAccess/api/IErrors'
 import { useNotifications } from '@/composables/useNotifications'
 
 const { $afFetch } = useNuxtApp()
-const { tab, email, dialogShown } = storeToRefs(useAuthStore())
+const { tab, email, password, dialogShown } = storeToRefs(useAuthStore())
 const userStore = useUserStore()
 const { updateJwt, getUser } = userStore
 const { addNotification } = useNotifications()
 
-const password = ref('')
 const errors = ref<IErrors>()
 const isLoading = ref(false)
 

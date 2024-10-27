@@ -1,16 +1,16 @@
 <template>
-  <div class="login-form">
-    <form class="login-form__form auth-form" @submit.prevent="onSubmit">
+  <div class="signup-form">
+    <form class="signup-form__form auth-form" @submit.prevent="onSubmit">
       <InputWrapper class="auth-form__input" type="email" :icon="UserIcon">
         <TextInput v-model="name" placeholder="Ваше имя" />
-        <template v-if="errors?.name" #error>
-          {{ errors.name[0] }}
+        <template v-if="errorName" #error>
+          {{ errorName }}
         </template>
       </InputWrapper>
       <InputWrapper class="auth-form__input" :icon="MailIcon">
         <TextInput v-model="email" placeholder="Email" autocomplete="email" />
-        <template v-if="errors?.email" #error>
-          {{ errors.email[0] }}
+        <template v-if="errorEmail" #error>
+          {{ errorEmail }}
         </template>
       </InputWrapper>
       <PasswordInput
@@ -18,8 +18,8 @@
         v-model="password"
         autocomplete="new-password"
       >
-        <template v-if="errors?.password" #error>
-          {{ errors.password[0] }}
+        <template v-if="errorPassword" #error>
+          {{ errorPassword }}
         </template>
       </PasswordInput>
       <PasswordInput
@@ -27,9 +27,14 @@
         v-model="passwordRepeat"
         placeholder="Пароль еще раз"
         autocomplete="new-password"
-      />
+      >
+        <template v-if="errorPasswordRepeat" #error>
+          {{ errorPasswordRepeat }}
+        </template>
+      </PasswordInput>
       <div class="auth-form__buttons">
-        <AFButton type="submit" label="Войти" :disabled="isLoading" />
+        <!-- <AFButton type="submit" label="Войти" :disabled="isButtonDisabled" /> -->
+        <AFButton type="submit" label="Войти" :disabled="false" />
       </div>
     </form>
   </div>
@@ -46,23 +51,47 @@ import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore'
 import { useUserStore } from '@/stores/userStore'
-import type { IErrors } from '~/dataAccess/api/IErrors'
 import { useNotifications } from '@/composables/useNotifications'
 
 const { $afFetch } = useNuxtApp()
-const { email, dialogShown, isLoading } = storeToRefs(useAuthStore())
+const { name, email, password, passwordRepeat, dialogShown, isLoading } =
+  storeToRefs(useAuthStore())
 const userStore = useUserStore()
 const { getUser } = userStore
 const { addNotification } = useNotifications()
 
 const { jwt } = storeToRefs(useUserStore())
 
-const name = ref('')
-const password = ref('')
-const passwordRepeat = ref('')
-const errors = ref<IErrors>()
+const errorName = ref('')
+const errorEmail = ref('')
+const errorPassword = ref('')
+const errorPasswordRepeat = ref('')
+const validateAll = useAllValidation([
+  useValidation(email, errorEmail, [
+    emailValidation(),
+    mustPresentValidation(),
+  ]),
+  useValidation(password, errorPassword, [
+    passwordValidation(),
+    mustPresentValidation(),
+  ]),
+  useValidation(passwordRepeat, errorPasswordRepeat, [
+    passwordsMatchValidation(password),
+  ]),
+])
+
+const isButtonDisabled = computed(
+  () =>
+    isLoading.value ||
+    !email.value ||
+    !password.value ||
+    !name.value ||
+    !passwordRepeat.value
+)
 
 async function onSubmit() {
+  if (!validateAll.validate()) return
+
   isLoading.value = true
 
   try {
@@ -85,7 +114,9 @@ async function onSubmit() {
         }
       },
       onResponseError({ response }) {
-        errors.value = response._data.errors
+        errorName.value = response._data.errors?.name[0] || ''
+        errorEmail.value = response._data.errors?.email[0] || ''
+        errorPassword.value = response._data.errors?.password[0] || ''
       },
     })
   } catch (e) {}

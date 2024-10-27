@@ -6,38 +6,38 @@
     <div class="input-wrapper__wrap">
       <AFIcon v-if="icon" class="input-wrapper__icon" :icon="icon" />
       <slot />
-      <Transition name="fade-in">
-        <span v-if="slots.error" class="input-wrapper__error _error">
-          <slot name="error" />
-        </span>
-      </Transition>
     </div>
+    <Transition name="drop-down">
+      <span v-if="slots.error" class="input-wrapper__error _error">
+        <slot name="error" />
+      </span>
+    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import AFIcon from "~/components/Blocks/AFIcon.vue"
-import { computed } from "vue"
-import { useSlots } from "vue"
+import AFIcon from '~/components/Blocks/AFIcon.vue'
+import { computed } from 'vue'
+import { useSlots } from 'vue'
 
 const props = withDefaults(
   defineProps<{
     label?: string
     id?: string
     icon?: string | any
-    iconPos?: "right" | "left"
+    iconPos?: 'right' | 'left'
     rounded?: boolean
   }>(),
   {
-    iconPos: "left",
+    iconPos: 'left',
   }
 )
 const slots = useSlots()
 
 const className = computed(() => {
   return {
-    "input-wrapper--icon-left": props.iconPos === "left",
-    "input-wrapper--rounded": props.rounded,
+    'input-wrapper--icon-left': props.iconPos === 'left',
+    'input-wrapper--rounded': props.rounded,
   }
 })
 </script>
@@ -119,9 +119,10 @@ const className = computed(() => {
   }
 
   &__error {
-    position: absolute;
-    top: calc(100% + 0.15rem);
-    left: 0;
+    display: block;
+    margin-top: 0.3rem;
+    margin-bottom: -1rem;
+    max-width: 100%;
   }
 }
 </style>
