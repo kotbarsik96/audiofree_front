@@ -1,20 +1,25 @@
 <template>
   <div class="rating" :style="style">
-    <div class="rating__items rating__items--totals">
-      <AFIcon
-        v-for="num in total"
-        class="rating__icon"
-        :icon="_icon"
-        :key="num"
-      />
+    <div class="rating__items-wrapper">
+      <div class="rating__items rating__items--totals">
+        <AFIcon
+          v-for="num in total"
+          class="rating__icon"
+          :icon="_icon"
+          :key="num"
+        />
+      </div>
+      <div class="rating__items rating__items--values">
+        <AFIcon
+          v-for="num in total"
+          class="rating__icon"
+          :icon="_icon"
+          :key="num"
+        />
+      </div>
     </div>
-    <div class="rating__items rating__items--values">
-      <AFIcon
-        v-for="num in total"
-        class="rating__icon"
-        :icon="_icon"
-        :key="num"
-      />
+    <div v-if="detailed" class="rating__detail">
+      ({{ value.toFixed(2) }} из {{ total }})
     </div>
   </div>
 </template>
@@ -28,6 +33,7 @@ const props = withDefaults(
     icon?: string | any
     total?: number
     value: number
+    detailed?: boolean
   }>(),
   {
     total: 5,
@@ -45,6 +51,13 @@ const _icon = computed(() => props.icon || StarIcon)
 <style lang="scss" scoped>
 .rating {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  &__items-wrapper {
+    position: relative;
+  }
 
   &__items {
     display: flex;
@@ -77,6 +90,12 @@ const _icon = computed(() => props.icon || StarIcon)
   }
   &__items--values &__icon {
     color: var(--rating-fill-color);
+  }
+
+  &__detail {
+    color: var(--text-color);
+    font-weight: 500;
+    @include fontSize(14);
   }
 }
 </style>

@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="product-card__img">
-        <img :src="data.image.url" alt="" />
+        <AFImage :src="data.image.url" />
       </div>
       <div class="product-card__title">
         {{ data.brand.value }} {{ data.name }}
@@ -39,6 +39,7 @@ import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 import HeartIcon from '~/assets/images/icons/heart.svg'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 import AFButton from '~/components/Blocks/AFButton.vue'
+import AFImage from '~/components/Blocks/AFImage.vue'
 import { currency } from '~/utils/numbers'
 
 const props = defineProps<{
@@ -151,7 +152,7 @@ const statusText = computed(() => statusMap[props.data.status.value_slug])
     }
   }
 
-  @include adaptive(tablet-big){
+  @include adaptive(tablet-big) {
     max-width: 20rem;
   }
 }
