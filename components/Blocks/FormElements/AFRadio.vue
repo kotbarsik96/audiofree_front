@@ -28,46 +28,5 @@ const _value = computed({
 </script>
 
 <style lang="scss" scoped>
-.radio {
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.625rem;
-
-  &__label {
-    @include fontSize(16);
-  }
-
-  input {
-    display: none;
-  }
-
-  &__circle {
-    flex-shrink: 0;
-    border-radius: 50%;
-    border: 1px solid var(--stroke);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
-    width: 1.25rem;
-    height: 1.25rem;
-    transition: var(--general-transition);
-
-    &::before {
-      content: "";
-      width: 50%;
-      height: 50%;
-      opacity: 0;
-      background-color: var(--primary);
-      border-radius: 50%;
-      transition: var(--general-transition);
-    }
-  }
-  input:checked + &__circle {
-    &::before{
-      opacity: 1;
-    }
-  }
-}
+@import '~/scss/components/_AFRadio';
 </style>

@@ -45,6 +45,10 @@ html {
   @include fontSize(14);
 }
 
+._bold {
+  font-weight: 700;
+}
+
 ._box {
   padding: 20px;
   border-radius: 8px;

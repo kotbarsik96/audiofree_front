@@ -1,5 +1,9 @@
 <template>
-  <div class="product-card _card" :class="className">
+  <NuxtLink
+    class="product-card _card"
+    :class="className"
+    :to="`/product/${data.id}/${data.first_variation.id}`"
+  >
     <div class="product-card__inner _card__inner">
       <div class="product-card__top">
         <div class="product-card__status">
@@ -28,7 +32,7 @@
         <AFButton label="В корзину" styleType="secondary" />
       </div>
     </div>
-  </div>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
