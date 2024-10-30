@@ -3,6 +3,7 @@
     <button
       class="quantity-input__arrow quantity-input__arrow--less"
       type="button"
+      aria-label="Убавить"
       @click="updateValue(-1)"
     >
       <AFIcon :icon="ChevronIcon" rotate="180deg" />
@@ -18,6 +19,7 @@
     <button
       class="quantity-input__arrow quantity-input__arrow--more"
       type="button"
+      aria-label="Прибавить"
       @click="updateValue(1)"
     >
       <AFIcon :icon="ChevronIcon" />
@@ -36,7 +38,7 @@ const props = withDefaults(
     max?: number
   }>(),
   {
-    min: 0,
+    min: 1,
     max: 99,
   }
 )
@@ -65,8 +67,9 @@ function updateValue(num: number) {
 .quantity-input {
   border-radius: 8px;
   border: 1px solid var(--stroke);
-  display: flex;
+  display: inline-flex;
   background-color: var(--white);
+  overflow: hidden;
 
   &__arrow {
     display: flex;
@@ -74,6 +77,11 @@ function updateValue(num: number) {
     justify-content: center;
     width: 2.625rem;
     height: 2.625rem;
+    transition: var(--general-transition);
+
+    &:hover {
+      background-color: var(--stroke);
+    }
 
     .icon {
       width: 0.75rem;
@@ -87,6 +95,8 @@ function updateValue(num: number) {
   }
 
   &__input {
+    outline: none;
+    border: none;
     color: var(--text-color-light);
     width: 3.75rem;
     text-align: center;
