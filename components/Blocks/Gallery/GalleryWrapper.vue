@@ -1,23 +1,24 @@
 <template>
-  <GallerySlider v-if="showSlider" :images="images" />
-  <GallerySwitcher v-else :images="images" />
+  <div class="gallery-wrapper">
+    <GallerySlider class="gallery-wrapper__slider" :images="images" />
+    <GallerySwitcher class="gallery-wrapper__switcher" :images="images" />
+  </div>
 </template>
 
 <script setup lang="ts">
 import GallerySwitcher from '~/components/Blocks/Gallery/GallerySwitcher.vue'
 import GallerySlider from '~/components/Blocks/Gallery/GallerySlider.vue'
 
-const props = withDefaults(
-  defineProps<{
-    images: string[]
-    showSliderMedia?: string
-  }>(),
-  {
-    showSliderMedia: 'max-width: 990px',
-  }
-)
-
-const { matches: showSlider } = useMatchMedia(props.showSliderMedia)
+const props = defineProps<{
+  images: string[]
+  showSliderMedia?: string
+}>()
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.gallery-wrapper {
+  &__slider {
+    display: none;
+  }
+}
+</style>

@@ -1,12 +1,6 @@
 <template>
   <div v-if="!!variation && !!product" class="product-body">
-    <div class="product-body__gallery-wrapper">
-      <GalleryWrapper
-        class="product-body__gallery"
-        :images="gallery"
-        showSliderMedia="max-width: 766px"
-      />
-    </div>
+    <GalleryWrapper class="product-body__gallery-wrapper" :images="gallery" />
     <BreadCrumbs class="product-body__breadcrumbs" />
     <h1 class="product-body__title _page-header__title">{{ fullName }}</h1>
     <AFRating
@@ -297,36 +291,50 @@ const quantity = ref(1)
       height: 20rem;
       max-width: 30rem;
       margin: 0 auto;
+
+      :deep(.gallery-wrapper__slider){
+        display: block;
+      }
+      :deep(.gallery-wrapper__switcher){
+        display: none;
+      }
     }
 
     &__side-top {
       grid-column: 1 / -1;
       grid-row: 3 / 4;
     }
+
     &__title {
       grid-column: 1 / -1;
       grid-row: span 1;
     }
+
     &__rating {
       grid-column: 1 / -1;
       grid-row: span 1;
     }
+
     &__price {
       grid-column: 1 / -1;
       grid-row: span 1;
     }
+
     &__quantity {
       grid-column: 1 / -1;
       grid-row: span 1;
     }
+
     &__variations {
       grid-column: 1 / -1;
       grid-row: span 1;
     }
+
     &__buttons {
       grid-column: 1 / -1;
       grid-row: span 1;
     }
+    
     &__side-info {
       grid-column: 1 / -1;
       grid-row: span 1;
