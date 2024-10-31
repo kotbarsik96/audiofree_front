@@ -1,6 +1,6 @@
 <template>
   <div class="gallery-slider">
-    <Swiper>
+    <Swiper class="gallery-slider__slider">
       <SwiperSlide
         v-for="img in images"
         class="gallery-slider__slide"
@@ -22,12 +22,18 @@ const props = defineProps<{
 
 <style lang="scss" scoped>
 .gallery-slider {
+  &__slider{ 
+    width: 100%;
+  }
+
   &__slide {
+    width: 100% !important;
   }
 
   &__img {
     width: 100%;
     max-width: 400px;
+    aspect-ratio: 1;
     object-fit: contain;
   }
 }

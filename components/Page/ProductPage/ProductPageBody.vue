@@ -1,7 +1,11 @@
 <template>
   <div v-if="!!variation && !!product" class="product-body">
     <div class="product-body__gallery-wrapper">
-      <GalleryWrapper class="product-body__gallery" :images="gallery" />
+      <GalleryWrapper
+        class="product-body__gallery"
+        :images="gallery"
+        showSliderMedia="max-width: 766px"
+      />
     </div>
     <BreadCrumbs class="product-body__breadcrumbs" />
     <h1 class="product-body__title _page-header__title">{{ fullName }}</h1>
@@ -37,28 +41,27 @@
       <AFButton label="В корзину" />
       <AFButton label="Купить в 1 клик" styleType="secondary" />
     </div>
-    <div class="product-body__side">
-      <div class="product-body__side-top">
-        <div v-if="true!" class="product-body__side-top-warning">
-          <ExclamationMarkIcon class="icon" />
-          <div>
-            До конца акции осталось:
-            <span class="_bold">3 дня</span>
-          </div>
+    <div class="product-body__side-top">
+      <div v-if="true!" class="product-body__side-top-warning">
+        <ExclamationMarkIcon class="icon" />
+        <div>
+          До конца акции осталось:
+          <span class="_bold">3 дня</span>
         </div>
-        <div class="product-body__side-top-main">
-          <div class="product-body__side-top-id">
-            Артикул:
-            <span class="_bold">
-              {{ product.id }}
-            </span>
-          </div>
-          <div class="product-body__side-top-buttons">
-            <ButtonIcon contrast :icon="HeartIcon" />
-          </div>
+      </div>
+      <div class="product-body__side-top-main">
+        <div class="product-body__side-top-id">
+          Артикул:
+          <span class="_bold">
+            {{ product.id }}
+          </span>
+        </div>
+        <div class="product-body__side-top-buttons">
+          <ButtonIcon contrast :icon="HeartIcon" />
         </div>
       </div>
     </div>
+    <ProductSideInfo class="product-body__side-info" />
   </div>
 </template>
 
@@ -70,6 +73,7 @@ import QuantityInput from '~/components/Blocks/FormElements/QuantityInput.vue'
 import RadioLink from '~/components/Blocks/RadioLink.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
+import ProductSideInfo from '~/components/Blocks/ProductSideInfo.vue'
 import ExclamationMarkIcon from '~/assets/images/icons/exclamation-mark.svg'
 import HeartIcon from '~/assets/images/icons/heart.svg'
 import type { IProductData } from '~/domain/product/types/IProductData'
@@ -99,17 +103,16 @@ const quantity = ref(1)
 <style lang="scss" scoped>
 .product-body {
   display: grid;
-  grid-template-columns: repeat(3, auto);
+  grid-template-columns: 27rem 1fr auto;
   grid-template-rows: repeat(6, auto) 1fr;
   gap: 2rem 2.75rem;
+  padding-bottom: 4.5rem;
+  border-bottom: 1px solid var(--stroke);
+  margin-bottom: 4.5rem;
 
   &__gallery-wrapper {
     grid-column: 1 / 2;
     grid-row: 1 / -1;
-  }
-
-  &__gallery {
-    grid-column: 2 / 3;
   }
 
   &__breadcrumbs {
@@ -176,14 +179,14 @@ const quantity = ref(1)
     flex-wrap: wrap;
   }
 
-  &__side {
-    grid-row: 1 / -1;
-    grid-column: 3 / 4;
-  }
-
   &__side-top {
+    grid-column: 3 / 4;
+    grid-row: 1 / 3;
     display: flex;
     justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.25rem;
+    flex-wrap: wrap;
   }
 
   &__side-top-warning {
@@ -191,6 +194,7 @@ const quantity = ref(1)
     display: flex;
     align-items: center;
     gap: 0.4rem;
+    @include fontSize(14);
 
     .icon {
       flex-shrink: 0;
@@ -200,13 +204,133 @@ const quantity = ref(1)
   }
 
   &__side-top-main {
-  }
-
-  &__side-top-id {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
   }
 
   &__side-top-buttons {
-    
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+
+  &__side-info {
+    grid-column: 3 / 4;
+    grid-row: 3/ -1;
+
+    :deep(.product-info__section:nth-child(2) .product-info__section-value) {
+      .icon {
+        color: var(--rating-fill-color);
+      }
+    }
+  }
+
+  @include adaptive(tablet-big) {
+    grid-template-columns: 28rem 1fr;
+    grid-template-rows: repeat(9, auto);
+
+    &__breadcrumbs {
+      grid-column: 1 / -1;
+      grid-row: 1 / 2;
+    }
+
+    &__gallery-wrapper {
+      grid-column: 1 / 2;
+      grid-row: 2 / 9;
+    }
+
+    &__side-top {
+      grid-column: 2 / 3;
+      grid-row: 2 / 3;
+    }
+
+    &__title {
+      grid-column: 2 / 3;
+      grid-row: span 1;
+    }
+
+    &__rating {
+      grid-column: 2 / 3;
+      grid-row: span 1;
+    }
+
+    &__price {
+      grid-column: 2 / 3;
+      grid-row: span 1;
+    }
+
+    &__quantity {
+      grid-column: 2 / 3;
+      grid-row: span 1;
+    }
+
+    &__variations {
+      grid-column: 2 / 3;
+      grid-row: span 1;
+    }
+
+    &__buttons {
+      grid-column: 2 / 3;
+      grid-row: span 1;
+    }
+
+    &__side-info {
+      grid-column: 1 / -1;
+      grid-row: 9 / 10;
+      max-width: 35rem;
+    }
+  }
+
+  @include adaptive(tablet-small) {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(10, auto);
+    width: 100%;
+    gap: 1rem;
+
+    &__gallery-wrapper {
+      grid-column: 1 / -1;
+      grid-row: 2 / 3;
+      width: 100%;
+      height: 20rem;
+      max-width: 30rem;
+      margin: 0 auto;
+    }
+
+    &__side-top {
+      grid-column: 1 / -1;
+      grid-row: 3 / 4;
+    }
+    &__title {
+      grid-column: 1 / -1;
+      grid-row: span 1;
+    }
+    &__rating {
+      grid-column: 1 / -1;
+      grid-row: span 1;
+    }
+    &__price {
+      grid-column: 1 / -1;
+      grid-row: span 1;
+    }
+    &__quantity {
+      grid-column: 1 / -1;
+      grid-row: span 1;
+    }
+    &__variations {
+      grid-column: 1 / -1;
+      grid-row: span 1;
+    }
+    &__buttons {
+      grid-column: 1 / -1;
+      grid-row: span 1;
+    }
+    &__side-info {
+      grid-column: 1 / -1;
+      grid-row: span 1;
+    }
   }
 }
 </style>
