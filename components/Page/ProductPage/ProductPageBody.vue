@@ -75,8 +75,7 @@ import type { IProductData } from '~/domain/product/types/IProductData'
 const route = useRoute()
 
 const { data: productData } = await useAPI<{ data: IProductData }>(
-  `/product/${route.params.product}/${route.params.variation}`,
-  {}
+  `/product/${route.params.product}/${route.params.variation}`
 )
 const product = computed(() => productData.value?.data.product)
 const variation = computed(() => productData.value?.data.variation)
@@ -292,14 +291,14 @@ const quantity = ref(1)
       max-width: 30rem;
       margin: 0 auto;
 
-      :deep(.gallery-wrapper__slider){
+      :deep(.gallery-wrapper__slider) {
         display: block;
 
         .gallery-slider__img {
           height: 20rem;
         }
       }
-      :deep(.gallery-wrapper__switcher){
+      :deep(.gallery-wrapper__switcher) {
         display: none;
       }
     }
@@ -338,7 +337,7 @@ const quantity = ref(1)
       grid-column: 1 / -1;
       grid-row: span 1;
     }
-    
+
     &__side-info {
       grid-column: 1 / -1;
       grid-row: span 1;

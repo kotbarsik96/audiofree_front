@@ -1,5 +1,25 @@
 import type IImage from '~/domain/images/types/IImage'
 
+export interface IProductTaxonomy {
+  id: number
+  slug: string
+  value: string
+  value_slug: string
+}
+
+export interface IProductInfo {
+  id: number
+  product_id: number
+  name: string
+  value: string
+}
+
+export interface IProductVariation {
+  id: number
+  product_id: number
+  name: string
+}
+
 export interface IProduct {
   id: number
   name: string
@@ -9,140 +29,12 @@ export interface IProduct {
   brand_id: number
   category_id: number
   type_id: number
-  status: {
-    id: number
-    slug: string
-    value: string
-    value_slug: string
-  }
-  brand: {
-    id: number
-    slug: string
-    value: string
-    value_slug: string
-  }
-  category: {
-    id: number
-    slug: string
-    value: string
-    value_slug: string
-  }
-  type: {
-    id: number
-    slug: string
-    value: string
-    value_slug: string
-  }
-  info: [
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-      value: string
-    }
-  ]
-  variations: [
-    {
-      id: number
-      product_id: number
-      name: string
-    },
-    {
-      id: number
-      product_id: number
-      name: string
-    }
-  ]
+  status: IProductTaxonomy
+  brand: IProductTaxonomy
+  category: IProductTaxonomy
+  type: IProductTaxonomy
+  info: IProductInfo[]
+  variations: IProductVariation[]
 }
 
 export interface IVariation {
@@ -152,83 +44,7 @@ export interface IVariation {
   name: string
   quantity: number
   current_price: number
-  gallery: [
-    {
-      id: number
-      name: string
-      extension: string
-      path: string
-      alt: null
-      disk: string
-      url: string
-      relativeUrl: string
-      pivot: {
-        attachmentable_type: string
-        attachmentable_id: number
-        attachment_id: number
-      }
-    },
-    {
-      id: number
-      name: string
-      extension: string
-      path: string
-      alt: null
-      disk: string
-      url: string
-      relativeUrl: string
-      pivot: {
-        attachmentable_type: string
-        attachmentable_id: number
-        attachment_id: number
-      }
-    },
-    {
-      id: number
-      name: string
-      extension: string
-      path: string
-      alt: null
-      disk: string
-      url: string
-      relativeUrl: string
-      pivot: {
-        attachmentable_type: string
-        attachmentable_id: number
-        attachment_id: number
-      }
-    },
-    {
-      id: number
-      name: string
-      extension: string
-      path: string
-      alt: null
-      disk: string
-      url: string
-      relativeUrl: string
-      pivot: {
-        attachmentable_type: string
-        attachmentable_id: number
-        attachment_id: number
-      }
-    },
-    {
-      id: number
-      name: string
-      extension: string
-      path: string
-      alt: null
-      disk: string
-      url: string
-      relativeUrl: string
-      pivot: {
-        attachmentable_type: string
-        attachmentable_id: number
-        attachment_id: number
-      }
-    }
-  ]
+  gallery: IImage[]
 }
 
 export interface IProductData {

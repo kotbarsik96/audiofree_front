@@ -9,11 +9,10 @@
 <script setup lang="ts">
 const props = defineProps<{
   title: string
-  tabId: string
-  currId: string
 }>()
 
-const isActive = computed(() => props.currId === props.tabId)
+const activeTabTitle = injectStrict<Ref<string>>(TabTitleInjection)
+const isActive = computed(() => activeTabTitle.value === props.title)
 </script>
 
 <style lang="scss" scoped></style>
