@@ -52,5 +52,24 @@ const props = defineProps<{
       }
     }
   }
+
+  @include adaptive(tablet-big){
+    &__table {
+      td {
+        padding: 10px;
+      }
+    }
+  }
+
+  @include adaptive(phone-big){
+    &__table {
+      td  {
+        &:first-child,
+        &:last-child {
+          border-radius: 0;
+        }
+      }
+    }
+  }
 }
 </style>

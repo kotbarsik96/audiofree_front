@@ -113,10 +113,12 @@ function hide() {
     background-color: var(--white);
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.15);
     transition: max-height 0.25s ease-in-out;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
   }
 
   &__body-inner {
-    padding-top: 10px;
+    padding: 20px 0;
   }
 }
 </style>

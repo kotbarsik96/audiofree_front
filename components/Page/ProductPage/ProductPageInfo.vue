@@ -1,27 +1,27 @@
 <template>
-  <div v-if="product" class="product-info">
-    <AFTabs class="product-info__tabs">
+  <div v-if="product" class="product-page-info">
+    <AFTabs class="product-page-info__tabs">
       <AFTab title="Описание">
         <ProductDescription
-          class="product-info__description"
+          class="product-page-info__description"
           :description="product.description"
         />
       </AFTab>
       <AFTab title="Характеристики">
-        <ProductInfo class="product-info__info" :info="product.info" />
+        <ProductInfo class="product-page-info__info" :info="product.info" />
       </AFTab>
     </AFTabs>
-    <div class="product-info__spoilers">
+    <div class="product-page-info__spoilers">
       <AFSpoiler>
         <template #head>Описание</template>
         <ProductDescription
-          class="product-info__description"
+          class="product-page-info__description"
           :description="product.description"
         />
       </AFSpoiler>
       <AFSpoiler>
         <template #head>Характеристики</template>
-        <ProductInfo class="product-info__info" :info="product.info" />
+        <ProductInfo class="product-page-info__info" :info="product.info" />
       </AFSpoiler>
     </div>
   </div>
@@ -44,8 +44,14 @@ const product = computed(() => productData.value?.data.product)
 </script>
 
 <style lang="scss" scoped>
-.product-info {
+.product-page-info {
+  margin-bottom: 100px;
+
   &__description {
+    padding: 0 50px;
+  }
+
+  &__info {
     padding: 0 50px;
   }
 
@@ -54,6 +60,8 @@ const product = computed(() => productData.value?.data.product)
   }
 
   @include adaptive(tablet-big) {
+    margin-bottom: 50px;
+
     &__tabs {
       display: none;
     }
@@ -62,6 +70,19 @@ const product = computed(() => productData.value?.data.product)
       display: flex;
       flex-direction: column;
       gap: 0.35rem;
+    }
+
+    &__description {
+      padding: 0 20px;
+    }
+
+    &__info {
+      padding: 0 20px;
+    }
+  }
+  @include adaptive(phone-big) {
+    &__info {
+      padding: 0;
     }
   }
 }
