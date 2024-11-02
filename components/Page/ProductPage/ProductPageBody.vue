@@ -294,6 +294,10 @@ const quantity = ref(1)
 
       :deep(.gallery-wrapper__slider){
         display: block;
+
+        .gallery-slider__img {
+          height: 20rem;
+        }
       }
       :deep(.gallery-wrapper__switcher){
         display: none;
