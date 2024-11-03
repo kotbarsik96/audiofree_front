@@ -15,7 +15,9 @@
       @submit.prevent="onSubmit"
     >
       <div class="review-form__inputs">
-        
+        <InputWrapper symbolsCounter>
+          <textarea class="textarea"></textarea>
+        </InputWrapper>
       </div>
     </form>
   </div>
@@ -23,7 +25,6 @@
 
 <script setup lang="ts">
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
-import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
 
 const { user } = storeToRefs(useUserStore())
 const { openSignupDialog, openLoginDialog } = useAuthStore()

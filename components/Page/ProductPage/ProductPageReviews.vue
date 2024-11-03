@@ -1,9 +1,9 @@
 <template>
   <div class="product-reviews">
     <ReviewForm class="product-reviews__form" />
-    <div v-if="reviewsData?.data.reviews.total" class="product-reviews__count">
+    <div v-if="reviewsData?.data.total" class="product-reviews__count">
       Всего отзывов:
-      <span>{{ reviewsData?.data.reviews.total }}</span>
+      <span>{{ reviewsData?.data.total }}</span>
     </div>
     <div v-if="reviews.length > 0" class="product-reviews__comments">
       <template v-if="currentUserReview">
@@ -43,36 +43,48 @@ import SmallPreloader from '~/components/Blocks/SmallPreloader.vue'
 import type { IProductReview } from '~/domain/product/types/IProductData'
 import type IPagination from '~/dataAccess/api/IPagination'
 
+const { isAuth } = storeToRefs(useUserStore())
+
 const intersectionEl = ref<HTMLElement>()
 
 const route = useRoute()
 
 const page = ref(1)
-const lastPage = computed(() => reviewsData.value?.data.reviews.last_page || 1)
+const lastPage = computed(() => reviewsData.value?.data.last_page || 1)
 
 const productId = computed(() => route.params.product)
 
 const reviews = useState<IProductReview[]>('reviewsArray', () => [])
+const currentUserReview = useState<IProductReview | null>(
+  'currentUserReview',
+  () => null
+)
 
 const { data: reviewsData, status } = await useAPI<{
-  data: {
-    reviews: IPagination<IProductReview>
-    current_user_review: IProductReview
-  }
+  data: IPagination<IProductReview>
 }>(`/products/${productId.value}/reviews`, {
   params: {
     page,
   },
   onResponse({ response }) {
-    const arr: IProductReview[] | null = response._data.data.reviews.data
+    const arr: IProductReview[] | null = response._data.data.data
     if (Array.isArray(arr)) reviews.value.push(...arr)
   },
   watch: [page],
 })
 
-const currentUserReview = computed(
-  () => reviewsData.value?.data.current_user_review
-)
+if (isAuth.value) {
+  await useAPI<{ data: IProductReview | null }>(
+    `/product/${productId.value}/user-review`,
+    {
+      onResponse({ response }) {
+        if (response._data) {
+          currentUserReview.value = response._data.data
+        }
+      },
+    }
+  )
+}
 
 let observer: IntersectionObserver
 
@@ -84,7 +96,7 @@ onMounted(() => {
   if (intersectionEl.value) observer.observe(intersectionEl.value)
 })
 onUnmounted(() => {
-  observer.disconnect()
+  if (observer) observer.disconnect()
 })
 
 function observerCallback(entries: IntersectionObserverEntry[]) {

@@ -7,6 +7,9 @@
       <AFIcon v-if="icon" class="input-wrapper__icon" :icon="icon" />
       <slot />
     </div>
+    <div v-if="symbolsCounter" class="input-wrapper__counter">
+      
+    </div>
     <Transition name="drop-down">
       <span v-if="slots.error" class="input-wrapper__error _error">
         <slot name="error" />
@@ -27,6 +30,7 @@ const props = withDefaults(
     icon?: string | any
     iconPos?: 'right' | 'left'
     rounded?: boolean
+    symbolsCounter?: boolean
   }>(),
   {
     iconPos: 'left',

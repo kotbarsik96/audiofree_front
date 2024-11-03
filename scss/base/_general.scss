@@ -38,6 +38,10 @@ html {
   &--white {
     color: var(--white);
   }
+
+  &--text-color {
+    color: var(--text-color);
+  }
 }
 
 ._error {
