@@ -28,7 +28,7 @@ html {
 ._link {
   text-decoration: none;
   @include fontSize(14);
-  color: var(--text-color);
+  color: var(--primary);
   transition: var(--general-transition);
 
   &:hover {
