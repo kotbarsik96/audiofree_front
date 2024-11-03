@@ -1,5 +1,5 @@
 <template>
-  <div class="review-comment">
+  <div class="review-comment _section-box">
     <div class="review-comment__head">
       <div class="review-comment__avatar">
         <img src="/assets/images/icons/user.svg?url" alt="" />
@@ -23,14 +23,10 @@
         <div class="review-comment__body-text">{{ review.description }}</div>
       </div>
     </div>
-    <!-- <div
+    <div
       v-if="userData && review.user_id === userId"
       class="review-comment__edit-buttons"
     >
-      <AFButton label="Редактировать отзыв" />
-      <AFButton label="Удалить отзыв" styleType="secondary" />
-    </div> -->
-    <div class="review-comment__edit-buttons">
       <AFButton label="Редактировать отзыв" />
       <AFButton label="Удалить отзыв" styleType="secondary" />
     </div>
@@ -54,10 +50,6 @@ const userId = computed(() => userData.value?.data.id)
 <style lang="scss" scoped>
 .review-comment {
   --comment-padding: 15px 20px;
-
-  border-radius: 8px;
-  background-color: var(--white);
-  box-shadow: 0px 1px 25px rgba(0, 0, 0, 0.06);
 
   &__head {
     padding: var(--comment-padding);

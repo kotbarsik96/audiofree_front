@@ -64,6 +64,12 @@ html {
   }
 }
 
+._section-box {
+  border-radius: 8px;
+  background-color: var(--white);
+  box-shadow: 0px 1px 25px rgba(0, 0, 0, 0.06);
+}
+
 ._page {
   margin-top: 3.75rem;
 

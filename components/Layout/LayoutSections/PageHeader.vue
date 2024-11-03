@@ -159,8 +159,6 @@
         </nav>
       </div>
     </template>
-
-    <AuthDialog v-model:shown="dialogShown" />
   </header>
 </template>
 
@@ -182,11 +180,8 @@ import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 import HeaderAuthBlock from '~/components/Blocks/Header/HeaderAuthBlock.vue'
 import vClickAway from '@/directives/vClickAway'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
-import AuthDialog from '~/components/Blocks/Dialog/AuthDialog.vue'
 
 const { matches: mediaMatches } = useMatchMedia('max-width: 991px')
-
-const { dialogShown } = storeToRefs(useAuthStore())
 
 const searchValue = ref('')
 

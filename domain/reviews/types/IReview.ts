@@ -1,4 +1,5 @@
 export default interface IReview {
+  id: number
   user_id: number
   description?: string
   pros?: string

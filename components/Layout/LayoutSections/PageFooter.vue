@@ -65,25 +65,18 @@
         </div>
       </div>
     </div>
-
-    <AuthDialog v-model:shown="authDialogShown" />
   </footer>
 </template>
 
 <script setup lang="ts">
-import AuthDialog from '~/components/Blocks/Dialog/AuthDialog.vue'
 import SocialsList from '~/components/Blocks/SocialsList.vue'
 import contacts from '@/enums/footer/contacts'
 import FreeCall from '~/components/Blocks/FreeCall.vue'
 import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 import LogoText from '~/components/Blocks/LogoText.vue'
 import { useAuthStore } from '@/stores/authStore'
-import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
 
-const { tab } = storeToRefs(useAuthStore())
-
-const authDialogShown = ref(false)
+const { openSignupDialog, openLoginDialog } = useAuthStore()
 
 const columns = [
   {
@@ -91,11 +84,11 @@ const columns = [
     items: [
       {
         title: 'Войти в аккаунт',
-        action: login,
+        action: openLoginDialog,
       },
       {
         title: 'Зарегистрироваться',
-        action: signup,
+        action: openSignupDialog,
       },
       {
         title: 'Отложенные товары',
@@ -129,15 +122,6 @@ const columns = [
     ],
   },
 ]
-
-function signup() {
-  tab.value = 'signup'
-  authDialogShown.value = true
-}
-function login() {
-  tab.value = 'login'
-  authDialogShown.value = true
-}
 </script>
 
 <style lang="scss" scoped>

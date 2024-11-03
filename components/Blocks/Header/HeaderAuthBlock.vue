@@ -18,7 +18,7 @@
       <button
         class="h-auth-block__btn _link"
         type="button"
-        @click="showDialog('login')"
+        @click="openLoginDialog"
       >
         Вход
       </button>
@@ -26,7 +26,7 @@
       <button
         class="h-auth-block__btn _link"
         type="button"
-        @click="showDialog('signup')"
+        @click="openSignupDialog"
       >
         Регистрация
       </button>
@@ -42,14 +42,10 @@ import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/userStore'
 
-const { tab, dialogShown } = storeToRefs(useAuthStore())
+const { openLoginDialog, openSignupDialog } = useAuthStore()
 const userStore = useUserStore()
 const { isAuth } = storeToRefs(userStore)
 
-function showDialog(_tab: authTabs) {
-  tab.value = _tab
-  dialogShown.value = true
-}
 </script>
 
 <style lang="scss">
