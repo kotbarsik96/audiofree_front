@@ -2,12 +2,12 @@
   <div class="h-auth-block">
     <AFIcon class="h-auth-block__icon" :icon="UserIcon" />
     <div v-if="isAuth" class="h-auth-block__links">
-      <NuxtLink class="h-auth-block__btn _link" type="button" to="/profile">
+      <NuxtLink class="h-auth-block__btn _link _link--text-color" type="button" to="/profile">
         Профиль
       </NuxtLink>
       <div class="h-auth-block__delimeter">/</div>
       <button
-        class="h-auth-block__btn _link"
+        class="h-auth-block__btn _link _link--text-color"
         type="button"
         @click="userStore.logout"
       >
