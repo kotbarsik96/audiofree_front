@@ -20,6 +20,7 @@ import EmptyBoxIcon from '~/assets/images/icons/empty-box.svg'
 import ReviewForm from '~/components/Blocks/Review/ReviewForm.vue'
 import ReviewComment from '~/components/Blocks/Review/ReviewComment.vue'
 import type { IProductReview } from '~/domain/product/types/IProductData'
+import type IPagination from "~/dataAccess/api/IPagination";
 
 const route = useRoute()
 
@@ -27,8 +28,8 @@ const page = ref(1)
 
 const productId = computed(() => route.params.product)
 
-const { data: reviewsData } = await useAPI<{ data: IProductReview[] }>(
-  `/products/${productId}/reviews`,
+const { data: reviewsData } = await useAPI<{ data: IPagination<IProductReview> }>(
+  `/products/${productId.value}/reviews`,
   {
     params: {
       page,
@@ -37,7 +38,7 @@ const { data: reviewsData } = await useAPI<{ data: IProductReview[] }>(
   }
 )
 
-const reviews = computed(() => reviewsData.value?.data || [])
+const reviews = computed(() => reviewsData.value?.data.data || [])
 </script>
 
 <style lang="scss" scoped></style>
