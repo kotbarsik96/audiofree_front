@@ -43,7 +43,7 @@
       <div class="header__bottom">
         <div class="header__container _container">
           <div class="header__bottom-catalog">
-            <NuxtLink class="_link" to="/catalog">
+            <NuxtLink class="_link _link--text-color" to="/catalog">
               <AFIcon :icon="MenuIcon" />
               <span> Каталог товаров</span>
             </NuxtLink>

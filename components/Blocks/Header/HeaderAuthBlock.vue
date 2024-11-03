@@ -16,7 +16,7 @@
     </div>
     <div v-else class="h-auth-block__links">
       <button
-        class="h-auth-block__btn _link"
+        class="h-auth-block__btn _link _link--text-color"
         type="button"
         @click="openLoginDialog"
       >
@@ -24,7 +24,7 @@
       </button>
       <div class="h-auth-block__delimeter">/</div>
       <button
-        class="h-auth-block__btn _link"
+        class="h-auth-block__btn _link _link--text-color"
         type="button"
         @click="openSignupDialog"
       >
