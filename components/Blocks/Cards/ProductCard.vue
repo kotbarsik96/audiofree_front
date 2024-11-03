@@ -24,7 +24,7 @@
         {{ data.brand.value }} {{ data.name }}
       </div>
       <div class="product-card__rating">
-        <AFRating :value="data.rating" />
+        <AFRating :value="data.rating_value" />
       </div>
       <div class="product-card__price">от {{ currency(data.min_price) }}</div>
       <div class="product-card__buttons">

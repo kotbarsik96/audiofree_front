@@ -5,7 +5,7 @@
     <h1 class="product-body__title _page-header__title">{{ fullName }}</h1>
     <AFRating
       class="product-body__rating"
-      :value="productData?.data.rating || 0"
+      :value="product.rating_value || 0"
       detailed
     />
     <div class="product-body__price">

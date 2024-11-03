@@ -1,4 +1,5 @@
 import type IImage from '~/domain/images/types/IImage'
+import type IReview from '~/domain/reviews/types/IReview'
 
 export interface IProductTaxonomy {
   id: number
@@ -20,6 +21,10 @@ export interface IProductVariation {
   name: string
 }
 
+export interface IProductReview extends IReview {
+  product_id: number
+}
+
 export interface IProduct {
   id: number
   name: string
@@ -35,6 +40,8 @@ export interface IProduct {
   type: IProductTaxonomy
   info: IProductInfo[]
   variations: IProductVariation[]
+  rating_value: number
+  rating_count: number
 }
 
 export interface IVariation {
@@ -50,5 +57,4 @@ export interface IVariation {
 export interface IProductData {
   product: IProduct
   variation: IVariation
-  rating: number
 }

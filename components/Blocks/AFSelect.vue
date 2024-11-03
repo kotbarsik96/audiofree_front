@@ -93,7 +93,7 @@ function toggle() {
 
 <style lang="scss" scoped>
 .select {
-  --select-padding: 0.625rem 1.25rem;
+  --select-padding: 0.625rem 0.8rem;
   --border-radius: 9px;
   --border-width: 1px;
 
@@ -143,6 +143,7 @@ function toggle() {
   &__value-icon {
     width: 0.75rem;
     height: 0.75rem;
+    flex-shrink: 0;
   }
 
   &__options {
@@ -175,6 +176,7 @@ function toggle() {
         width: 1rem;
         height: 1rem;
         color: inherit;
+        flex-shrink: 0;
       }
 
       &:last-child {
