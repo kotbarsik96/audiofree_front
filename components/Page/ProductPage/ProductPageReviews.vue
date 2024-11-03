@@ -1,11 +1,19 @@
 <template>
   <div class="product-reviews">
     <ReviewForm class="product-reviews__form" />
-    <div v-if="reviewsData?.data.total" class="product-reviews__count">
+    <div v-if="reviewsData?.data.reviews.total" class="product-reviews__count">
       Всего отзывов:
-      <span>{{ reviewsData?.data.total }}</span>
+      <span>{{ reviewsData?.data.reviews.total }}</span>
     </div>
     <div v-if="reviews.length > 0" class="product-reviews__comments">
+      <template v-if="currentUserReview">
+        <div class="product-reviews__user-review-title">Ваш отзыв:</div>
+        <ReviewComment
+          :key="currentUserReview.id"
+          class="product-reviews__comment"
+          :review="currentUserReview"
+        />
+      </template>
       <TransitionGroup name="blur">
         <ReviewComment
           v-for="comment in reviews"
@@ -40,24 +48,31 @@ const intersectionEl = ref<HTMLElement>()
 const route = useRoute()
 
 const page = ref(1)
-const lastPage = computed(() => reviewsData.value?.data.last_page || 1)
+const lastPage = computed(() => reviewsData.value?.data.reviews.last_page || 1)
 
 const productId = computed(() => route.params.product)
 
 const reviews = useState<IProductReview[]>('reviewsArray', () => [])
 
 const { data: reviewsData, status } = await useAPI<{
-  data: IPagination<IProductReview>
+  data: {
+    reviews: IPagination<IProductReview>
+    current_user_review: IProductReview
+  }
 }>(`/products/${productId.value}/reviews`, {
   params: {
     page,
   },
   onResponse({ response }) {
-    const arr: IProductReview[] | null = response._data.data.data
+    const arr: IProductReview[] | null = response._data.data.reviews.data
     if (Array.isArray(arr)) reviews.value.push(...arr)
   },
   watch: [page],
 })
+
+const currentUserReview = computed(
+  () => reviewsData.value?.data.current_user_review
+)
 
 let observer: IntersectionObserver
 
@@ -101,6 +116,11 @@ function observerCallback(entries: IntersectionObserverEntry[]) {
     span {
       font-weight: 500;
     }
+  }
+
+  &__user-review-title {
+    @include fontSize(21);
+    font-weight: 500;
   }
 
   &__comments {

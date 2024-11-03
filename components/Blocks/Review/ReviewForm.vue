@@ -13,11 +13,18 @@
       v-if="!!user"
       class="review-form _section-box"
       @submit.prevent="onSubmit"
-    ></form>
+    >
+      <div class="review-form__inputs">
+        
+      </div>
+    </form>
   </div>
 </template>
 
 <script setup lang="ts">
+import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
+import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
+
 const { user } = storeToRefs(useUserStore())
 const { openSignupDialog, openLoginDialog } = useAuthStore()
 
