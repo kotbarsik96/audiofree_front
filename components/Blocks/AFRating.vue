@@ -1,12 +1,14 @@
 <template>
-  <div class="rating" :style="style">
-    <div class="rating__items-wrapper">
+  <div class="rating" :class="className" :style="style">
+    <div class="rating__items-wrapper" @pointerleave="suggestRating(null)">
       <div class="rating__items rating__items--totals">
         <AFIcon
           v-for="num in total"
           class="rating__icon"
           :icon="_icon"
           :key="num"
+          @pointerenter="props.interactive ? suggestRating(num) : null"
+          @click="props.interactive ? updateRating(num) : null"
         />
       </div>
       <div class="rating__items rating__items--values">
@@ -15,6 +17,8 @@
           class="rating__icon"
           :icon="_icon"
           :key="num"
+          @pointerenter="props.interactive ? suggestRating(num) : null"
+          @click="props.interactive ? updateRating(num) : null"
         />
       </div>
     </div>
@@ -27,6 +31,7 @@
 <script setup lang="ts">
 import AFIcon from '~/components/Blocks/AFIcon.vue'
 import StarIcon from '~/assets/images/icons/star.svg'
+import ratingTotalValue from "~/enums/ratingTotalValue";
 
 const props = withDefaults(
   defineProps<{
@@ -34,18 +39,35 @@ const props = withDefaults(
     total?: number
     value: number
     detailed?: boolean
+    interactive?: boolean
   }>(),
   {
-    total: 5,
+    total: ratingTotalValue,
   }
 )
 
+const emit = defineEmits<{
+  (e: "update:value", _value: typeof props.value): void
+}>()
+
 const valuePercent = computed(() => props.value / (props.total / 100))
+const className = computed(() => ({
+  '--interactive': props.interactive
+}))
 const style = computed(() => ({
   '--percent': `${valuePercent.value}%`,
 }))
 
+const suggestedRating = ref<number | null>(null)
+
 const _icon = computed(() => props.icon || StarIcon)
+
+async function suggestRating(ratingValue: number | null){
+  suggestedRating.value = ratingValue
+}
+function updateRating(ratingValue: number){
+  emit("update:value", ratingValue)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -87,6 +109,7 @@ const _icon = computed(() => props.icon || StarIcon)
     z-index: 5;
     width: var(--percent);
     overflow: hidden;
+    pointer-events: none;
   }
   &__items--values &__icon {
     color: var(--rating-fill-color);

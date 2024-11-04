@@ -37,7 +37,6 @@
 <script setup lang="ts">
 import UserIcon from '@/assets/images/icons/user.svg'
 import AFIcon from '~/components/Blocks/AFIcon.vue'
-import type { authTabs } from '@/enums/auth/authTabs'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/userStore'

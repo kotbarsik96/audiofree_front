@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="review-form review-form--empty _section-box">
+    <div v-if="!isAuth" class="review-form review-form--empty _section-box">
       <button class="_link" type="button" @click="openLoginDialog">
         Войдите
       </button>
@@ -9,27 +9,103 @@
         зарегистрируйтесь</button
       >, чтобы оставить отзыв
     </div>
-    <form
-      v-if="!!user"
-      class="review-form _section-box"
-      @submit.prevent="onSubmit"
-    >
+    <form v-else class="review-form _section-box" @submit.prevent="onSubmit">
+      <h3 class="review-form__title">Оставить отзыв о товаре:</h3>
+      <div class="review-form__rating">
+        <div class="review-form__rating-title">Оценка:</div>
+        <AFRating v-model:value="rating" interactive />
+      </div>
       <div class="review-form__inputs">
-        <InputWrapper symbolsCounter>
-          <textarea class="textarea"></textarea>
+        <InputWrapper
+          class="review-form__input"
+          :symbols="pros.length"
+          label="Достоинства"
+          :maxlength="maxSymbols"
+        >
+          <TextareaField v-model="pros" :maxlength="maxSymbols" />
+          <template v-if="prosError" #error>{{ prosError }}</template>
+        </InputWrapper>
+        <InputWrapper
+          class="review-form__input"
+          :symbols="cons.length"
+          label="Недостатки"
+          :maxlength="maxSymbols"
+        >
+          <TextareaField v-model="cons" :maxlength="maxSymbols" />
+          <template v-if="consError" #error>{{ consError }}</template>
+        </InputWrapper>
+        <InputWrapper
+          class="review-form__input"
+          :symbols="description.length"
+          label="Комментарий"
+          :maxlength="maxSymbols"
+        >
+          <TextareaField v-model="description" :maxlength="maxSymbols" />
+          <template v-if="descriptionError" #error>{{
+            descriptionError
+          }}</template>
         </InputWrapper>
       </div>
+      <AFButton type="submit" label="Отправить" />
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
+import TextareaField from '~/components/Blocks/FormElements/TextareaField.vue'
+import AFButton from '~/components/Blocks/AFButton.vue'
+import AFRating from '~/components/Blocks/AFRating.vue'
 
-const { user } = storeToRefs(useUserStore())
+const { isAuth } = storeToRefs(useUserStore())
 const { openSignupDialog, openLoginDialog } = useAuthStore()
 
-function onSubmit() {}
+const minSymbols = 20
+const maxSymbols = 400
+const pros = ref('')
+const cons = ref('')
+const description = ref('')
+const rating = ref(0)
+
+const prosError = ref('')
+const consError = ref('')
+const descriptionError = ref('')
+const ratingError = ref('')
+const validation = useAllValidation([
+  useValidation(pros, prosError, [minLengthValidation(minSymbols)]),
+  useValidation(cons, consError, [minLengthValidation(minSymbols)]),
+  useValidation(description, descriptionError, [
+    minLengthValidation(minSymbols),
+  ]),
+  useValidation<number>(rating, ratingError, [minNumberValidation(1)]),
+])
+
+function onSubmit() {
+  if (!validation.validate()) return
+}
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.review-form {
+  padding: 15px 20px;
+
+  &__title {
+    @include fontSize(21);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  &__inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  &__input {
+    :deep(.input-wrapper__label) {
+      @include fontSize(16);
+    }
+  }
+}
+</style>

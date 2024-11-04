@@ -1,6 +1,6 @@
 <template>
   <div class="product-reviews">
-    <ReviewForm class="product-reviews__form" />
+    <ReviewForm v-if="!currentUserReview" class="product-reviews__form" />
     <div v-if="reviewsData?.data.total" class="product-reviews__count">
       Всего отзывов:
       <span>{{ reviewsData?.data.total }}</span>

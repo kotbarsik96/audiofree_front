@@ -1,6 +1,6 @@
 import type { WatchHandle } from 'vue'
 
-export function passwordValidation(): ValidatorCallback {
+export function passwordValidation(): ValidatorCallback<string> {
   let minLength = 6
 
   return function (value: string) {
@@ -23,7 +23,7 @@ export function passwordValidation(): ValidatorCallback {
   }
 }
 
-export function emailValidation(): ValidatorCallback {
+export function emailValidation(): ValidatorCallback<string> {
   return function (value: string) {
     const regexp =
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -34,7 +34,7 @@ export function emailValidation(): ValidatorCallback {
   }
 }
 
-export function mustPresentValidation(fieldName?: string): ValidatorCallback {
+export function mustPresentValidation(fieldName?: string): ValidatorCallback<string> {
   return function (value: string) {
     if (!value) {
       if (fieldName) return `Не указано поле: ${fieldName}`
@@ -47,14 +47,30 @@ export function mustPresentValidation(fieldName?: string): ValidatorCallback {
 
 export function passwordsMatchValidation(
   password: Ref<string>
-): ValidatorCallback {
+): ValidatorCallback<string> {
   return function (value: string): string | false {
     if (password.value && password.value !== value) return 'Пароли не совпадают'
     return false
   }
 }
 
-type ValidatorCallback = (value: string) => string | false
+export function minLengthValidation(minLength: number): ValidatorCallback<string> {
+  return function (value: string) {
+    if (value.length < minLength) return `Не менее ${minLength} знаков`
+
+    return false
+  }
+}
+
+export function minNumberValidation(minNumber: number): ValidatorCallback<number> {
+  return function(value: number) {
+    if(value < minNumber) return `Число от ${minNumber}`
+
+    return false
+  }
+}
+
+type ValidatorCallback<T> = (value: T) => string | false
 
 export interface IValidationOptions {
   /** по умолчанию, watcher валидации откладывается до момента вызова startWatching
@@ -68,10 +84,10 @@ export interface IValidationOptions {
  *
  *
  */
-export function useValidation(
-  value: Ref<string>,
+export function useValidation<T = string>(
+  value: Ref<T>,
   error: Ref<string>,
-  validators: ValidatorCallback[],
+  validators: ValidatorCallback<any>[],
   options?: IValidationOptions
 ) {
   let watcher: WatchHandle | undefined
