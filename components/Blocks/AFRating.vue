@@ -7,8 +7,8 @@
           class="rating__icon"
           :icon="_icon"
           :key="num"
-          @pointerenter="props.interactive ? suggestRating(num) : null"
-          @click="props.interactive ? updateRating(num) : null"
+          @pointerenter="suggestRating(num)"
+          @click="updateRating(num)"
         />
       </div>
       <div class="rating__items rating__items--values">
@@ -17,8 +17,8 @@
           class="rating__icon"
           :icon="_icon"
           :key="num"
-          @pointerenter="props.interactive ? suggestRating(num) : null"
-          @click="props.interactive ? updateRating(num) : null"
+          @pointerenter="suggestRating(num)"
+          @click="updateRating(num)"
         />
       </div>
     </div>
@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import AFIcon from '~/components/Blocks/AFIcon.vue'
 import StarIcon from '~/assets/images/icons/star.svg'
-import ratingTotalValue from "~/enums/ratingTotalValue";
+import ratingTotalValue from '~/enums/ratingTotalValue'
 
 const props = withDefaults(
   defineProps<{
@@ -47,26 +47,34 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: "update:value", _value: typeof props.value): void
+  (e: 'update:value', _value: typeof props.value): void
 }>()
 
-const valuePercent = computed(() => props.value / (props.total / 100))
+const suggestedRating = ref<number | null>(null)
+
+const valuePercent = computed(() => {
+  let _percent
+  
+  if (props.interactive && suggestedRating.value)
+    _percent = suggestedRating.value / (props.total / 100)
+  else _percent = props.value / (props.total / 100)
+
+  return _percent
+})
 const className = computed(() => ({
-  '--interactive': props.interactive
+  '--interactive': props.interactive,
 }))
 const style = computed(() => ({
   '--percent': `${valuePercent.value}%`,
 }))
 
-const suggestedRating = ref<number | null>(null)
-
 const _icon = computed(() => props.icon || StarIcon)
 
-async function suggestRating(ratingValue: number | null){
+async function suggestRating(ratingValue: number | null) {
   suggestedRating.value = ratingValue
 }
-function updateRating(ratingValue: number){
-  emit("update:value", ratingValue)
+function updateRating(ratingValue: number) {
+  emit('update:value', ratingValue)
 }
 </script>
 
@@ -109,7 +117,6 @@ function updateRating(ratingValue: number){
     z-index: 5;
     width: var(--percent);
     overflow: hidden;
-    pointer-events: none;
   }
   &__items--values &__icon {
     color: var(--rating-fill-color);

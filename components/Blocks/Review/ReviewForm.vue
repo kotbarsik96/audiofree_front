@@ -11,9 +11,16 @@
     </div>
     <form v-else class="review-form _section-box" @submit.prevent="onSubmit">
       <h3 class="review-form__title">Оставить отзыв о товаре:</h3>
-      <div class="review-form__rating">
+      <div class="review-form__rating-wrapper">
         <div class="review-form__rating-title">Оценка:</div>
-        <AFRating v-model:value="rating" interactive />
+        <AFRating
+          class="review-form__rating"
+          v-model:value="rating"
+          interactive
+        />
+        <Transition name="drop-down">
+          <div v-if="ratingError" class="_error">{{ ratingError }}</div>
+        </Transition>
       </div>
       <div class="review-form__inputs">
         <InputWrapper
@@ -57,8 +64,18 @@ import TextareaField from '~/components/Blocks/FormElements/TextareaField.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import AFRating from '~/components/Blocks/AFRating.vue'
 
+const emit = defineEmits<{
+  (e: 'review'): void
+}>()
+
+const route = useRoute()
+
+const { $afFetch } = useNuxtApp()
+
 const { isAuth } = storeToRefs(useUserStore())
 const { openSignupDialog, openLoginDialog } = useAuthStore()
+
+const productId = computed(() => route.params.product)
 
 const minSymbols = 20
 const maxSymbols = 400
@@ -80,8 +97,35 @@ const validation = useAllValidation([
   useValidation<number>(rating, ratingError, [minNumberValidation(1)]),
 ])
 
-function onSubmit() {
+async function onSubmit() {
   if (!validation.validate()) return
+
+  try {
+    await $afFetch(`/product/rating`, {
+      method: 'POST',
+      body: {
+        product_id: productId.value,
+        rating_value: rating.value,
+        pros: pros.value,
+        cons: cons.value,
+        description: description.value,
+      },
+      onResponse({ response }) {
+        if (response.ok) {
+          emit('review')
+        }
+      },
+      onResponseError({ response }) {
+        let errors = response._data.errors
+        if (errors) {
+          if (errors.description) descriptionError.value = errors.description[0]
+          if (errors.pros) prosError.value = errors.pros[0]
+          if (errors.cons) consError.value = errors.cons[0]
+          if (errors.rating_value) ratingError.value = errors.rating_value[0]
+        }
+      },
+    })
+  } catch (err) {}
 }
 </script>
 
@@ -105,6 +149,27 @@ function onSubmit() {
   &__input {
     :deep(.input-wrapper__label) {
       @include fontSize(16);
+    }
+  }
+
+  &__rating-wrapper {
+    margin-bottom: 1rem;
+
+    ._error {
+      margin-top: 0.25rem;
+    }
+  }
+
+  &__rating-title {
+    font-weight: 500;
+  }
+
+  &__rating {
+    margin-top: 0.25rem;
+
+    :deep(.rating__icon) {
+      width: 1.25rem;
+      height: 1.25rem;
     }
   }
 }

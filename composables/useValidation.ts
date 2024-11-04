@@ -56,7 +56,7 @@ export function passwordsMatchValidation(
 
 export function minLengthValidation(minLength: number): ValidatorCallback<string> {
   return function (value: string) {
-    if (value.length < minLength) return `Не менее ${minLength} знаков`
+    if (value.length < minLength) return `Не менее ${minLength} символов`
 
     return false
   }

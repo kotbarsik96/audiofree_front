@@ -1,6 +1,6 @@
 <template>
   <div class="product-reviews">
-    <ReviewForm v-if="!currentUserReview" class="product-reviews__form" />
+    <ReviewForm v-if="!currentUserReview" class="product-reviews__form" @review="getUserReview" />
     <div v-if="reviewsData?.data.total" class="product-reviews__count">
       Всего отзывов:
       <span>{{ reviewsData?.data.total }}</span>
@@ -73,8 +73,7 @@ const { data: reviewsData, status } = await useAPI<{
   watch: [page],
 })
 
-if (isAuth.value) {
-  await useAPI<{ data: IProductReview | null }>(
+const { execute: getUserReview } = useAPI<{ data: IProductReview | null }>(
     `/product/${productId.value}/user-review`,
     {
       onResponse({ response }) {
@@ -82,8 +81,13 @@ if (isAuth.value) {
           currentUserReview.value = response._data.data
         }
       },
+      watch: false,
+      immediate: false
     }
   )
+
+if (isAuth.value) {
+  await getUserReview()
 }
 
 let observer: IntersectionObserver
