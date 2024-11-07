@@ -3,6 +3,7 @@ import type IUser from '~/domain/user/types/IUser'
 import { defineStore } from 'pinia'
 import { computed } from 'vue'
 import { AppKeys } from '~/enums/AppKeys'
+import { ServerStatuses } from '~/enums/ServerStatuses'
 
 export const useUserStore = defineStore('user', () => {
   const jwt = useCookie(AppKeys.JWT)
@@ -14,9 +15,14 @@ export const useUserStore = defineStore('user', () => {
     {
       immediate: false,
       watch: false,
+      onResponseError({ response }) {
+        if (response.status === ServerStatuses.UNAUTHORIZED) {
+          jwt.value = null
+        }
+      },
     }
   )
-  const isAuth = computed(() => !!user.value)
+  const isAuth = computed(() => !!jwt.value)
 
   async function logout() {
     jwt.value = null
@@ -29,7 +35,11 @@ export const useUserStore = defineStore('user', () => {
     })
   }
   function getUser() {
-    if (jwt.value) _getUser()
+    if (jwt.value) {
+      try {
+        _getUser()
+      } catch (err) {}
+    }
   }
   function updateJwt(_jwt: string | null) {
     jwt.value = _jwt

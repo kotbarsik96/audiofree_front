@@ -65,6 +65,7 @@ const { data: reviewsData, status } = await useAPI<{
 }>(`/products/${productId.value}/reviews`, {
   params: {
     page,
+    per_page: 5
   },
   onResponse({ response }) {
     const arr: IProductReview[] | null = response._data.data.data
@@ -124,6 +125,7 @@ function observerCallback(entries: IntersectionObserverEntry[]) {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  position: relative;
 
   &__count {
     @include fontSize(21);

@@ -1,35 +1,43 @@
 <template>
   <div class="h-auth-block">
     <AFIcon class="h-auth-block__icon" :icon="UserIcon" />
-    <div v-if="isAuth" class="h-auth-block__links">
-      <NuxtLink class="h-auth-block__btn _link _link--text-color" type="button" to="/profile">
-        Профиль
-      </NuxtLink>
-      <div class="h-auth-block__delimeter">/</div>
-      <button
-        class="h-auth-block__btn _link _link--text-color"
-        type="button"
-        @click="userStore.logout"
-      >
-        Выйти
-      </button>
-    </div>
-    <div v-else class="h-auth-block__links">
-      <button
-        class="h-auth-block__btn _link _link--text-color"
-        type="button"
-        @click="openLoginDialog"
-      >
-        Вход
-      </button>
-      <div class="h-auth-block__delimeter">/</div>
-      <button
-        class="h-auth-block__btn _link _link--text-color"
-        type="button"
-        @click="openSignupDialog"
-      >
-        Регистрация
-      </button>
+    <div class="h-auth-block__links">
+      <ClientOnly>
+        <div v-if="isAuth" class="h-auth-block__links-inner">
+          <NuxtLink
+            class="h-auth-block__btn _link _link--text-color"
+            type="button"
+            to="/profile"
+          >
+            Профиль
+          </NuxtLink>
+          <div class="h-auth-block__delimeter">/</div>
+          <button
+            class="h-auth-block__btn _link _link--text-color"
+            type="button"
+            @click="userStore.logout"
+          >
+            Выйти
+          </button>
+        </div>
+        <div v-else class="h-auth-block__links-inner">
+          <button
+            class="h-auth-block__btn _link _link--text-color"
+            type="button"
+            @click="openLoginDialog"
+          >
+            Вход
+          </button>
+          <div class="h-auth-block__delimeter">/</div>
+          <button
+            class="h-auth-block__btn _link _link--text-color"
+            type="button"
+            @click="openSignupDialog"
+          >
+            Регистрация
+          </button>
+        </div>
+      </ClientOnly>
     </div>
   </div>
 </template>
@@ -43,8 +51,7 @@ import { useUserStore } from '@/stores/userStore'
 
 const { openLoginDialog, openSignupDialog } = useAuthStore()
 const userStore = useUserStore()
-const { isAuth } = storeToRefs(userStore)
-
+const { isAuth, isLoadingUser } = storeToRefs(userStore)
 </script>
 
 <style lang="scss">
@@ -64,6 +71,10 @@ const { isAuth } = storeToRefs(userStore)
   &__links {
     color: var(--text-color);
     @include fontSize(14);
+    min-width: 8rem;
+  }
+
+  &__links-inner {
     display: flex;
     align-items: center;
   }
