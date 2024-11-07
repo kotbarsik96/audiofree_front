@@ -1,6 +1,5 @@
 import { ref, readonly } from 'vue'
 
-/* если используется не внутри компонента, указать setOnUnmount = false  */
 export function useMatchMedia(query: string) {
   let _query = query.match(/^\(.+\)$/) ? query : `(${query})`
   let media: MediaQueryList | undefined

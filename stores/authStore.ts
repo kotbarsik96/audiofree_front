@@ -18,6 +18,15 @@ export const useAuthStore = defineStore('auth', () => {
     tab.value = previousTab.value
   }
 
+  function openLoginDialog() {
+    tab.value = 'login'
+    dialogShown.value = true
+  }
+  function openSignupDialog() {
+    tab.value = 'signup'
+    dialogShown.value = true
+  }
+
   return {
     tab,
     previousTab,
@@ -28,5 +37,7 @@ export const useAuthStore = defineStore('auth', () => {
     dialogShown,
     isLoading,
     goBack,
+    openLoginDialog,
+    openSignupDialog,
   }
 })

@@ -25,10 +25,15 @@
               {{ titles[index] }}
             </h3>
             <div class="bestsellers-slider__slide-image">
-              <img :src="product.image.url" />
+              <AFImage :src="product.image.url" />
             </div>
             <div class="bestsellers-slider__button-container">
-              <AFButton class="bestsellers-slider__button" label="Купить" to="/" styleType="secondary" />
+              <AFButton
+                class="bestsellers-slider__button"
+                label="Купить"
+                to="/"
+                styleType="secondary"
+              />
             </div>
           </div>
         </SwiperSlide>
@@ -39,6 +44,7 @@
 
 <script setup lang="ts">
 import AFButton from '~/components/Blocks/AFButton.vue'
+import AFImage from '~/components/Blocks/AFImage.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Pagination, EffectFlip } from 'swiper/modules'
 import { Product } from '~/domain/product/Product'
@@ -149,8 +155,8 @@ const bestsellers = computed(() => data.value?.data || [])
     position: relative;
     z-index: 15;
 
-    img,
-    picture {
+    :deep(img),
+    :deep(picture) {
       width: 500px;
       height: 350px;
       object-fit: contain;

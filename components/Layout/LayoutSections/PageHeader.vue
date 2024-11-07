@@ -43,7 +43,7 @@
       <div class="header__bottom">
         <div class="header__container _container">
           <div class="header__bottom-catalog">
-            <NuxtLink class="_link" to="/catalog">
+            <NuxtLink class="_link _link--text-color" to="/catalog">
               <AFIcon :icon="MenuIcon" />
               <span> Каталог товаров</span>
             </NuxtLink>
@@ -159,8 +159,6 @@
         </nav>
       </div>
     </template>
-
-    <AuthDialog v-model:shown="dialogShown" />
   </header>
 </template>
 
@@ -182,11 +180,8 @@ import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 import HeaderAuthBlock from '~/components/Blocks/Header/HeaderAuthBlock.vue'
 import vClickAway from '@/directives/vClickAway'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
-import AuthDialog from '~/components/Blocks/Dialog/AuthDialog.vue'
 
 const { matches: mediaMatches } = useMatchMedia('max-width: 991px')
-
-const { dialogShown } = storeToRefs(useAuthStore())
 
 const searchValue = ref('')
 

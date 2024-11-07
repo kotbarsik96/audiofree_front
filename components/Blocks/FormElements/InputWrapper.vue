@@ -7,6 +7,10 @@
       <AFIcon v-if="icon" class="input-wrapper__icon" :icon="icon" />
       <slot />
     </div>
+    <div v-if="typeof symbols === 'number'" class="input-wrapper__counter">
+      <span> {{ symbols }} </span>
+      <span v-if="_maxlength > 0"> / {{ _maxlength }} </span>
+    </div>
     <Transition name="drop-down">
       <span v-if="slots.error" class="input-wrapper__error _error">
         <slot name="error" />
@@ -27,12 +31,18 @@ const props = withDefaults(
     icon?: string | any
     iconPos?: 'right' | 'left'
     rounded?: boolean
+    maxlength?: number | string
+    symbols?: number
   }>(),
   {
     iconPos: 'left',
   }
 )
 const slots = useSlots()
+
+const _maxlength = computed(() =>
+  props.maxlength ? Number(props.maxlength) : 0
+)
 
 const className = computed(() => {
   return {
@@ -92,14 +102,16 @@ const className = computed(() => {
     left: var(--input-icon-padding);
   }
 
-  &:has(._error) :deep(.input) {
+  &:has(._error) :deep(.input),
+  &:has(._error) :deep(.textarea) {
     border-color: var(--red);
   }
   &:has(._error) &__icon {
     color: var(--red);
   }
 
-  :deep(.input) {
+  :deep(.input),
+  :deep(.textarea) {
     border-radius: 9px;
     border: 1px solid #dadada;
     background-color: transparent;
@@ -110,19 +122,29 @@ const className = computed(() => {
     transition: var(--general-transition);
     @include fontSize(14);
   }
-  :deep(.input)::placeholder {
+  :deep(.input)::placeholder,
+  :deep(.textarea)::placeholder {
     color: #b9b9b9;
   }
 
-  &--rounded :deep(.input) {
+  &--rounded :deep(.input),
+  &--rounded :deep(.textarea) {
     border-radius: 23px;
+  }
+
+  &__counter {
+    position: absolute;
+    right: 0;
+    bottom: -1rem;
   }
 
   &__error {
     display: block;
-    margin-top: 0.3rem;
     margin-bottom: -1rem;
     max-width: 100%;
+  }
+  &__counter + &__error {
+    padding-right: 5rem;
   }
 }
 </style>

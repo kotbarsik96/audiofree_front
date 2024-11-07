@@ -5,6 +5,7 @@ export function useAPI<T>(
   options?: UseFetchOptions<T>
 ) {
   return useFetch(url, {
+    dedupe: 'defer',
     ...options,
     headers: {
       Accept: 'application/json',

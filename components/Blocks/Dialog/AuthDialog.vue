@@ -1,5 +1,5 @@
 <template>
-  <AFDialog class="auth-dialog" v-show="!isAuth" v-model:shown="_shown">
+  <AFDialog class="auth-dialog" v-model:shown="_shown">
     <AuthWindow />
   </AFDialog>
 </template>
@@ -29,8 +29,6 @@ const _shown = computed({
     emit("update:shown", bool)
   },
 })
-
-
 
 watch(isAuth, () => {
   if (isAuth.value) {

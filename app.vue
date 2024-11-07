@@ -7,12 +7,17 @@
         <NuxtPage />
       </LayoutWrapper>
     </NuxtLayout>
+
+    <AuthDialog v-model:shown="dialogShown" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useGlobalStore } from '~/stores/globalStore'
 import LayoutWrapper from '~/components/Layout/LayoutWrapper.vue'
+import AuthDialog from '~/components/Blocks/Dialog/AuthDialog.vue'
+
+const { dialogShown } = storeToRefs(useAuthStore())
 
 onMounted(() => {
   defineIfFirefox()

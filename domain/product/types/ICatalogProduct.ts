@@ -5,7 +5,8 @@ export default interface ICatalogProduct {
   status_id: number
   min_price: number
   max_price: number
-  rating: number
+  rating_value: number
+  rating_count: number
   image: {
     id: number
     name: string
