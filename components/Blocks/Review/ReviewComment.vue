@@ -27,8 +27,17 @@
       v-if="userData && review.user_id === userId"
       class="review-comment__edit-buttons"
     >
-      <AFButton label="Редактировать отзыв" />
-      <AFButton label="Удалить отзыв" styleType="secondary" />
+      <AFButton
+        label="Редактировать отзыв"
+        :disabled="isLoading"
+        @click="editReview"
+      />
+      <AFButton
+        label="Удалить отзыв"
+        styleType="secondary"
+        :disabled="isLoading"
+        @click="removeReview"
+      />
     </div>
   </div>
 </template>
@@ -40,11 +49,48 @@ import AFButton from '~/components/Blocks/AFButton.vue'
 
 const props = defineProps<{
   review: IReview
+  productId?: number | string
 }>()
 
+const emit = defineEmits<{
+  (e: 'deleteReview'): void
+  (e: 'editReview'): void
+}>()
+
+const { $afFetch } = useNuxtApp()
+
 const { user: userData } = storeToRefs(useUserStore())
+const isLoading = ref(false)
 
 const userId = computed(() => userData.value?.data.id)
+
+const { addNotification } = useNotifications()
+
+async function removeReview() {
+  if (!props.productId) return
+
+  isLoading.value = true
+
+  try {
+    await $afFetch('product/rating', {
+      method: 'DELETE',
+      params: {
+        product_id: props.productId,
+      },
+      onResponse({ response }) {
+        if (response.ok) {
+          addNotification('success', 'Вы удалили свой отзыв о товаре')
+          emit('deleteReview')
+        }
+      },
+    })
+  } catch (err) {}
+
+  isLoading.value = false
+}
+async function editReview() {
+  emit('editReview')
+}
 </script>
 
 <style lang="scss" scoped>
@@ -125,8 +171,8 @@ const userId = computed(() => userData.value?.data.id)
     flex-wrap: wrap;
     gap: 0.625rem;
   }
-  
-  @include adaptive(phone){
+
+  @include adaptive(phone) {
     &__edit-buttons {
       .btn {
         width: 100%;

@@ -53,7 +53,7 @@
           }}</template>
         </InputWrapper>
       </div>
-      <AFButton type="submit" label="Отправить" />
+      <AFButton type="submit" label="Отправить" :disabled="isLoading" />
     </form>
   </div>
 </template>
@@ -76,6 +76,7 @@ const { isAuth } = storeToRefs(useUserStore())
 const { openSignupDialog, openLoginDialog } = useAuthStore()
 
 const productId = computed(() => route.params.product)
+const isLoading = ref(false)
 
 const minSymbols = 20
 const maxSymbols = 400
@@ -99,6 +100,8 @@ const validation = useAllValidation([
 
 async function onSubmit() {
   if (!validation.validate()) return
+
+  isLoading.value = true
 
   try {
     await $afFetch(`/product/rating`, {
@@ -126,6 +129,8 @@ async function onSubmit() {
       },
     })
   } catch (err) {}
+
+  isLoading.value = false
 }
 </script>
 

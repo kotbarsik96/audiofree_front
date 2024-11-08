@@ -1,20 +1,50 @@
 <template>
   <div class="product-reviews">
-    <ReviewForm v-if="!currentUserReview" class="product-reviews__form" @review="getUserReview" />
+    <div v-if="noReviews" class="product-reviews__empty">
+      <svg class="product-reviews__empty-icon" viewBox="0 0 64 64">
+        <g>
+          <path
+            fill="currentColor"
+            d="M60,0H16c-2.211,0-4,1.789-4,4v6H4c-2.211,0-4,1.789-4,4v30c0,2.211,1.789,4,4,4h7c0.553,0,1,0.447,1,1v11
+		c0,1.617,0.973,3.078,2.469,3.695C14.965,63.902,15.484,64,16,64c1.039,0,2.062-0.406,2.828-1.172l14.156-14.156
+		c0,0,0.516-0.672,1.672-0.672S50,48,50,48c2.211,0,4-1.789,4-4v-8h6c2.211,0,4-1.789,4-4V4C64,1.789,62.211,0,60,0z M52,44
+		c0,1.105-0.895,2-2,2c0,0-14.687,0-15.344,0C32.709,46,32,47,32,47S20,59,18,61c-2.141,2.141-4,0.391-4-1c0-1,0-12,0-12
+		c0-1.105-0.895-2-2-2H4c-1.105,0-2-0.895-2-2V14c0-1.105,0.895-2,2-2h46c1.105,0,2,0.895,2,2V44z M62,32c0,1.105-0.895,2-2,2h-6V14
+		c0-2.211-1.789-4-4-4H14V4c0-1.105,0.895-2,2-2h44c1.105,0,2,0.895,2,2V32z"
+          />
+          <path
+            fill="currentColor"
+            d="M13,24h13c0.553,0,1-0.447,1-1s-0.447-1-1-1H13c-0.553,0-1,0.447-1,1S12.447,24,13,24z"
+          />
+          <path
+            fill="currentColor"
+            d="M41,28H13c-0.553,0-1,0.447-1,1s0.447,1,1,1h28c0.553,0,1-0.447,1-1S41.553,28,41,28z"
+          />
+          <path
+            fill="currentColor"
+            d="M34,34H13c-0.553,0-1,0.447-1,1s0.447,1,1,1h21c0.553,0,1-0.447,1-1S34.553,34,34,34z"
+          />
+        </g>
+      </svg>
+      <p>Отзывов еще нет. Напишите первым!</p>
+    </div>
+    <ReviewForm
+      v-if="!currentUserReview || isEditingReview"
+      class="product-reviews__form"
+      @review="onReviewChange"
+    />
     <div v-if="reviewsData?.data.total" class="product-reviews__count">
       Всего отзывов:
       <span>{{ reviewsData?.data.total }}</span>
     </div>
-    <div v-if="reviews.length > 0" class="product-reviews__comments">
-      <template v-if="currentUserReview">
-        <div class="product-reviews__user-review-title">Ваш отзыв:</div>
-        <ReviewComment
-          :key="currentUserReview.id"
-          class="product-reviews__comment"
-          :review="currentUserReview"
-        />
-      </template>
-      <TransitionGroup name="blur">
+    <div class="product-reviews__comments">
+      <CurrentUserReview
+        v-if="currentUserReview"
+        :review="currentUserReview"
+        :productId="productId"
+        @changeReview="onReviewChange"
+      />
+      <TransitionGroup v-if="!noReviews" name="blur">
         <ReviewComment
           v-for="comment in reviews"
           :key="comment.id"
@@ -27,23 +57,19 @@
         <div>Загружаем еще отзывы...</div>
       </div>
     </div>
-    <div v-else class="product-reviews__empty">
-      <CommentsIcon class="product-reviews__empty-icon" />
-      <p>Отзывов еще нет. Напишите первым!</p>
-    </div>
     <div class="product-reviews__intersection-el" ref="intersectionEl"></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import CommentsIcon from '~/assets/images/icons/comments.svg'
 import ReviewForm from '~/components/Blocks/Review/ReviewForm.vue'
 import ReviewComment from '~/components/Blocks/Review/ReviewComment.vue'
 import SmallPreloader from '~/components/Blocks/SmallPreloader.vue'
+import CurrentUserReview from '~/components/Blocks/Review/CurrentUserReview.vue'
 import type { IProductReview } from '~/domain/product/types/IProductData'
 import type IPagination from '~/dataAccess/api/IPagination'
 
-const { isAuth } = storeToRefs(useUserStore())
+const { isAuth, userId } = storeToRefs(useUserStore())
 
 const intersectionEl = ref<HTMLElement>()
 
@@ -52,7 +78,10 @@ const route = useRoute()
 const page = ref(1)
 const lastPage = computed(() => reviewsData.value?.data.last_page || 1)
 
-const productId = computed(() => route.params.product)
+const productId = computed(() => route.params.product as string)
+
+const isUpdatingReviews = ref(false)
+const isEditingReview = ref(false)
 
 const reviews = useState<IProductReview[]>('reviewsArray', () => [])
 const currentUserReview = useState<IProductReview | null>(
@@ -60,32 +89,47 @@ const currentUserReview = useState<IProductReview | null>(
   () => null
 )
 
-const { data: reviewsData, status } = await useAPI<{
+const noReviews = computed(
+  () => !reviews.value.length && !currentUserReview.value
+)
+
+const {
+  data: reviewsData,
+  status,
+  execute: _updateReviews,
+} = await useAPI<{
   data: IPagination<IProductReview>
 }>(`/products/${productId.value}/reviews`, {
   params: {
     page,
-    per_page: 5
+    per_page: 5,
   },
   onResponse({ response }) {
-    const arr: IProductReview[] | null = response._data.data.data
-    if (Array.isArray(arr)) reviews.value.push(...arr)
+    if (!isUpdatingReviews.value) {
+      let arr: IProductReview[] | null = response._data.data.data
+      if (Array.isArray(arr)) {
+        // не показывать отзыв текущего пользователя на первой странице
+        if (page.value === 1)
+          arr = arr.filter((review) => review.user_id !== userId.value)
+        reviews.value.push(...arr)
+      }
+    }
   },
   watch: [page],
 })
 
 const { execute: getUserReview } = useAPI<{ data: IProductReview | null }>(
-    `/product/${productId.value}/user-review`,
-    {
-      onResponse({ response }) {
-        if (response._data) {
-          currentUserReview.value = response._data.data
-        }
-      },
-      watch: false,
-      immediate: false
-    }
-  )
+  `/product/${productId.value}/user-review`,
+  {
+    onResponse({ response }) {
+      if (response._data) {
+        currentUserReview.value = response._data.data
+      }
+    },
+    watch: false,
+    immediate: false,
+  }
+)
 
 if (isAuth.value) {
   await getUserReview()
@@ -117,6 +161,15 @@ function observerCallback(entries: IntersectionObserverEntry[]) {
 
   if (shouldUpdatePage) page.value++
 }
+async function updateReviews() {
+  isUpdatingReviews.value = true
+  await _updateReviews()
+  isUpdatingReviews.value = false
+}
+async function onReviewChange() {
+  await updateReviews()
+  await getUserReview()
+}
 </script>
 
 <style lang="scss" scoped>
@@ -134,11 +187,6 @@ function observerCallback(entries: IntersectionObserverEntry[]) {
     span {
       font-weight: 500;
     }
-  }
-
-  &__user-review-title {
-    @include fontSize(21);
-    font-weight: 500;
   }
 
   &__comments {
@@ -159,6 +207,7 @@ function observerCallback(entries: IntersectionObserverEntry[]) {
   &__empty-icon {
     width: 5rem;
     height: 5rem;
+    margin-bottom: 0.625rem;
   }
 
   &__loading-more {

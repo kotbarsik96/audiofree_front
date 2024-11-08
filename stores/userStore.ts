@@ -7,17 +7,26 @@ import { ServerStatuses } from '~/enums/ServerStatuses'
 
 export const useUserStore = defineStore('user', () => {
   const jwt = useCookie(AppKeys.JWT)
+  const _userId = useCookie(AppKeys.USER_ID)
   const { $afFetch } = useNuxtApp()
   const { addNotification } = useNotifications()
+
+  const userId = computed(() => (_userId.value ? Number(_userId.value) : 0))
 
   const { data: user, execute: _getUser } = useAPI<{ data: IUser }>(
     '/profile/user',
     {
       immediate: false,
       watch: false,
+      onResponse({ response }) {
+        if (response.ok) {
+          _userId.value = response._data.data.id
+        }
+      },
       onResponseError({ response }) {
         if (response.status === ServerStatuses.UNAUTHORIZED) {
           jwt.value = null
+          _userId.value = null
         }
       },
     }
@@ -26,6 +35,7 @@ export const useUserStore = defineStore('user', () => {
 
   async function logout() {
     jwt.value = null
+    _userId.value = null
     await $afFetch('/logout', {
       method: 'POST',
       onResponse({ response }) {
@@ -48,6 +58,7 @@ export const useUserStore = defineStore('user', () => {
   return {
     jwt,
     user,
+    userId,
     isAuth,
     getUser,
     logout,
