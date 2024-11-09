@@ -23,7 +23,7 @@
       </div>
     </div>
     <div v-if="detailed" class="rating__detail">
-      ({{ value.toFixed(2) }} из {{ total }})
+      ({{ _value.toFixed(2) }} из {{ total }})
     </div>
   </div>
 </template>
@@ -37,7 +37,7 @@ const props = withDefaults(
   defineProps<{
     icon?: string | any
     total?: number
-    value: number
+    value: number | null
     detailed?: boolean
     interactive?: boolean
   }>(),
@@ -52,12 +52,14 @@ const emit = defineEmits<{
 
 const suggestedRating = ref<number | null>(null)
 
+const _value = computed(() => props.value ? props.value : 0)
+
 const valuePercent = computed(() => {
   let _percent
   
   if (props.interactive && suggestedRating.value)
     _percent = suggestedRating.value / (props.total / 100)
-  else _percent = props.value / (props.total / 100)
+  else _percent = _value.value / (props.total / 100)
 
   return _percent
 })

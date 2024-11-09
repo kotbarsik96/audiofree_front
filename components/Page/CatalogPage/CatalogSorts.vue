@@ -40,7 +40,7 @@ const options = computed(() => {
   return arr
 })
 
-const sortType = ref(options.value?.[0]?.value)
+const sortType = ref((route.query.sort as string) || options.value?.[0]?.value)
 
 watch(sortType, onSortTypeChange)
 
