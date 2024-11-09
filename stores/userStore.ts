@@ -6,10 +6,11 @@ import { AppKeys } from '~/enums/AppKeys'
 import { ServerStatuses } from '~/enums/ServerStatuses'
 
 export const useUserStore = defineStore('user', () => {
+  const { addNotification } = useNotifications()
+
   const jwt = useCookie(AppKeys.JWT)
   const _userId = useCookie(AppKeys.USER_ID)
   const { $afFetch } = useNuxtApp()
-  const { addNotification } = useNotifications()
 
   const userId = computed(() => (_userId.value ? Number(_userId.value) : 0))
 

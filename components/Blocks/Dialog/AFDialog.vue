@@ -19,23 +19,30 @@
 </template>
 
 <script setup lang="ts">
-import NotificationsContainer from "~/components/Blocks/Notifications/NotificationsContainer.vue"
-import AFIcon from "~/components/Blocks/AFIcon.vue"
-import CloseIcon from "@/assets/images/icons/close.svg"
-import { setBodyScroll, hideBodyScroll } from "@/utils/scrollbarHelpers"
-import { ref, watch } from "vue"
+import NotificationsContainer from '~/components/Blocks/Notifications/NotificationsContainer.vue'
+import AFIcon from '~/components/Blocks/AFIcon.vue'
+import CloseIcon from '@/assets/images/icons/close.svg'
+import { setBodyScroll, hideBodyScroll } from '@/utils/scrollbarHelpers'
+import { ref, watch } from 'vue'
 
 const props = defineProps<{
   shown?: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: "update:shown", value: boolean): void
+  (e: 'update:shown', value: boolean): void
 }>()
 
 const el = ref<HTMLDialogElement>()
 
-const dialogShown = ref(false)
+const _shown = computed({
+  get() {
+    return props.shown
+  },
+  set(v) {
+    emit('update:shown', v)
+  },
+})
 
 watch(
   () => props.shown,
@@ -44,16 +51,19 @@ watch(
     else closeDialog()
   }
 )
-watch(dialogShown, () => emit("update:shown", dialogShown.value))
+
+onMounted(() => {
+  if (props.shown) showDialog()
+})
 
 function closeDialog() {
-  dialogShown.value = false
+  _shown.value = false
   setBodyScroll()
   el.value?.close()
 }
 function showDialog() {
   if (el.value) {
-    dialogShown.value = true
+    _shown.value = true
     hideBodyScroll()
     el.value.showModal()
   }
@@ -61,10 +71,10 @@ function showDialog() {
 function onPointerdown(event: PointerEvent) {
   if (!el.value || event.target !== el.value) return
 
-  document.addEventListener("pointerup", onPointerup)
+  document.addEventListener('pointerup', onPointerup)
 
   function onPointerup(upEvent: PointerEvent) {
-    document.removeEventListener("pointerup", onPointerup)
+    document.removeEventListener('pointerup', onPointerup)
     if (upEvent.target !== el.value) return
 
     closeDialog()
@@ -84,7 +94,7 @@ function onPointerdown(event: PointerEvent) {
   border-radius: 8px;
   width: 90%;
   max-height: 90%;
-  animation: hideDialog 0.3s ease-in-out;
+  animation: hideDialog 0.15s ease-in-out;
   z-index: 9000;
 
   &::backdrop {
@@ -93,7 +103,7 @@ function onPointerdown(event: PointerEvent) {
 
   &[open] {
     display: block;
-    animation: openDialog 0.3s ease-in-out;
+    animation: openDialog 0.15s ease-in-out;
   }
 
   &__head {

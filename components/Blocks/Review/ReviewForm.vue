@@ -30,7 +30,11 @@
           label="Достоинства"
           :maxlength="maxSymbols"
         >
-          <TextareaField v-model="pros" :maxlength="maxSymbols" id="review-pros" />
+          <TextareaField
+            v-model="pros"
+            :maxlength="maxSymbols"
+            id="review-pros"
+          />
           <template v-if="prosError" #error>{{ prosError }}</template>
         </InputWrapper>
         <InputWrapper
@@ -40,7 +44,11 @@
           label="Недостатки"
           :maxlength="maxSymbols"
         >
-          <TextareaField v-model="cons" :maxlength="maxSymbols" id="review-cons" />
+          <TextareaField
+            v-model="cons"
+            :maxlength="maxSymbols"
+            id="review-cons"
+          />
           <template v-if="consError" #error>{{ consError }}</template>
         </InputWrapper>
         <InputWrapper
@@ -50,7 +58,11 @@
           label="Комментарий"
           :maxlength="maxSymbols"
         >
-          <TextareaField v-model="description" :maxlength="maxSymbols" id="review-description" />
+          <TextareaField
+            v-model="description"
+            :maxlength="maxSymbols"
+            id="review-description"
+          />
           <template v-if="descriptionError" #error>{{
             descriptionError
           }}</template>
@@ -95,6 +107,7 @@ const submitLabel = computed(() =>
 const isLoading = ref(false)
 
 const { addNotification } = useNotifications()
+const { addConfirm } = useConfirmation()
 
 const minSymbols = 20
 const maxSymbols = 400
@@ -152,9 +165,13 @@ async function onSubmit() {
 
   isLoading.value = false
 }
-function cancelEdit() {
-  // todo: модалку подтверждения
-  isWritingReview.value = false
+async function cancelEdit() {
+  const confirmed = await addConfirm({
+    title: 'Вы уверены, что хотите отменить редактирование отзыва?',
+    detail: 'Введенные сейчас данные не будут сохранены',
+  })
+  
+  if (confirmed) isWritingReview.value = false
 }
 </script>
 

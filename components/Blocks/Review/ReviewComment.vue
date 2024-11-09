@@ -60,6 +60,7 @@ const isLoading = ref(false)
 const reviewsStore = useReviewsStore()
 const { updateAllReviews } = reviewsStore
 const { isWritingReview } = storeToRefs(reviewsStore)
+const { addConfirm } = useConfirmation()
 
 const userId = computed(() => userData.value?.data.id)
 
@@ -68,9 +69,13 @@ const { addNotification } = useNotifications()
 async function removeReview() {
   if (!props.productId) return
 
+  const confirmed = await addConfirm({
+    title: 'Вы уверены, что хотите удалить отзыв?',
+  })
+  if (!confirmed) return
+
   isLoading.value = true
 
-  // todo: модалку подтверждения
   try {
     await $afFetch('product/rating', {
       method: 'DELETE',

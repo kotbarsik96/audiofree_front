@@ -89,6 +89,12 @@ if (isAuth.value) {
   await loadUserReview()
 }
 
+const { userId } = storeToRefs(useUserStore())
+
+watch(userId, async () => {
+  await loadUserReview()
+})
+
 let observer: IntersectionObserver
 
 onMounted(() => {

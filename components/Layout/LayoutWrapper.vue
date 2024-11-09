@@ -1,6 +1,8 @@
 <template>
   <div class="layout">
+    <AuthDialog v-model:shown="dialogShown" />
     <NotificationsContainer class="layout__notifications" />
+    <ConfirmationDialogsList />
     <div class="layout__content">
       <PageHeader />
       <main class="layout__main" id="main">
@@ -15,6 +17,10 @@
 import PageHeader from '~/components/Layout/LayoutSections/PageHeader.vue'
 import PageFooter from '~/components/Layout/LayoutSections/PageFooter.vue'
 import NotificationsContainer from '~/components/Blocks/Notifications/NotificationsContainer.vue'
+import AuthDialog from '~/components/Blocks/Dialog/AuthDialog.vue'
+import ConfirmationDialogsList from '~/components/Blocks/ConfirmationDialogsList.vue'
+
+const { dialogShown } = storeToRefs(useAuthStore())
 </script>
 
 <style lang="scss" scoped>
