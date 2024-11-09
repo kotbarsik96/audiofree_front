@@ -4,6 +4,8 @@
     ref="el"
     @close="closeDialog"
     @pointerdown="onPointerdown"
+    @animationend="onAnimEnd"
+    @animationcancel="onAnimEnd"
   >
     <div class="dialog__inner" @click.stop>
       <div class="dialog__head">
@@ -14,7 +16,7 @@
       <slot />
     </div>
 
-    <NotificationsContainer />
+    <NotificationsContainer v-show="shownNotificationsContainer" />
   </dialog>
 </template>
 
@@ -34,6 +36,8 @@ const emit = defineEmits<{
 }>()
 
 const el = ref<HTMLDialogElement>()
+
+const shownNotificationsContainer = ref(false)
 
 const _shown = computed({
   get() {
@@ -79,6 +83,9 @@ function onPointerdown(event: PointerEvent) {
 
     closeDialog()
   }
+}
+function onAnimEnd() {
+  shownNotificationsContainer.value = true
 }
 </script>
 

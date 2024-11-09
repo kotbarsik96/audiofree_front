@@ -87,20 +87,28 @@ import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import TextareaField from '~/components/Blocks/FormElements/TextareaField.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import AFRating from '~/components/Blocks/AFRating.vue'
+import {
+  ReviewInjection,
+  type IReviewInjection,
+} from '~/domain/reviews/types/IReviewInjection'
 
-const route = useRoute()
+const emit = defineEmits<{
+  (e: 'update:isWriting', v: boolean): void
+}>()
 
 const { $afFetch } = useNuxtApp()
 
 const { isAuth } = storeToRefs(useUserStore())
 const { openSignupDialog, openLoginDialog } = useAuthStore()
 
-const reviewsStore = useReviewsStore()
-const { updateAllReviews } = reviewsStore
-const { isWritingReview, isEditingReview, currentUserReview } =
-  storeToRefs(reviewsStore)
+const {
+  currentUserReview,
+  productId,
+  isEditingReview,
+  updateAllReviews,
+  updateWritingReview,
+} = injectStrict<IReviewInjection>(ReviewInjection)
 
-const productId = computed(() => route.params.product)
 const submitLabel = computed(() =>
   isEditingReview.value ? 'Сохранить' : 'Отправить'
 )
@@ -147,7 +155,7 @@ async function onSubmit() {
       async onResponse({ response }) {
         if (response.ok) {
           await updateAllReviews()
-          isWritingReview.value = false
+          updateWritingReview(false)
           addNotification('success', 'Ваш отзыв сохранен')
         }
       },
@@ -170,8 +178,8 @@ async function cancelEdit() {
     title: 'Вы уверены, что хотите отменить редактирование отзыва?',
     detail: 'Введенные сейчас данные не будут сохранены',
   })
-  
-  if (confirmed) isWritingReview.value = false
+
+  if (confirmed) updateWritingReview(false)
 }
 </script>
 

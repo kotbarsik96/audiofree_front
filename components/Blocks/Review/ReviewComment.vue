@@ -46,6 +46,10 @@
 import type IReview from '~/domain/reviews/types/IReview'
 import AFRating from '~/components/Blocks/AFRating.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
+import {
+  type IReviewInjection,
+  ReviewInjection,
+} from '~/domain/reviews/types/IReviewInjection'
 
 const props = defineProps<{
   review: IReview
@@ -57,9 +61,8 @@ const { $afFetch } = useNuxtApp()
 const { user: userData } = storeToRefs(useUserStore())
 const isLoading = ref(false)
 
-const reviewsStore = useReviewsStore()
-const { updateAllReviews } = reviewsStore
-const { isWritingReview } = storeToRefs(reviewsStore)
+const { updateAllReviews, updateWritingReview } =
+  injectStrict<IReviewInjection>(ReviewInjection)
 const { addConfirm } = useConfirmation()
 
 const userId = computed(() => userData.value?.data.id)
@@ -95,7 +98,7 @@ async function removeReview() {
 }
 
 function editReview() {
-  isWritingReview.value = true
+  updateWritingReview(true)
 }
 </script>
 

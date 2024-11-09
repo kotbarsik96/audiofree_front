@@ -17,10 +17,13 @@
 <script setup lang="ts">
 import ReviewForm from '~/components/Blocks/Review/ReviewForm.vue'
 import ReviewComment from '~/components/Blocks/Review/ReviewComment.vue'
+import {
+  ReviewInjection,
+  type IReviewInjection,
+} from '~/domain/reviews/types/IReviewInjection'
 
-const reviewsStore = useReviewsStore()
 const { isWritingReview, currentUserReview, productId } =
-  storeToRefs(reviewsStore)
+  injectStrict<IReviewInjection>(ReviewInjection)
 </script>
 
 <style lang="scss" scoped>
