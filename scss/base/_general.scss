@@ -27,7 +27,7 @@ html {
 
 ._link {
   text-decoration: none;
-  @include fontSize(14);
+  @include fontSize(16);
   color: var(--primary);
   transition: var(--general-transition);
 
@@ -46,7 +46,7 @@ html {
 
 ._error {
   color: var(--red);
-  @include fontSize(14);
+  @include fontSize(16);
 }
 
 ._bold {

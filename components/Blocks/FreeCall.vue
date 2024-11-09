@@ -26,7 +26,7 @@ import PhoneIcon from "@/assets/images/icons/phone.svg"
 
   &__title {
     color: #aeaeae;
-    @include fontSize(12);
+    @include fontSize(16);
   }
 
   &__number {

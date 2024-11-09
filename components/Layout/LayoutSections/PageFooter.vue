@@ -141,7 +141,7 @@ const columns = [
   }
 
   &__column-link {
-    @include fontSize(14);
+    @include fontSize(16);
   }
 
   &__column-title {
@@ -182,11 +182,11 @@ const columns = [
   }
 
   &__contact-item-title {
-    @include fontSize(14);
+    @include fontSize(16);
   }
 
   &__contact-item-detail {
-    @include fontSize(14);
+    @include fontSize(16);
     font-weight: 700;
   }
 
@@ -204,7 +204,7 @@ const columns = [
     display: flex;
     justify-content: space-between;
     align-items: center;
-    @include fontSize(14);
+    @include fontSize(16);
   }
 
   @include adaptive(tablet-big) {

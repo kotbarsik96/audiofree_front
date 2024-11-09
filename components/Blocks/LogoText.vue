@@ -53,7 +53,7 @@ const className = computed(() => {
   }
 
   &__text {
-    @include fontSize(12);
+    @include fontSize(16);
     line-height: 1;
     transition: var(--general-transition);
   }

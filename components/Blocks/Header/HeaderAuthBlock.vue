@@ -70,13 +70,18 @@ const { isAuth, isLoadingUser } = storeToRefs(userStore)
 
   &__links {
     color: var(--text-color);
-    @include fontSize(14);
+    @include fontSize(16);
     min-width: 8rem;
   }
 
   &__links-inner {
     display: flex;
     align-items: center;
+  }
+
+
+  &__btn {
+    @include fontSize(16);
   }
 }
 </style>

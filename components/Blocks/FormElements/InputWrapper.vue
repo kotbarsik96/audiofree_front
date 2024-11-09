@@ -66,12 +66,12 @@ const className = computed(() => {
   position: relative;
   margin-bottom: 0.25rem;
 
-  @include fontSize(14);
+  @include fontSize(16);
 
   &__label {
     cursor: pointer;
     display: inline-block;
-    @include fontSize(12);
+    @include fontSize(16);
     font-weight: 500;
   }
 
@@ -120,7 +120,7 @@ const className = computed(() => {
     width: 100%;
     color: var(--text-color);
     transition: var(--general-transition);
-    @include fontSize(14);
+    @include fontSize(16);
   }
   :deep(.input)::placeholder,
   :deep(.textarea)::placeholder {

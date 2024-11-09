@@ -71,7 +71,7 @@ const attrs = computed(() => {
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
-  @include fontSize(14);
+  @include fontSize(16);
     font-weight: 700;
   transition: var(--general-transition);
 
@@ -103,7 +103,7 @@ const attrs = computed(() => {
   }
 
   &__label {
-    @include fontSize(14);
+    @include fontSize(16);
     font-weight: 700;
   }
 

@@ -127,7 +127,7 @@ function updateRating(ratingValue: number) {
   &__detail {
     color: var(--text-color);
     font-weight: 500;
-    @include fontSize(14);
+    @include fontSize(16);
   }
 }
 </style>

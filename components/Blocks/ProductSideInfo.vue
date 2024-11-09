@@ -52,7 +52,7 @@ const items = [
   }
 
   &__section-title {
-    @include fontSize(14);
+    @include fontSize(16);
     font-weight: 500;
     color: var(--black);
     margin-bottom: 1.125rem;
@@ -68,7 +68,7 @@ const items = [
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    @include fontSize(14);
+    @include fontSize(16);
 
     .icon {
       flex-shrink: 0;

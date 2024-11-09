@@ -91,7 +91,7 @@ const statusText = computed(() => statusMap[props.data.status.value_slug])
     border-radius: 14px;
     gap: 0.3rem;
     border: 1px solid var(--stroke);
-    @include fontSize(14);
+    @include fontSize(16);
   }
 
   &__status-icon {
@@ -126,7 +126,7 @@ const statusText = computed(() => statusMap[props.data.status.value_slug])
 
   &__title {
     grid-column: 1 / -1;
-    @include fontSize(14);
+    @include fontSize(16);
     font-weight: 500;
   }
 

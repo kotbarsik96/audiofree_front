@@ -1,6 +1,6 @@
 <template>
   <header class="header" :class="headerClassName">
-    <template v-if="platform === 'desktop'">
+    <div class="header__desktop">
       <div class="header__top">
         <div class="header__container _container">
           <LogoText class="header__top-logo" link />
@@ -62,8 +62,8 @@
           <HeaderAuthBlock class="header__auth" />
         </div>
       </div>
-    </template>
-    <template v-if="platform === 'mobile'" class="header__container">
+    </div>
+    <div class="header__mobile">
       <div class="header-mobile__search" :class="mobileSearchClassName">
         <button
           class="header-mobile__search-button"
@@ -158,7 +158,7 @@
           </div>
         </nav>
       </div>
-    </template>
+    </div>
   </header>
 </template>
 
@@ -183,11 +183,9 @@ import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
 
 const { matches: mediaMatches } = useMatchMedia('max-width: 991px')
 
-const searchValue = ref('')
+const route = useRoute()
 
-const platform = computed<'mobile' | 'desktop'>(() =>
-  mediaMatches.value ? 'mobile' : 'desktop'
-)
+const searchValue = ref('')
 
 const bottomLinksMobile = computed(() =>
   bottomLinks.filter((item) => item.to !== '/')
@@ -206,6 +204,13 @@ const mobileSearchClassName = computed(() => {
 })
 
 const headerMobileMenuBtnEl = ref<HTMLElement>()
+
+watch(
+  () => route.path,
+  () => {
+    isMobileShown.value = false
+  }
+)
 
 function toggleMobileSearch() {
   mobileSearchShown.value = !mobileSearchShown.value
@@ -227,6 +232,10 @@ function closeMenu(e: Event) {
   box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.12);
   position: relative;
   background-color: var(--white);
+
+  &__mobile {
+    display: none;
+  }
 
   &__container {
     display: flex;
@@ -343,6 +352,13 @@ function closeMenu(e: Event) {
 
     box-shadow: none;
     background: transparent;
+
+    &__mobile {
+      display: block;
+    }
+    &__desktop {
+      display: none;
+    }
 
     &.shown .header-mobile {
       border-bottom-left-radius: 0;
@@ -497,13 +513,13 @@ function closeMenu(e: Event) {
   }
 
   &__menu-item-inner {
-    @include fontSize(12);
+    @include fontSize(16);
 
     &.--iconed {
       display: flex;
       align-items: center;
       gap: 22px;
-      @include fontSize(14);
+      @include fontSize(16);
       font-weight: 500;
 
       .icon {

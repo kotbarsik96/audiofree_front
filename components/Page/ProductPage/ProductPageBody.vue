@@ -187,7 +187,7 @@ const quantity = ref(1)
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    @include fontSize(14);
+    @include fontSize(16);
 
     .icon {
       flex-shrink: 0;

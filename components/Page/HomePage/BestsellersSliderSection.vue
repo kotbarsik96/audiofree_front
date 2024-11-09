@@ -31,7 +31,8 @@
               <AFButton
                 class="bestsellers-slider__button"
                 label="Купить"
-                to="/"
+                type="nuxt-link"
+                :to="`/product/${product.id}/${product.first_variation.id}`"
                 styleType="secondary"
               />
             </div>
@@ -78,6 +79,8 @@ const bestsellers = computed(() => data.value?.data || [])
 }
 
 .bestsellers-slider {
+  overflow: hidden;
+
   :deep(.swiper-pagination) {
     display: flex;
     justify-content: center;
