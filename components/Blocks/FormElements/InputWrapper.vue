@@ -1,6 +1,6 @@
 <template>
   <div class="input-wrapper" :class="className">
-    <label v-if="label" class="input-wrapper__label" :for="id">
+    <label v-if="label" class="input-wrapper__label" :for="inputId">
       {{ label }}
     </label>
     <div class="input-wrapper__wrap">
@@ -27,7 +27,7 @@ import { useSlots } from 'vue'
 const props = withDefaults(
   defineProps<{
     label?: string
-    id?: string
+    inputId?: string
     icon?: string | any
     iconPos?: 'right' | 'left'
     rounded?: boolean

@@ -25,35 +25,47 @@
       <div class="review-form__inputs">
         <InputWrapper
           class="review-form__input"
+          inputId="review-pros"
           :symbols="pros.length"
           label="Достоинства"
           :maxlength="maxSymbols"
         >
-          <TextareaField v-model="pros" :maxlength="maxSymbols" />
+          <TextareaField v-model="pros" :maxlength="maxSymbols" id="review-pros" />
           <template v-if="prosError" #error>{{ prosError }}</template>
         </InputWrapper>
         <InputWrapper
           class="review-form__input"
+          inputId="review-cons"
           :symbols="cons.length"
           label="Недостатки"
           :maxlength="maxSymbols"
         >
-          <TextareaField v-model="cons" :maxlength="maxSymbols" />
+          <TextareaField v-model="cons" :maxlength="maxSymbols" id="review-cons" />
           <template v-if="consError" #error>{{ consError }}</template>
         </InputWrapper>
         <InputWrapper
           class="review-form__input"
+          inputId="review-description"
           :symbols="description.length"
           label="Комментарий"
           :maxlength="maxSymbols"
         >
-          <TextareaField v-model="description" :maxlength="maxSymbols" />
+          <TextareaField v-model="description" :maxlength="maxSymbols" id="review-description" />
           <template v-if="descriptionError" #error>{{
             descriptionError
           }}</template>
         </InputWrapper>
       </div>
-      <AFButton type="submit" label="Отправить" :disabled="isLoading" />
+      <div class="review-form__buttons">
+        <AFButton type="submit" :label="submitLabel" :disabled="isLoading" />
+        <AFButton
+          v-if="isEditingReview"
+          styleType="secondary"
+          label="Отменить"
+          :disabled="isLoading"
+          @click="cancelEdit"
+        />
+      </div>
     </form>
   </div>
 </template>
@@ -64,10 +76,6 @@ import TextareaField from '~/components/Blocks/FormElements/TextareaField.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import AFRating from '~/components/Blocks/AFRating.vue'
 
-const emit = defineEmits<{
-  (e: 'review'): void
-}>()
-
 const route = useRoute()
 
 const { $afFetch } = useNuxtApp()
@@ -75,15 +83,25 @@ const { $afFetch } = useNuxtApp()
 const { isAuth } = storeToRefs(useUserStore())
 const { openSignupDialog, openLoginDialog } = useAuthStore()
 
+const reviewsStore = useReviewsStore()
+const { updateAllReviews } = reviewsStore
+const { isWritingReview, isEditingReview, currentUserReview } =
+  storeToRefs(reviewsStore)
+
 const productId = computed(() => route.params.product)
+const submitLabel = computed(() =>
+  isEditingReview.value ? 'Сохранить' : 'Отправить'
+)
 const isLoading = ref(false)
+
+const { addNotification } = useNotifications()
 
 const minSymbols = 20
 const maxSymbols = 400
-const pros = ref('')
-const cons = ref('')
-const description = ref('')
-const rating = ref(0)
+const pros = ref(currentUserReview.value?.pros || '')
+const cons = ref(currentUserReview.value?.cons || '')
+const description = ref(currentUserReview.value?.description || '')
+const rating = ref(currentUserReview.value?.value || 0)
 
 const prosError = ref('')
 const consError = ref('')
@@ -113,9 +131,11 @@ async function onSubmit() {
         cons: cons.value,
         description: description.value,
       },
-      onResponse({ response }) {
+      async onResponse({ response }) {
         if (response.ok) {
-          emit('review')
+          await updateAllReviews()
+          isWritingReview.value = false
+          addNotification('success', 'Ваш отзыв сохранен')
         }
       },
       onResponseError({ response }) {
@@ -131,6 +151,10 @@ async function onSubmit() {
   } catch (err) {}
 
   isLoading.value = false
+}
+function cancelEdit() {
+  // todo: модалку подтверждения
+  isWritingReview.value = false
 }
 </script>
 
@@ -176,6 +200,13 @@ async function onSubmit() {
       width: 1.25rem;
       height: 1.25rem;
     }
+  }
+
+  &__buttons {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.625rem;
   }
 }
 </style>

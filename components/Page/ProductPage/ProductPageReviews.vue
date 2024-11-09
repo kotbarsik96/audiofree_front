@@ -28,11 +28,7 @@
       </svg>
       <p>Отзывов еще нет. Напишите первым!</p>
     </div>
-    <ReviewForm
-      v-if="!currentUserReview || isEditingReview"
-      class="product-reviews__form"
-      @review="onReviewChange"
-    />
+    <ReviewForm v-if="!currentUserReview" class="product-reviews__form" />
     <div v-if="reviewsData?.data.total" class="product-reviews__count">
       Всего отзывов:
       <span>{{ reviewsData?.data.total }}</span>
@@ -42,7 +38,6 @@
         v-if="currentUserReview"
         :review="currentUserReview"
         :productId="productId"
-        @changeReview="onReviewChange"
       />
       <TransitionGroup v-if="!noReviews" name="blur">
         <ReviewComment
@@ -50,9 +45,13 @@
           :key="comment.id"
           class="product-reviews__comment"
           :review="comment"
+          :productId="productId"
         />
       </TransitionGroup>
-      <div v-if="status === 'pending'" class="product-reviews__loading-more">
+      <div
+        v-if="reviewsLoadingStatus === 'pending'"
+        class="product-reviews__loading-more"
+      >
         <SmallPreloader />
         <div>Загружаем еще отзывы...</div>
       </div>
@@ -66,73 +65,28 @@ import ReviewForm from '~/components/Blocks/Review/ReviewForm.vue'
 import ReviewComment from '~/components/Blocks/Review/ReviewComment.vue'
 import SmallPreloader from '~/components/Blocks/SmallPreloader.vue'
 import CurrentUserReview from '~/components/Blocks/Review/CurrentUserReview.vue'
-import type { IProductReview } from '~/domain/product/types/IProductData'
-import type IPagination from '~/dataAccess/api/IPagination'
 
-const { isAuth, userId } = storeToRefs(useUserStore())
+const { isAuth } = storeToRefs(useUserStore())
+
+const reviewsStore = useReviewsStore()
+const { loadReviews, loadUserReview } = reviewsStore
+const {
+  productId,
+  page,
+  reviews,
+  currentUserReview,
+  reviewsData,
+  reviewsLoadingStatus,
+  lastPage,
+  noReviews,
+} = storeToRefs(reviewsStore)
 
 const intersectionEl = ref<HTMLElement>()
 
-const route = useRoute()
-
-const page = ref(1)
-const lastPage = computed(() => reviewsData.value?.data.last_page || 1)
-
-const productId = computed(() => route.params.product as string)
-
-const isUpdatingReviews = ref(false)
-const isEditingReview = ref(false)
-
-const reviews = useState<IProductReview[]>('reviewsArray', () => [])
-const currentUserReview = useState<IProductReview | null>(
-  'currentUserReview',
-  () => null
-)
-
-const noReviews = computed(
-  () => !reviews.value.length && !currentUserReview.value
-)
-
-const {
-  data: reviewsData,
-  status,
-  execute: _updateReviews,
-} = await useAPI<{
-  data: IPagination<IProductReview>
-}>(`/products/${productId.value}/reviews`, {
-  params: {
-    page,
-    per_page: 5,
-  },
-  onResponse({ response }) {
-    if (!isUpdatingReviews.value) {
-      let arr: IProductReview[] | null = response._data.data.data
-      if (Array.isArray(arr)) {
-        // не показывать отзыв текущего пользователя на первой странице
-        if (page.value === 1)
-          arr = arr.filter((review) => review.user_id !== userId.value)
-        reviews.value.push(...arr)
-      }
-    }
-  },
-  watch: [page],
-})
-
-const { execute: getUserReview } = useAPI<{ data: IProductReview | null }>(
-  `/product/${productId.value}/user-review`,
-  {
-    onResponse({ response }) {
-      if (response._data) {
-        currentUserReview.value = response._data.data
-      }
-    },
-    watch: false,
-    immediate: false,
-  }
-)
+await loadReviews()
 
 if (isAuth.value) {
-  await getUserReview()
+  await loadUserReview()
 }
 
 let observer: IntersectionObserver
@@ -155,20 +109,11 @@ function observerCallback(entries: IntersectionObserverEntry[]) {
    * есть пересечение
    */
   const shouldUpdatePage =
-    status.value !== 'pending' &&
+    reviewsLoadingStatus.value !== 'pending' &&
     page.value < lastPage.value &&
     entries.some((entry) => entry.isIntersecting)
 
   if (shouldUpdatePage) page.value++
-}
-async function updateReviews() {
-  isUpdatingReviews.value = true
-  await _updateReviews()
-  isUpdatingReviews.value = false
-}
-async function onReviewChange() {
-  await updateReviews()
-  await getUserReview()
 }
 </script>
 

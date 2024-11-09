@@ -52,15 +52,14 @@ const props = defineProps<{
   productId?: number | string
 }>()
 
-const emit = defineEmits<{
-  (e: 'deleteReview'): void
-  (e: 'editReview'): void
-}>()
-
 const { $afFetch } = useNuxtApp()
 
 const { user: userData } = storeToRefs(useUserStore())
 const isLoading = ref(false)
+
+const reviewsStore = useReviewsStore()
+const { updateAllReviews } = reviewsStore
+const { isWritingReview } = storeToRefs(reviewsStore)
 
 const userId = computed(() => userData.value?.data.id)
 
@@ -71,16 +70,17 @@ async function removeReview() {
 
   isLoading.value = true
 
+  // todo: модалку подтверждения
   try {
     await $afFetch('product/rating', {
       method: 'DELETE',
       params: {
         product_id: props.productId,
       },
-      onResponse({ response }) {
+      async onResponse({ response }) {
         if (response.ok) {
+          await updateAllReviews()
           addNotification('success', 'Вы удалили свой отзыв о товаре')
-          emit('deleteReview')
         }
       },
     })
@@ -88,8 +88,9 @@ async function removeReview() {
 
   isLoading.value = false
 }
-async function editReview() {
-  emit('editReview')
+
+function editReview() {
+  isWritingReview.value = true
 }
 </script>
 
