@@ -10,15 +10,17 @@ export const useProductsCatalogStore = defineStore(
       ...parseRouteQuery(route.query),
       per_page: 9,
     }))
-    const fetchingProducts = ref(false)
 
-    const { data: productsData, execute: fetchProducts } = useAPI<
-      IPagination<ICatalogProduct>
-    >('/products/catalog', {
+    const {
+      data: productsData,
+      execute: fetchProducts,
+      status,
+    } = useAPI<IPagination<ICatalogProduct>>('/products/catalog', {
       query: urlQuery,
       immediate: false,
       watch: false,
     })
+    const fetchingProducts = computed(() => status.value === 'pending')
 
     return { urlQuery, fetchingProducts, productsData, fetchProducts }
   }

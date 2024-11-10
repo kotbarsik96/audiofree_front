@@ -50,14 +50,14 @@
             <AFButton
               class="ct-filter__button"
               label="Применить фильтр"
-              :disabled="fetchingProducts"
+              :disabled="disabledButtons"
               @click="applyFilter"
             />
             <AFButton
               class="ct-filter__button"
               styleType="secondary"
               label="Очистить фильтр"
-              :disabled="fetchingProducts"
+              :disabled="disabledButtons"
               @click="clearFilter"
             />
           </div>
@@ -84,6 +84,10 @@ const router = useRouter()
 const catalogStore = useProductsCatalogStore()
 const { fetchProducts } = catalogStore
 const { urlQuery, fetchingProducts } = storeToRefs(catalogStore)
+
+const disabledButtons = computed(
+  () => fetchingProducts.value && typeof window !== 'undefined'
+)
 
 const bodyEl = ref<HTMLElement>()
 
@@ -240,7 +244,6 @@ async function updateUrlQuery() {
   await router.push({ query })
 }
 async function applyFilter() {
-  fetchingProducts.value = true
   try {
     clearTimeout(filterValuesTimeout)
     await updateUrlQuery()
@@ -248,7 +251,6 @@ async function applyFilter() {
     await router.push({ query: { ...route.query, page: 1 } })
     await fetchProducts()
   } catch (err) {}
-  fetchingProducts.value = false
 }
 function clearFilter() {
   Object.keys(filterValues.value).forEach((slug) => {
