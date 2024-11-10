@@ -79,8 +79,6 @@ const bestsellers = computed(() => data.value?.data || [])
 }
 
 .bestsellers-slider {
-  overflow: hidden;
-
   :deep(.swiper-pagination) {
     display: flex;
     justify-content: center;
@@ -89,6 +87,7 @@ const bestsellers = computed(() => data.value?.data || [])
 
   :deep(.swiper-slide) {
     cursor: grab;
+    overflow: hidden;
   }
 
   &__bullet {

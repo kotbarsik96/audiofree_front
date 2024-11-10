@@ -25,6 +25,13 @@ html {
   padding: 0 var(--container-padding-x);
 }
 
+a,
+button {
+  &:focus-visible {
+    outline: 1px solid var(--black);
+  }
+}
+
 ._link {
   text-decoration: none;
   @include fontSize(16);

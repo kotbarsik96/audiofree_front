@@ -12,7 +12,7 @@ import { defineNuxtLink } from '#app'
 
 const props = withDefaults(
   defineProps<{
-    type?: 'button' | 'link' | 'router-link'
+    type?: 'button' | 'link' | 'router-link' | 'div'
     icon: string | any
     shadow?: boolean
     badge?: string | number
@@ -32,6 +32,8 @@ const component = computed(() => {
       return 'a'
     case 'router-link':
       return defineNuxtLink({})
+    case 'div':
+      return 'div'
   }
 })
 const attrs = computed(() => {
@@ -74,7 +76,7 @@ const className = computed(() => {
     box-shadow: 0 0.31rem 0.975rem rgba(140, 121, 199, 0.3);
   }
 
-  &:hover {
+  &:not(div):hover {
     background-color: var(--secondary-2);
     color: var(--white);
   }

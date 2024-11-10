@@ -5,6 +5,7 @@
         v-if="item.link"
         class="breadcrumbs__link _link"
         :to="item.link"
+        tabindex="0"
       >
         {{ item.label }}
       </NuxtLink>

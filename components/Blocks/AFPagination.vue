@@ -5,6 +5,7 @@
         v-if="toPrevPage"
         class="pagination__button pagination__button--prev"
         :to="toPrevPage"
+        tabindex="0"
       >
         <AFIcon :icon="ChevronRightIcon" rotate="180deg" />
       </NuxtLink>
@@ -15,6 +16,7 @@
           class="pagination__link"
           :class="{ active: page === currentPage }"
           :to="getUrl(page, route.query)"
+          tabindex="0"
         >
           {{ page }}
         </NuxtLink>
@@ -22,7 +24,7 @@
       <template v-if="toLastPage">
         <li>...</li>
         <li>
-          <NuxtLink class="pagination__link" :to="toLastPage">
+          <NuxtLink class="pagination__link" :to="toLastPage" tabindex="0">
             {{ pages }}
           </NuxtLink>
         </li>
@@ -33,6 +35,7 @@
         v-if="toNextPage"
         class="pagination__button pagination__button--next"
         :to="toNextPage"
+        tabindex="0"
       >
         <AFIcon :icon="ChevronRightIcon" />
       </NuxtLink>
@@ -139,7 +142,7 @@ function checkIfCorrectPage() {
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  
+
   &.--disabled {
     opacity: 0.5;
     pointer-events: none;

@@ -12,12 +12,11 @@
     </div>
     <ul class="gallery-switcher__gallery">
       <li v-for="img in images" :key="img" :class="{ '--active': chosenImg === img }">
-        <button type="button" aria-label="Показать изображение">
+        <button type="button" aria-label="Показать изображение" @click="chooseImg(img)">
           <img
             class="gallery-switcher__gallery-img"
             :src="img"
             alt=""
-            @click="chooseImg(img)"
           />
         </button>
       </li>

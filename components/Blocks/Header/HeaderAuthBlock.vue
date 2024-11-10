@@ -6,15 +6,14 @@
         <div v-if="isAuth" class="h-auth-block__links-inner">
           <NuxtLink
             class="h-auth-block__btn _link _link--text-color"
-            type="button"
             to="/profile"
+            tabindex="0"
           >
             Профиль
           </NuxtLink>
           <div class="h-auth-block__delimeter">/</div>
           <button
             class="h-auth-block__btn _link _link--text-color"
-            type="button"
             @click="userStore.logout"
           >
             Выйти
@@ -51,7 +50,7 @@ import { useUserStore } from '@/stores/userStore'
 
 const { openLoginDialog, openSignupDialog } = useAuthStore()
 const userStore = useUserStore()
-const { isAuth, isLoadingUser } = storeToRefs(userStore)
+const { isAuth } = storeToRefs(userStore)
 </script>
 
 <style lang="scss">
@@ -78,7 +77,6 @@ const { isAuth, isLoadingUser } = storeToRefs(userStore)
     display: flex;
     align-items: center;
   }
-
 
   &__btn {
     @include fontSize(16);

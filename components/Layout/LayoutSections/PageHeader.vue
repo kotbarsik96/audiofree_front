@@ -3,12 +3,13 @@
     <div class="header__desktop">
       <div class="header__top">
         <div class="header__container _container">
-          <LogoText class="header__top-logo" link />
+          <LogoText class="header__top-logo" link  />
           <ul class="header__top-links">
             <li v-for="obj in topLinks">
               <NuxtLink
                 class="header__top-link _link _link--white"
                 :to="obj.to"
+                tabindex="0"
               >
                 {{ obj.title }}
               </NuxtLink>
@@ -43,7 +44,7 @@
       <div class="header__bottom">
         <div class="header__container _container">
           <div class="header__bottom-catalog">
-            <NuxtLink class="_link _link--text-color" to="/catalog">
+            <NuxtLink class="_link _link--text-color" to="/catalog" tabindex="0">
               <AFIcon :icon="MenuIcon" />
               <span> Каталог товаров</span>
             </NuxtLink>
@@ -54,6 +55,7 @@
                 :to="link.to"
                 class="header__bottom-link"
                 :class="{ bold: link.bold }"
+                tabindex="0"
               >
                 {{ link.title }}
               </NuxtLink>
@@ -252,12 +254,21 @@ function closeMenu(e: Event) {
     color: var(--white);
   }
 
+  &__top-logo{
+    outline-color: var(--white);
+  }
+
   &__top-links {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 1.875rem;
     flex: 1 1 auto;
+
+    a,
+    button {
+      outline-color: var(--white);
+    }
   }
 
   &__main {

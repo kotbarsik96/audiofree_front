@@ -12,9 +12,12 @@
       type="text"
       inputmode="numeric"
       class="quantity-input__input"
-      v-model="_value"
+      :value="_value"
+      @input="onInput"
+      @change="onChange"
       @keyup.up="updateValue(1)"
       @keyup.down="updateValue(-1)"
+      ref="inputEl"
     />
     <button
       class="quantity-input__arrow quantity-input__arrow--more"
@@ -43,13 +46,15 @@ const props = withDefaults(
   }
 )
 
+const inputEl = ref<HTMLInputElement>()
+
 const _value = computed({
   get() {
     return props.modelValue
   },
   set(v) {
-    if (v < props.min) v = props.min
-    if (props.max && v > props.max) v = props.max
+    if (typeof v !== 'number') v = 0
+    v = handleMinmax(v)
     emit('update:modelValue', v)
   },
 })
@@ -60,6 +65,27 @@ const emit = defineEmits<{
 
 function updateValue(num: number) {
   _value.value += num
+}
+function getNumValue(v: string) {
+  return Number(v.replace(/\D/g, '')) || 0
+}
+function onInput(event: Event) {
+  const target = event.target as HTMLInputElement
+  let value = getNumValue(target.value)
+
+  target.value = value.toString()
+  _value.value = value
+}
+function onChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  let value = handleMinmax(getNumValue(target.value))
+  target.value = value.toString()
+  _value.value = value
+}
+function handleMinmax(value: number) {
+  if (value < props.min) value = props.min
+  if (value > props.max) value = props.max
+  return value
 }
 </script>
 
@@ -72,6 +98,7 @@ function updateValue(num: number) {
   overflow: hidden;
 
   &__arrow {
+    outline-offset: -2px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -95,7 +122,8 @@ function updateValue(num: number) {
   }
 
   &__input {
-    outline: none;
+    outline-offset: -1px;
+    outline-width: 1px;
     border: none;
     color: var(--text-color-light);
     width: 3.75rem;

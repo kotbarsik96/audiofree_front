@@ -16,6 +16,7 @@
                 class="footer__column-link _link _link--white"
                 v-if="item.to"
                 :to="item.to"
+                tabindex="0"
               >
                 {{ item.title }}
               </NuxtLink>
@@ -41,7 +42,7 @@
               :key="item.title"
               class="footer__contact-item"
             >
-              <ButtonIcon :icon="item.icon" />
+              <ButtonIcon :icon="item.icon" type="div" />
               <div>
                 <div class="footer__contact-item-title">{{ item.title }}</div>
                 <div class="footer__contact-item-detail">{{ item.detail }}</div>
@@ -59,7 +60,7 @@
           <LogoText hideText link />
         </div>
         <div>
-          <NuxtLink class="_link _link--white" to="/">
+          <NuxtLink class="_link _link--white" to="/" tabindex="0">
             Политика конфиденциальности
           </NuxtLink>
         </div>
@@ -128,6 +129,11 @@ const columns = [
 .footer {
   color: var(--white);
 
+  a,
+  button {
+    outline-color: var(--white);
+  }
+
   &__main {
     padding: 4.375rem 0 3.125rem 0;
     background-color: var(--primary-dark);
@@ -176,7 +182,7 @@ const columns = [
     :deep(.btn-icon) {
       background-color: var(--secondary);
     }
-    :deep(.btn-icon):hover {
+    :deep(.btn-icon:not(div)):hover {
       background-color: var(--secondary-2);
     }
   }
