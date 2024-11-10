@@ -24,7 +24,7 @@
       </div>
     </div>
     <div
-      v-if="userData && review.user_id === userId"
+      v-if="user && review.user_id === userId"
       class="review-comment__edit-buttons"
     >
       <AFButton
@@ -58,7 +58,7 @@ const props = defineProps<{
 
 const { $afFetch } = useNuxtApp()
 
-const { user: userData, userId } = storeToRefs(useUserStore())
+const { user, userId } = storeToRefs(useUserStore())
 const isLoading = ref(false)
 
 const { updateAllReviews, updateWritingReview } =

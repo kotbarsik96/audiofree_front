@@ -12,16 +12,16 @@ export const useUserStore = defineStore('user', () => {
   const jwt = useCookie(AppKeys.JWT)
   const { $afFetch } = useNuxtApp()
 
-  const userId = computed(() => user.value?.data.id)
+  const userId = computed(() => user.value?.id)
 
   const {
-    data: user,
+    data: userData,
     execute: _getUser,
     status,
   } = useAPI<{ data: IUser }>('/profile/user', {
     immediate: false,
     watch: false,
-    onResponse({ response }) {
+    onResponse() {
       checkPageMetaAuth()
     },
     onResponseError({ response }) {
@@ -30,6 +30,7 @@ export const useUserStore = defineStore('user', () => {
       }
     },
   })
+  const user = computed(() => userData.value?.data)
   const isAuth = computed(() => !!jwt.value)
   const isLoadingUser = computed(() => status.value === 'pending')
 
@@ -40,7 +41,7 @@ export const useUserStore = defineStore('user', () => {
       method: 'POST',
       onResponse({ response }) {
         addNotification('info', response._data.message)
-        user.value = null
+        userData.value = null
       },
     })
 
