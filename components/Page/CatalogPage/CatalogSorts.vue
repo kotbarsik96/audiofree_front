@@ -8,12 +8,15 @@
 import AFSelect from '~/components/Blocks/AFSelect.vue'
 import ArrowUpIcon from '~/assets/images/icons/arrow-up.svg'
 import type ICatalogSortItem from '~/domain/product/types/ICatalogSortItem'
+import {
+  CatalogInject,
+  type IInjectCatalog,
+} from '~/domain/product/types/IInjectCtalog'
 
 const router = useRouter()
 const route = useRoute()
 
-const catalogStore = useProductsCatalogStore()
-const { fetchProducts } = catalogStore
+const { fetchProducts } = injectStrict<IInjectCatalog>(CatalogInject)
 
 const { data } = await useAPI<{ data: ICatalogSortItem[] }>(
   '/products/catalog/sorts'

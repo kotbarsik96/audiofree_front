@@ -43,7 +43,10 @@
 import AFPagination from '~/components/Blocks/AFPagination.vue'
 import ProductCard from '~/components/Blocks/Cards/ProductCard.vue'
 import EmptyBoxIcon from '~/assets/images/icons/empty-box.svg'
-import { useProductsCatalogStore } from '~/stores/productsCatalogStore'
+import {
+  CatalogInject,
+  type IInjectCatalog,
+} from '~/domain/product/types/IInjectCtalog'
 
 const route = useRoute()
 const currentPage = computed<number>(() => Number(route.query.page) || 0)
@@ -51,9 +54,8 @@ let lastPage = currentPage.value
 
 const el = ref<HTMLElement>()
 
-const catalogStore = useProductsCatalogStore()
-const { fetchProducts } = catalogStore
-const { productsData, fetchingProducts } = storeToRefs(catalogStore)
+const { fetchingProducts, fetchProducts, productsData } =
+  injectStrict<IInjectCatalog>(CatalogInject)
 const disabledPagination = computed(
   () => fetchingProducts.value && typeof window !== 'undefined'
 )

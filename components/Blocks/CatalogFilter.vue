@@ -74,16 +74,18 @@ import CFilterCheckboxes from '~/components/Blocks/CatalogFilter/CFilterCheckbox
 import CFilterRadios from '~/components/Blocks/CatalogFilter/CFilterRadios.vue'
 import FilterIcon from '~/assets/images/icons/filter.svg'
 import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
-import { useProductsCatalogStore } from '~/stores/productsCatalogStore'
 import type IFilterItem from '~/domain/product/types/IFilterItem'
 import type { IInjectFiltersData } from '~/domain/product/types/IInjectFiltersData'
+import {
+  CatalogInject,
+  type IInjectCatalog,
+} from '~/domain/product/types/IInjectCtalog'
 
 const route = useRoute()
 const router = useRouter()
 
-const catalogStore = useProductsCatalogStore()
-const { fetchProducts } = catalogStore
-const { urlQuery, fetchingProducts } = storeToRefs(catalogStore)
+const { fetchProducts, urlQuery, fetchingProducts } =
+  injectStrict<IInjectCatalog>(CatalogInject)
 
 const disabledButtons = computed(
   () => fetchingProducts.value && typeof window !== 'undefined'
