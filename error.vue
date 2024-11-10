@@ -8,7 +8,12 @@
             <p v-if="error?.statusCode === 500">Что-то пошло не так</p>
             <p v-else-if="error?.statusCode === 404">Страница не найдена</p>
             <p>Вы можете перейти на главную страницу</p>
-            <AFButton class="error__link" label="На главную" to="/" type="nuxt-link" />
+            <AFButton
+              class="error__link"
+              label="На главную"
+              to="/"
+              type="nuxt-link"
+            />
           </div>
         </div>
       </LayoutWrapper>
@@ -17,9 +22,12 @@
 </template>
 
 <script setup lang="ts">
+import type { NuxtError } from '#app'
 import AFButton from '~/components/Blocks/AFButton.vue'
 
-const error = useError()
+const props = defineProps<{
+  error: NuxtError
+}>()
 </script>
 
 <style lang="scss" scoped>
