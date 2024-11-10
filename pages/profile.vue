@@ -1,11 +1,7 @@
 <template>
-  
+  <ProfilePage />
 </template>
 
 <script setup lang="ts">
-
+import ProfilePage from '~/components/PageLayout.vue/ProfilePage.vue'
 </script>
-
-<style lang="scss">
-  
-</style>

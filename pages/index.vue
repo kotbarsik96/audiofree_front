@@ -1,11 +1,7 @@
 <template>
-  <div class="home">
-    <BestsellersSliderSection />
-  </div>
+  <HomePage />
 </template>
 
 <script setup lang="ts">
-import BestsellersSliderSection from '~/components/Page/HomePage/BestsellersSliderSection.vue'
+import HomePage from '~/components/PageLayout.vue/HomePage.vue'
 </script>
-
-<style lang="scss" scoped></style>
