@@ -7,36 +7,35 @@ import { ServerStatuses } from '~/enums/ServerStatuses'
 
 export const useUserStore = defineStore('user', () => {
   const { addNotification } = useNotifications()
+  const route = useRoute()
 
   const jwt = useCookie(AppKeys.JWT)
-  const _userId = useCookie(AppKeys.USER_ID)
   const { $afFetch } = useNuxtApp()
 
-  const userId = computed(() => (_userId.value ? Number(_userId.value) : 0))
+  const userId = computed(() => user.value?.data.id)
 
-  const { data: user, execute: _getUser } = useAPI<{ data: IUser }>(
-    '/profile/user',
-    {
-      immediate: false,
-      watch: false,
-      onResponse({ response }) {
-        if (response.ok) {
-          _userId.value = response._data.data.id
-        }
-      },
-      onResponseError({ response }) {
-        if (response.status === ServerStatuses.UNAUTHORIZED) {
-          jwt.value = null
-          _userId.value = null
-        }
-      },
-    }
-  )
+  const {
+    data: user,
+    execute: _getUser,
+    status,
+  } = useAPI<{ data: IUser }>('/profile/user', {
+    immediate: false,
+    watch: false,
+    onResponse({ response }) {
+      checkPageMetaAuth()
+    },
+    onResponseError({ response }) {
+      if (response.status === ServerStatuses.UNAUTHORIZED) {
+        jwt.value = null
+      }
+    },
+  })
   const isAuth = computed(() => !!jwt.value)
+  const isLoadingUser = computed(() => status.value === 'pending')
 
   async function logout() {
     jwt.value = null
-    _userId.value = null
+
     await $afFetch('/logout', {
       method: 'POST',
       onResponse({ response }) {
@@ -44,16 +43,25 @@ export const useUserStore = defineStore('user', () => {
         user.value = null
       },
     })
+
+    checkPageMetaAuth()
   }
-  function getUser() {
+  async function getUser() {
     if (jwt.value) {
       try {
-        _getUser()
+        await _getUser()
       } catch (err) {}
     }
+
+    checkPageMetaAuth()
   }
   function updateJwt(_jwt: string | null) {
     jwt.value = _jwt
+  }
+  function checkPageMetaAuth() {
+    if (!user.value && route.meta.auth) {
+      if (!isLoadingUser.value) navigateTo('/')
+    }
   }
 
   return {

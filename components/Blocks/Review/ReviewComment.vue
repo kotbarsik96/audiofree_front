@@ -58,14 +58,12 @@ const props = defineProps<{
 
 const { $afFetch } = useNuxtApp()
 
-const { user: userData } = storeToRefs(useUserStore())
+const { user: userData, userId } = storeToRefs(useUserStore())
 const isLoading = ref(false)
 
 const { updateAllReviews, updateWritingReview } =
   injectStrict<IReviewInjection>(ReviewInjection)
 const { addConfirm } = useConfirmation()
-
-const userId = computed(() => userData.value?.data.id)
 
 const { addNotification } = useNotifications()
 

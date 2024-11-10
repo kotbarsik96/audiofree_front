@@ -76,6 +76,7 @@ const component = computed(() => {
     font-weight: 500;
     background-color: var(--stroke);
     color: #9a9a9a;
+    outline-offset: -2px;
     transition: var(--general-transition);
 
     &.active {
