@@ -15,7 +15,7 @@
         label="Телефон"
         inputId="username"
       >
-        <MaskInput v-model="phoneNumber" id="phoneNumber" mask="+7 (___) ___ __ __" numeric />
+        <MaskInput v-model="phoneNumber" id="phoneNumber" mask="+7 (999) 999 99 99" numeric />
         <template #error v-if="phoneNumberError">{{ phoneNumberError }}</template>
       </InputWrapper>
       <InputWrapper
