@@ -1,9 +1,9 @@
 <template>
-  <form class="profile-userinfo _section-box" @submit.prevent="onSubmit">
-    <h1 class="_h2">Общая информация</h1>
-    <div class="profile-userinfo__inputs">
+  <form class="section-form _section-box" @submit.prevent="onSubmit">
+    <h2 class="_h2">Общая информация</h2>
+    <div class="section-form__inputs">
       <InputWrapper
-        class="profile-userinfo__input"
+        class="section-form__input"
         label="Имя (фамилия, отчество)"
         inputId="username"
       >
@@ -11,7 +11,7 @@
         <template #error v-if="usernameError">{{ usernameError }}</template>
       </InputWrapper>
       <InputWrapper
-        class="profile-userinfo__input"
+        class="section-form__input"
         label="Телефон"
         inputId="username"
       >
@@ -26,22 +26,18 @@
         }}</template>
       </InputWrapper>
       <InputWrapper
-        class="profile-userinfo__input"
+        class="section-form__input"
         label="Населенный пункт"
         inputId="location"
       >
         <TextInput v-model="location" id="location" />
         <template #error v-if="locationError">{{ locationError }}</template>
       </InputWrapper>
-      <InputWrapper
-        class="profile-userinfo__input"
-        label="Улица"
-        inputId="street"
-      >
+      <InputWrapper class="section-form__input" label="Улица" inputId="street">
         <TextInput v-model="street" id="street" />
         <template #error v-if="streetError">{{ streetError }}</template>
       </InputWrapper>
-      <InputWrapper class="profile-userinfo__input" label="Дом" inputId="house">
+      <InputWrapper class="section-form__input" label="Дом" inputId="house">
         <TextInput v-model="house" id="house" />
         <template #error v-if="houseError">{{ houseError }}</template>
       </InputWrapper>
@@ -100,7 +96,7 @@ function compareValues(value1: string, value2: string | null | undefined) {
   return value1 === value2
 }
 
-onMounted(() => isLoading.value = false)
+onMounted(() => (isLoading.value = false))
 
 async function onSubmit() {
   if (!validate()) return
@@ -123,20 +119,13 @@ async function onSubmit() {
         }
       },
       onResponseError({ response }) {
-        addNotification('error', 'При обновлении профиля произошла ошибка')
-        const errors = response._data.errors
-        mapErrors(errors, [
+        mapErrors(response._data.errors, [
           ['name', usernameError],
           ['phone_number', phoneNumberError],
           ['house', houseError],
           ['location', locationError],
           ['street', streetError],
         ])
-        // if (errors.name) usernameError.value = errors.name
-        // if (errors.phone_number) phoneNumberError.value = errors.phone_number
-        // if (errors.house) houseError.value = errors.house
-        // if (errors.location) locationError.value = errors.location
-        // if (errors.street) streetError.value = errors.street
       },
     })
   } catch (err) {}
@@ -146,25 +135,5 @@ async function onSubmit() {
 </script>
 
 <style lang="scss" scoped>
-.profile-userinfo {
-  padding: 1rem;
-  max-width: 47rem;
-
-  ._h2 {
-    margin-bottom: 2rem;
-  }
-
-  &__inputs {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem 1rem;
-    margin-bottom: 1rem;
-  }
-
-  @include adaptive(phone-big) {
-    &__inputs {
-      grid-template-columns: 1fr;
-    }
-  }
-}
+@import '/scss/components/SectionForm';
 </style>

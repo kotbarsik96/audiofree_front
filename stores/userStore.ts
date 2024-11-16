@@ -30,7 +30,7 @@ export const useUserStore = defineStore('user', () => {
       }
     },
   })
-  const user = computed(() => userData.value?.data)
+  const user = computed<IUser | undefined>(() => userData.value?.data)
   const isAuth = computed(() => !!jwt.value)
   const isLoadingUser = computed(() => status.value === 'pending')
 

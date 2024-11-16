@@ -1,3 +1,5 @@
+import type IUserConfirmations from '~/domain/user/types/IUserConfirmations'
+
 export default interface IUser {
   id: number
   email: string
@@ -9,4 +11,5 @@ export default interface IUser {
   house: null | string
   created_at: string
   updated_at: string
+  confirmations: IUserConfirmations
 }
