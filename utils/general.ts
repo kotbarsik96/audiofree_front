@@ -99,3 +99,14 @@ export function debugWarn(data: any, wrapperMessage?: string) {
     console.log(`${wrapperMessage} - end`)
   }
 }
+
+type IErrorMapper = [string, Ref]
+
+export function mapErrors(
+  errors: Record<string, string[]>,
+  mappers: IErrorMapper[]
+) {
+  mappers.forEach(([key, refVar]) => {
+    if (errors[key]) refVar.value = errors[key][0]
+  })
+}

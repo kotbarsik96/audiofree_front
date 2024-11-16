@@ -55,6 +55,7 @@ import AFButton from '~/components/Blocks/AFButton.vue'
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import MaskInput from '~/components/Blocks/FormElements/MaskInput.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
+import { mapErrors } from '~/utils/general'
 
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
@@ -73,22 +74,74 @@ const locationError = ref('')
 const streetError = ref('')
 const houseError = ref('')
 
+const { $afFetch } = useNuxtApp()
+const { getUser } = useUserStore()
+const { addNotification } = useNotifications()
+
 const { validate } = useAllValidation([
-  // useValidation(username, usernameError, [])
+  useValidation(phoneNumber, phoneNumberError, [phoneNumberValidation()]),
 ])
+
+const isLoading = ref(true)
 
 const disabledSave = computed(() => {
   return (
-    username.value === userInfo.value?.name &&
-    // && phoneNumber.value
-    location.value === userInfo.value?.location &&
-    street.value === userInfo.value?.street &&
-    house.value === userInfo.value?.house
+    isLoading.value ||
+    (compareValues(username.value, userInfo.value?.name) &&
+      compareValues(phoneNumber.value, userInfo.value?.phone_number) &&
+      compareValues(location.value, userInfo.value?.location) &&
+      compareValues(street.value, userInfo.value?.street) &&
+      compareValues(house.value, userInfo.value?.house))
   )
 })
 
-function onSubmit() {
+function compareValues(value1: string, value2: string | null | undefined) {
+  if (value1 === '' && !value2) return true
+  return value1 === value2
+}
+
+onMounted(() => isLoading.value = false)
+
+async function onSubmit() {
   if (!validate()) return
+
+  isLoading.value = true
+  try {
+    await $afFetch('/profile/edit', {
+      method: 'POST',
+      body: {
+        name: username.value,
+        phone_number: phoneNumber.value,
+        location: location.value,
+        street: street.value,
+        house: house.value,
+      },
+      async onResponse({ response }) {
+        if (response.ok) {
+          await getUser()
+          addNotification('success', 'Вы успешно обновили профиль')
+        }
+      },
+      onResponseError({ response }) {
+        addNotification('error', 'При обновлении профиля произошла ошибка')
+        const errors = response._data.errors
+        mapErrors(errors, [
+          ['name', usernameError],
+          ['phone_number', phoneNumberError],
+          ['house', houseError],
+          ['location', locationError],
+          ['street', streetError],
+        ])
+        // if (errors.name) usernameError.value = errors.name
+        // if (errors.phone_number) phoneNumberError.value = errors.phone_number
+        // if (errors.house) houseError.value = errors.house
+        // if (errors.location) locationError.value = errors.location
+        // if (errors.street) streetError.value = errors.street
+      },
+    })
+  } catch (err) {}
+
+  isLoading.value = false
 }
 </script>
 

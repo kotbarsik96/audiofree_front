@@ -34,7 +34,9 @@ export function emailValidation(): ValidatorCallback<string> {
   }
 }
 
-export function mustPresentValidation(fieldName?: string): ValidatorCallback<string> {
+export function mustPresentValidation(
+  fieldName?: string
+): ValidatorCallback<string> {
   return function (value: string) {
     if (!value) {
       if (fieldName) return `Не указано поле: ${fieldName}`
@@ -54,7 +56,18 @@ export function passwordsMatchValidation(
   }
 }
 
-export function minLengthValidation(minLength: number): ValidatorCallback<string> {
+export function phoneNumberValidation(): ValidatorCallback<string> {
+  return function (value: string) {
+    if (!value.match(/\+7 \(\d\d\d\) \d\d\d \d\d \d\d/))
+      return 'Неверный формат номера телефона'
+
+    return false
+  }
+}
+
+export function minLengthValidation(
+  minLength: number
+): ValidatorCallback<string> {
   return function (value: string) {
     if (value.length < minLength) return `Не менее ${minLength} символов`
 
@@ -62,9 +75,11 @@ export function minLengthValidation(minLength: number): ValidatorCallback<string
   }
 }
 
-export function minNumberValidation(minNumber: number): ValidatorCallback<number> {
-  return function(value: number) {
-    if(value < minNumber) return `Число от ${minNumber}`
+export function minNumberValidation(
+  minNumber: number
+): ValidatorCallback<number> {
+  return function (value: number) {
+    if (value < minNumber) return `Число от ${minNumber}`
 
     return false
   }
