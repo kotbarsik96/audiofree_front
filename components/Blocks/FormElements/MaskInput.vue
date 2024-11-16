@@ -4,7 +4,7 @@
     type="text"
     :value="value"
     ref="inputEl"
-    @input="($event) => onInput($event as InputEvent)"
+    @input="onInput"
     @focus="onFocus"
     @pointerup="onFocus"
   />
@@ -15,22 +15,26 @@ const props = withDefaults(
   defineProps<{
     /** указать строку вида '99-aa-9a', где '9' - numReplacer, 'a' - letterReplacer */
     mask: string
-    /** вместо symbolReplacer пользователь вставляет свои символы */
     numReplacer?: string
     letterReplacer?: string
     anyReplacer?: string
     modelValue: string
+    prettyValueReplacer?: string
   }>(),
   {
     numReplacer: '9',
     letterReplacer: 'a',
     anyReplacer: '*',
+    prettyValueReplacer: '_',
   }
 )
 
 const emit = defineEmits<{
   (e: 'update:modelValue', v: typeof props.modelValue): void
 }>()
+
+const letterRegexp = /[A-Za-z]/
+const numberRegexp = /\d/
 
 const inputEl = ref<HTMLInputElement>()
 
@@ -43,93 +47,97 @@ const value = computed({
   },
 })
 
+const prettyMask = computed(() => {
+  const regexp = new RegExp(
+    `[${props.letterReplacer}${props.numReplacer}${props.anyReplacer}]`,
+    'g'
+  )
+
+  return props.mask.replace(regexp, props.prettyValueReplacer)
+})
+
 if (!checkMatch(value.value)) {
-  value.value = props.mask
+  value.value = prettyMask.value
 }
 
-function onInput(event: InputEvent) {
+function onInput(event: Event) {
   const target = event.target as HTMLInputElement
-  const cursorPos = target.selectionStart
-  if (typeof cursorPos === 'number') {
-    if (event.inputType === 'deleteContentBackward') {
-    } else if (event.inputType === 'deleteContentForward') {
-    } else {
-      const insertedSymbol = target.value[cursorPos - 1]
-      const closestEmptySymbol = getClosestEmptySymbol(
-        cursorPos,
-        insertedSymbol
-      )
-      if (typeof closestEmptySymbol !== 'string') {
-        target.value = props.modelValue
-        return
-      }
-      let updatedValue = updateValue(cursorPos - 1, insertedSymbol)
-      value.value = updatedValue
-      target.value = updatedValue
-      target.selectionStart = target.selectionEnd = cursorPos // почти...
-    }
-  }
+  target.value = handleInput(target.value)
 }
 function onFocus() {}
 
-function getClosestEmptySymbol(
-  cursorPos: number,
-  symbol: string
-): string | null {
-  let sliced = value.value.slice(cursorPos)
-  const values = [
-    sliced.indexOf(props.letterReplacer),
-    sliced.indexOf(props.numReplacer),
-    sliced.indexOf(props.anyReplacer),
-  ].filter((num) => num >= 0)
+function handleInput(insertedValue: string) {
+  let unmaskedValue = insertedValue
+    .split('')
+    .filter((_, index) => isReplacer(index))
+    .join('')
 
-  let i = Math.min(...values)
-  if (i < 0) return null
+  let i = 0
+  let maskedValue = ''
+  props.mask.split('').forEach((maskSymbol, index) => {
+    let insertingSymbol = unmaskedValue[i]
+    if (isReplacer(index)) {
+      if (insertingSymbol) {
+        /** цикл будет удалять символы из unmaskedValue до тех пор, пока они не проходят проверку на тип */
+        while (
+          !!insertingSymbol &&
+          hasTypeMismatch(insertingSymbol, maskSymbol)
+        ) {
+          let splitted = unmaskedValue.split('')
+          splitted.splice(i, 1)
+          unmaskedValue = splitted.join('')
+          insertingSymbol = unmaskedValue[i]
+        }
 
-  const closestEmptySymbol = sliced[i]
+        if (insertingSymbol) maskedValue += insertingSymbol
+        else maskedValue += props.prettyValueReplacer
 
-  const hasNumericMismatch =
-    closestEmptySymbol === props.numReplacer && !symbol.match(/\d/)
-  const hasLetterMismatch =
-    closestEmptySymbol === props.letterReplacer && !symbol.match(/[A-Za-z]/)
-  const hasTypeMismatch = hasNumericMismatch || hasLetterMismatch
-  if (hasTypeMismatch) return null
+        i++
+      } else maskedValue += props.prettyValueReplacer
+    } else {
+      maskedValue += maskSymbol
+    }
+  })
 
-  return closestEmptySymbol
+  if (checkMatch(maskedValue)) value.value = maskedValue
+  return value.value
 }
 
-function updateValue(cursorPos: number, newSymbol: string): string {
-  const splitted = props.modelValue.split('')
-  splitted[cursorPos] = newSymbol
+function hasTypeMismatch(insertingSymbol: string, replacer: string) {
+  let hasMismatch = false
 
-  let updated: string | null = splitted.join('')
-  if (!checkMatch(updated)) updated = props.modelValue
+  switch (replacer) {
+    case props.letterReplacer:
+      if (!insertingSymbol.match(letterRegexp)) hasMismatch = true
+      break
+    case props.numReplacer:
+      if (!insertingSymbol.match(numberRegexp)) hasMismatch = true
+      break
+  }
 
-  return updated
+  return hasMismatch
 }
 
 function checkMatch(value: string): boolean {
-  /** найти первое несовпадение */
-  if (value.length > props.mask.length || !value.length) return false
+  if (value.trim().length < 1) return false
 
-  const matchFailed = props.mask.split('').some((substring, index) => {
-    if (typeof value[index] !== 'string') return false
-
-    /** проверить вводимую пользователем подстроку */
-    if (isOnReplacer(substring)) {
-      if (isOnReplacer(value[index])) return false
-      return false
+  const hasMismatch = props.mask.split('').some((symbol, index) => {
+    if (isReplacer(index)) {
+      if (value[index] === props.prettyValueReplacer) return false
+      return hasTypeMismatch(value[index], symbol)
+    } else {
+      return symbol !== value[index]
     }
-    /** проверить "статичную" подстроку */
-    return value[index] !== props.mask[index]
   })
 
-  return !matchFailed
+  return !hasMismatch
 }
-function isOnReplacer(symbol: string) {
-  return [props.letterReplacer, props.numReplacer, props.anyReplacer].includes(
-    symbol
-  )
+/** проверяет, что переданный symbol является заменяемым
+ *
+ * предполагается, что symbol взят из props.mask
+ */
+function isReplacer(index: number) {
+  return prettyMask.value[index] === props.prettyValueReplacer
 }
 </script>
 
