@@ -5,8 +5,6 @@
     :value="value"
     ref="inputEl"
     @input="onInput"
-    @focus="onFocus"
-    @pointerup="onFocus"
   />
 </template>
 
@@ -60,20 +58,42 @@ if (!checkMatch(value.value)) {
   value.value = prettyMask.value
 }
 
-function onInput(event: Event) {
-  const target = event.target as HTMLInputElement
+async function onInput(event: Event) {
+  let inputEvent = event as InputEvent
+  const target = inputEvent.target as HTMLInputElement
   target.value = handleInput(target.value)
+
+  await nextTick()
+  target.selectionStart = target.selectionEnd = getCursorNewPosition(
+    target.value,
+    inputEvent.inputType
+  )
 }
-function onFocus() {}
 
 function handleInput(insertedValue: string) {
-  let unmaskedValue = insertedValue
-    .split('')
-    .filter((_, index) => isReplacer(index))
-    .join('')
+  let unmaskedValue = ''
+
+  /** получаем очищенный от маски инпут, т.е. только введённые пользователем значения */
+  for (let index = 0; index < insertedValue.length; index++) {
+    const symbol = insertedValue[index]
+
+    // если текущий провяемый символ находится на месте заменяемого символа в маске
+    if (isReplacer(index)) {
+      if (symbol !== props.prettyValueReplacer) unmaskedValue += symbol
+    } else {
+      /**  если текущий проверяемый символ находится на месте статичного символа в маске. Учитывается, что пользователь мог вставить туда свой символ */
+      if (symbol !== props.mask[index]) {
+        unmaskedValue += symbol
+        let arr = insertedValue.split('')
+        arr.splice(index, 1)
+        insertedValue = arr.join('')
+      }
+    }
+  }
 
   let i = 0
   let maskedValue = ''
+  // собираем maskedValue, отсеивая несовпадающие по типу символы
   props.mask.split('').forEach((maskSymbol, index) => {
     let insertingSymbol = unmaskedValue[i]
     if (isReplacer(index)) {
@@ -99,10 +119,35 @@ function handleInput(insertedValue: string) {
     }
   })
 
+  // если maskedValue собрано верно, т.е. значение совпадает с маской, сохраняем. Иначе возвращаем предыдущее значение
   if (checkMatch(maskedValue)) value.value = maskedValue
   return value.value
 }
+function getCursorNewPosition(value: string, inputType: string) {
+  let cursorNewPos = value.indexOf(props.prettyValueReplacer)
 
+  if (inputType === 'deleteContentBackward') {
+    cursorNewPos = findLastReplaceablePosition(value) + 1
+  } else {
+    if (cursorNewPos < 0) cursorNewPos = value.length
+  }
+
+  return cursorNewPos
+}
+function findLastReplaceablePosition(str: string) {
+  let lastIndex = str.length
+
+  for (let index = 0; index < str.length; index++) {
+    if (!isReplacer(index)) continue
+
+    let symbol = str[index]
+    if (symbol === props.prettyValueReplacer) continue
+
+    lastIndex = index
+  }
+
+  return lastIndex
+}
 function hasTypeMismatch(insertingSymbol: string, replacer: string) {
   let hasMismatch = false
 

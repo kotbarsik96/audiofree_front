@@ -15,8 +15,15 @@
         label="Телефон"
         inputId="username"
       >
-        <MaskInput v-model="phoneNumber" id="phoneNumber" mask="+7 (999) 999 99 99" numeric />
-        <template #error v-if="phoneNumberError">{{ phoneNumberError }}</template>
+        <MaskInput
+          v-model="phoneNumber"
+          id="phoneNumber"
+          mask="+7 (999) 999 99 99"
+          inputmode="numeric"
+        />
+        <template #error v-if="phoneNumberError">{{
+          phoneNumberError
+        }}</template>
       </InputWrapper>
       <InputWrapper
         class="profile-userinfo__input"
@@ -46,7 +53,7 @@
 <script setup lang="ts">
 import AFButton from '~/components/Blocks/AFButton.vue'
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
-import MaskInput from "~/components/Blocks/FormElements/MaskInput.vue";
+import MaskInput from '~/components/Blocks/FormElements/MaskInput.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
 
 const userStore = useUserStore()
