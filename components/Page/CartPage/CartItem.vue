@@ -45,6 +45,7 @@ import CrossIcon from '~/assets/images/icons/cross.svg'
 import AFImage from '~/components/Blocks/AFImage.vue'
 import QuantityInput from '~/components/Blocks/FormElements/QuantityInput.vue'
 import AFDialog from '~/components/Blocks/Dialog/AFDialog.vue'
+import { useCart } from '~/domain/cart/useCart'
 import type ICartItem from '~/domain/cart/ICartItem'
 
 const props = defineProps<{
@@ -57,15 +58,14 @@ const emit = defineEmits<{
 
 const route = useRoute()
 
-const { $afFetch } = useNuxtApp()
-const { addNotification } = useNotifications()
-
 const quantity = ref(props.data.quantity || 0)
 const firstImg = computed(() => props.data.variation.image.url)
 const totalPrice = computed(
   () => props.data.variation.current_price * quantity.value
 )
 const isLoading = ref(false)
+
+const { updateQuantity, deleteCartItem } = useCart()
 
 const className = computed(() => ({
   '--loading': isLoading.value,
@@ -87,7 +87,7 @@ if (quantity.value > props.data.variation.quantity) {
 }
 
 const { refresh: refreshChangeTimeout } = useDelayedCallback(
-  1000,
+  250,
   changeQuantity
 )
 
@@ -99,50 +99,20 @@ watch(warningDialogShown, () => {
 
 async function deleteItem() {
   isLoading.value = true
-
-  try {
-    $afFetch('product/cart/item', {
-      method: 'DELETE',
-      params: {
-        variation_id: props.data.variation_id,
-        is_oneclick: route.query.oneclick ? '1' : '',
-      },
-      onResponse({ response }) {
-        if (response._data.message) {
-          const severity = response.ok ? 'info' : 'error'
-          addNotification(severity, response._data.message)
-        }
-        if (response.ok) {
-          emit('deleteItem')
-        }
-      },
-    })
-  } catch (err) {}
-
+  const response = await deleteCartItem(
+    props.data.variation,
+    !!route.query.oneclick
+  )
+  if (response.ok) emit('deleteItem')
   isLoading.value = false
 }
 async function changeQuantity() {
   isLoading.value = true
-
-  try {
-    await $afFetch('/product/cart', {
-      method: 'POST',
-      body: {
-        variation_id: props.data.variation_id,
-        quantity: quantity.value,
-        is_oneclick: route.query.oneclick ? '1' : '',
-      },
-      onResponseError({ response }) {
-        if (response._data.message) {
-          addNotification('error', response._data.message)
-          if (quantity.value > props.data.variation.quantity)
-            quantity.value = props.data.variation.quantity
-          else if (quantity.value < 1) quantity.value = 1
-        }
-      },
-    })
-  } catch (err) {}
-
+  await updateQuantity(
+    quantity.value,
+    props.data.variation,
+    !!route.query.oneclick
+  )
   isLoading.value = false
 }
 </script>

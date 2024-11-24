@@ -27,7 +27,7 @@
         <AFRating :value="data.rating_value" />
       </div>
       <div class="product-card__price">от {{ currency(data.min_price) }}</div>
-      <div v-if="true" class="product-card__in-cart">
+      <div v-if="isInCart" class="product-card__in-cart">
         <CartIcon />
         Товар у вас в корзине
       </div>
@@ -50,6 +50,9 @@ const props = defineProps<{
   data: ICatalogProduct
 }>()
 
+const productsCollectionStore = useProductCollectionsStore()
+const { collection: productsCollection } = storeToRefs(productsCollectionStore)
+
 const statusMap: Record<string, any> = {
   active: 'В наличии',
   inactive: 'Нет в наличии',
@@ -58,6 +61,12 @@ const statusMap: Record<string, any> = {
 const className = computed(() => [`--status-${props.data.status.value_slug}`])
 
 const statusText = computed(() => statusMap[props.data.status.value_slug])
+
+const isInCart = computed(() =>
+  productsCollection.value?.data.cart.some(
+    (item) => item.product_id === props.data.id
+  )
+)
 </script>
 
 <style lang="scss" scoped>

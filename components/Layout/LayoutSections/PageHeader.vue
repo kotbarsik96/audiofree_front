@@ -3,7 +3,7 @@
     <div class="header__desktop">
       <div class="header__top">
         <div class="header__container _container">
-          <LogoText class="header__top-logo" link  />
+          <LogoText class="header__top-logo" link />
           <ul class="header__top-links">
             <li v-for="obj in topLinks">
               <NuxtLink
@@ -34,7 +34,7 @@
                 :icon="item.icon"
                 type="router-link"
                 :to="item.to"
-                badge="2"
+                :badge="item.badge"
                 shadow
               />
             </li>
@@ -44,7 +44,11 @@
       <div class="header__bottom">
         <div class="header__container _container">
           <div class="header__bottom-catalog">
-            <NuxtLink class="_link _link--text-color" to="/catalog" tabindex="0">
+            <NuxtLink
+              class="_link _link--text-color"
+              to="/catalog"
+              tabindex="0"
+            >
               <AFIcon :icon="MenuIcon" />
               <span> Каталог товаров</span>
             </NuxtLink>
@@ -174,18 +178,30 @@ import LogoText from '~/components/Blocks/LogoText.vue'
 import topLinks from '@/enums/header/top-links'
 import FreeCall from '~/components/Blocks/FreeCall.vue'
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
-import iconLinks from '@/enums/header/icon-links'
 import bottomLinks from '@/enums/header/bottom-links'
 import { computed, ref } from 'vue'
-import { useMatchMedia } from '~/composables/useMatchMedia'
 import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 import HeaderAuthBlock from '~/components/Blocks/Header/HeaderAuthBlock.vue'
 import vClickAway from '@/directives/vClickAway'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
+import HeartIcon from '@/assets/images/icons/heart.svg'
+import CartIcon from '@/assets/images/icons/cart.svg'
 
-const { matches: mediaMatches } = useMatchMedia('max-width: 991px')
-
+const { favoritesCount, cartCount } = storeToRefs(useProductCollectionsStore())
 const route = useRoute()
+
+const iconLinks = computed(() => [
+  {
+    icon: HeartIcon,
+    to: '/favorites',
+    badge: favoritesCount.value,
+  },
+  {
+    icon: CartIcon,
+    to: '/cart',
+    badge: cartCount.value,
+  },
+])
 
 const searchValue = ref('')
 
@@ -254,7 +270,7 @@ function closeMenu(e: Event) {
     color: var(--white);
   }
 
-  &__top-logo{
+  &__top-logo {
     outline-color: var(--white);
   }
 

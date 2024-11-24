@@ -17,7 +17,9 @@
       </div>
     </div>
     <div v-if="variation.quantity > 0" class="product-body__quantity">
-      <div class="product-body__block-title">Количество:</div>
+      <div class="product-body__block-title">
+        Количество<span v-if="inCart"> (сейчас в корзине)</span>:
+      </div>
       <QuantityInput v-model="quantity" :max="variation.quantity" />
     </div>
     <div class="product-body__variations">
@@ -32,24 +34,36 @@
       </div>
     </div>
     <div class="product-body__buttons">
-      <AFButton label="В корзину" />
-      <AFButton label="Купить в 1 клик" styleType="secondary" />
+      <AFButton
+        v-if="inCart"
+        label="Убрать из корзины"
+        :disabled="isLoadingCart"
+        @click="deleteItem"
+      />
+      <AFButton
+        v-else
+        label="В корзину"
+        :disabled="isLoadingCart"
+        @click="onToCartClick"
+      />
+      <AFButton
+        label="Купить в 1 клик"
+        :disabled="isLoadingCart"
+        styleType="secondary"
+      />
     </div>
     <div class="product-body__side-top">
-      <div v-if="true!" class="product-body__side-top-warning">
-        <ExclamationMarkIcon class="icon" />
-        <div>
-          До конца акции осталось:
-          <span class="_bold">3 дня</span>
-        </div>
+      <div class="product-body__side-top-id">
+        Артикул:
+        <span class="_bold">
+          {{ product.id }}
+        </span>
+      </div>
+      <div v-if="inCart" class="product-body__side-top-text">
+        <CartIcon class="icon" />
+        <div>Товар в корзине</div>
       </div>
       <div class="product-body__side-top-main">
-        <div class="product-body__side-top-id">
-          Артикул:
-          <span class="_bold">
-            {{ product.id }}
-          </span>
-        </div>
         <div class="product-body__side-top-buttons">
           <ButtonIcon contrast :icon="HeartIcon" />
         </div>
@@ -68,11 +82,20 @@ import RadioLink from '~/components/Blocks/RadioLink.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 import ProductSideInfo from '~/components/Blocks/ProductSideInfo.vue'
-import ExclamationMarkIcon from '~/assets/images/icons/exclamation-mark.svg'
+import CartIcon from '~/assets/images/icons/cart.svg'
 import HeartIcon from '~/assets/images/icons/heart.svg'
 import type { IProductData } from '~/domain/product/types/IProductData'
+import { useCart } from '~/domain/cart/useCart'
 
 const route = useRoute()
+
+const productCollectionsStore = useProductCollectionsStore()
+const { cartCollection, favoritesCollection } = storeToRefs(
+  productCollectionsStore
+)
+
+const { updateQuantity, deleteCartItem } = useCart()
+const { addNotification } = useNotifications()
 
 const { data: productData } = await useAPI<{ data: IProductData }>(
   `/product/${route.params.product}/${route.params.variation}`
@@ -90,7 +113,61 @@ const oldPrice = computed(() =>
   variation.value?.price === currentPrice.value ? null : variation.value?.price
 )
 
-const quantity = ref(1)
+const isLoadingCart = ref(false)
+
+const inCart = computed(() =>
+  cartCollection.value?.find(
+    (item) => variation.value && item.variation_id === variation.value?.id
+  )
+)
+const isInFavorites = computed(() =>
+  favoritesCollection.value?.some(
+    (item) => variation.value && item.variation_id === variation.value?.id
+  )
+)
+
+const quantity = ref(inCart.value ? inCart.value.quantity : 1)
+const { refresh: quantityRefreshCallback } = useDelayedCallback(
+  250,
+  updateQuantityOnChange
+)
+
+watch(quantity, () => {
+  if (inCart.value) {
+    quantityRefreshCallback()
+  }
+})
+
+async function onToCartClick() {
+  if (!variation.value) return
+
+  isLoadingCart.value = true
+
+  try {
+    const response = await updateQuantity(
+      quantity.value,
+      variation.value,
+      false
+    )
+    if (response.ok && response._data.message) {
+      addNotification('success', response._data.message)
+    } else if (response._data.message) {
+      addNotification('error', response._data.message)
+    }
+  } catch (err) {}
+
+  isLoadingCart.value = false
+}
+function deleteItem() {
+  if (!variation.value) return
+
+  isLoadingCart.value = true
+  deleteCartItem(variation.value, false)
+  isLoadingCart.value = false
+}
+function updateQuantityOnChange() {
+  if (variation.value) updateQuantity(quantity.value, variation.value, false)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -176,14 +253,11 @@ const quantity = ref(1)
     grid-column: 3 / 4;
     grid-row: 1 / 3;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 1.25rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 0.25rem;
   }
 
-  &__side-top-warning {
-    max-width: 8.75rem;
+  &__side-top-text {
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -207,7 +281,6 @@ const quantity = ref(1)
     display: flex;
     gap: 0.75rem;
     justify-content: flex-end;
-    margin-top: 1rem;
   }
 
   &__side-info {
