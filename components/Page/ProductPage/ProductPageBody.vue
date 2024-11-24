@@ -50,6 +50,7 @@
         label="Купить в 1 клик"
         :disabled="isLoadingCart"
         styleType="secondary"
+        @click="buyOneclick"
       />
     </div>
     <div class="product-body__side-top">
@@ -87,6 +88,7 @@ import HeartIcon from '~/assets/images/icons/heart.svg'
 import type { IProductData } from '~/domain/product/types/IProductData'
 import { useCart } from '~/domain/cart/useCart'
 
+const router = useRouter()
 const route = useRoute()
 
 const productCollectionsStore = useProductCollectionsStore()
@@ -143,18 +145,12 @@ async function onToCartClick() {
 
   isLoadingCart.value = true
 
-  try {
-    const response = await updateQuantity(
-      quantity.value,
-      variation.value,
-      false
-    )
-    if (response.ok && response._data.message) {
-      addNotification('success', response._data.message)
-    } else if (response._data.message) {
-      addNotification('error', response._data.message)
-    }
-  } catch (err) {}
+  const response = await updateQuantity(quantity.value, variation.value, false)
+  if (response.ok && response._data.message) {
+    addNotification('success', response._data.message)
+  } else if (response._data.message) {
+    addNotification('error', response._data.message)
+  }
 
   isLoadingCart.value = false
 }
@@ -167,6 +163,16 @@ function deleteItem() {
 }
 function updateQuantityOnChange() {
   if (variation.value) updateQuantity(quantity.value, variation.value, false)
+}
+async function buyOneclick() {
+  if (!variation.value) return
+
+  isLoadingCart.value = true
+  await updateQuantity(quantity.value, variation.value, true)
+
+  router.push('/cart?oneclick=1')
+
+  isLoadingCart.value = false
 }
 </script>
 
