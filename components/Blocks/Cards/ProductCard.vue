@@ -27,9 +27,9 @@
         <AFRating :value="data.rating_value" />
       </div>
       <div class="product-card__price">от {{ currency(data.min_price) }}</div>
-      <div class="product-card__buttons">
-        <AFButton label="Купить в 1 клик" />
-        <AFButton label="В корзину" styleType="secondary" />
+      <div v-if="true" class="product-card__in-cart">
+        <CartIcon />
+        Товар у вас в корзине
       </div>
     </div>
   </NuxtLink>
@@ -42,7 +42,7 @@ import CheckmarkCircleIcon from '~/assets/images/icons/checkmark-circle.svg'
 import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 import HeartIcon from '~/assets/images/icons/heart.svg'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
-import AFButton from '~/components/Blocks/AFButton.vue'
+import CartIcon from '~/assets/images/icons/cart.svg'
 import AFImage from '~/components/Blocks/AFImage.vue'
 import { currency } from '~/utils/numbers'
 
@@ -70,9 +70,10 @@ const statusText = computed(() => statusMap[props.data.status.value_slug])
     grid-template-columns: repeat(2, auto);
     grid-template-rows: repeat(2, auto) 1fr repeat(2, auto);
     align-items: center;
-    justify-content: center;
+    // justify-content: center;
     padding-bottom: 1.5rem;
     gap: 1.25rem;
+    width: 100%;
     height: 100%;
   }
 
@@ -153,6 +154,21 @@ const statusText = computed(() => statusMap[props.data.status.value_slug])
     }
     :deep(.btn__label) {
       @include fontSize(13);
+    }
+  }
+
+  &__in-cart {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    gap: 0.625rem;
+    font-weight: 500;
+    color: var(--secondary-2);
+    @include fontSize(16);
+
+    svg {
+      width: 1rem;
+      height: 1rem;
     }
   }
 
