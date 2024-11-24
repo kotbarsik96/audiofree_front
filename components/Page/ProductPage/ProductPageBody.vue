@@ -18,7 +18,7 @@
     </div>
     <div v-if="variation.quantity > 0" class="product-body__quantity">
       <div class="product-body__block-title">Количество:</div>
-      <QuantityInput v-model="quantity" :max="9" />
+      <QuantityInput v-model="quantity" :max="variation.quantity" />
     </div>
     <div class="product-body__variations">
       <div class="product-body__block-title">Вариация:</div>
@@ -80,7 +80,7 @@ const { data: productData } = await useAPI<{ data: IProductData }>(
 const product = computed(() => productData.value?.data.product)
 const variation = computed(() => productData.value?.data.variation)
 const gallery = computed(
-  () => variation.value?.gallery.map((obj) => obj.url) || []
+  () => variation.value?.gallery?.map((obj) => obj.url) || []
 )
 const fullName = computed(
   () => `${product.value?.name || ''} ${variation.value?.name || ''}`

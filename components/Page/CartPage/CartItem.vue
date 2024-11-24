@@ -13,7 +13,7 @@
       <div>{{ currency(data.variation.current_price) }}</div>
     </div>
     <div class="cart-item__quantity">
-      <QuantityInput v-model="quantity" />
+      <QuantityInput v-model="quantity" :max="data.variation.quantity" />
     </div>
     <div class="cart-item__total-price">
       <div class="cart-item__subtitle">Итого</div>
@@ -24,6 +24,19 @@
         <CrossIcon />
       </button>
     </div>
+
+    <ClientOnly>
+      <AFDialog
+        v-if="warningDialogText"
+        class="cart-item__warning-dialog"
+        v-model:shown="warningDialogShown"
+      >
+        <div
+          class="cart-item__warning-dialog-body"
+          v-html="warningDialogText"
+        ></div>
+      </AFDialog>
+    </ClientOnly>
   </div>
 </template>
 
@@ -31,6 +44,7 @@
 import CrossIcon from '~/assets/images/icons/cross.svg'
 import AFImage from '~/components/Blocks/AFImage.vue'
 import QuantityInput from '~/components/Blocks/FormElements/QuantityInput.vue'
+import AFDialog from '~/components/Blocks/Dialog/AFDialog.vue'
 import type ICartItem from '~/domain/cart/ICartItem'
 
 const props = defineProps<{
@@ -61,6 +75,28 @@ const productLink = computed(
   () => `/product/${props.data.variation.product_id}/${props.data.variation_id}`
 )
 
+const warningDialogText = ref('')
+const warningDialogShown = ref(false)
+
+if (quantity.value > props.data.variation.quantity) {
+  quantity.value = props.data.variation.quantity
+  changeQuantity()
+  warningDialogText.value =
+    'Обратите внимание! <br /> Количество некоторых товаров в корзине было уменьшено'
+  warningDialogShown.value = true
+}
+
+const { refresh: refreshChangeTimeout } = useDelayedCallback(
+  1000,
+  changeQuantity
+)
+
+watch(quantity, refreshChangeTimeout)
+
+watch(warningDialogShown, () => {
+  if (!warningDialogShown.value) warningDialogText.value = ''
+})
+
 async function deleteItem() {
   isLoading.value = true
 
@@ -85,6 +121,30 @@ async function deleteItem() {
 
   isLoading.value = false
 }
+async function changeQuantity() {
+  isLoading.value = true
+
+  try {
+    await $afFetch('/product/cart', {
+      method: 'POST',
+      body: {
+        variation_id: props.data.variation_id,
+        quantity: quantity.value,
+        is_oneclick: route.query.oneclick ? '1' : '',
+      },
+      onResponseError({ response }) {
+        if (response._data.message) {
+          addNotification('error', response._data.message)
+          if (quantity.value > props.data.variation.quantity)
+            quantity.value = props.data.variation.quantity
+          else if (quantity.value < 1) quantity.value = 1
+        }
+      },
+    })
+  } catch (err) {}
+
+  isLoading.value = false
+}
 </script>
 
 <style lang="scss" scoped>
@@ -102,7 +162,7 @@ async function deleteItem() {
   background-color: var(--white);
 
   &::before {
-    content: "";
+    content: '';
     inset: 0;
     z-index: 500;
     position: absolute;
@@ -125,15 +185,19 @@ async function deleteItem() {
     }
   }
 
+  span:last-child {
+    display: none;
+  }
+
   > * {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-right: 1px solid var(--stroke);
+    border-left: 1px solid var(--stroke);
     padding: 0 1.75rem;
 
-    &:last-child {
-      border-right: none;
+    &:first-child {
+      border-left: none;
     }
   }
 
@@ -172,6 +236,18 @@ async function deleteItem() {
 
   &__subtitle {
     display: none;
+  }
+
+  &__warning-dialog {
+    max-width: 600px;
+    text-align: center;
+    padding: 0;
+    font-weight: 500;
+    @include fontSize(18);
+  }
+
+  &__warning-dialog-body {
+    padding: 1.25rem 0;
   }
 
   @include adaptive(desktop-small) {

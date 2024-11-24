@@ -42,7 +42,6 @@ const {
     is_oneclick: route.query.oneclick ? '1' : '',
   },
   immediate: true,
-  onResponse(response) {},
 })
 
 const isLoading = computed(() => status.value === 'pending')
