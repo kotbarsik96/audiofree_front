@@ -79,6 +79,7 @@ provide<IInjectCatalog>(CatalogInject, {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
+    gap: 1rem;
     grid-column: 2 / 3;
     grid-row: 1 / 2;
 

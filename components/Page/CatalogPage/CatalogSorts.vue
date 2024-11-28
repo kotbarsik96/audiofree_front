@@ -1,6 +1,7 @@
 <template>
-  <div v-if="options.length > 0">
-    <AFSelect :options="options" v-model="sortType" />
+  <div v-if="options.length > 0" class="catalog-sorts">
+    <AFSelect :options="options" v-model="sort" />
+    <AFSelect :options="orderOptions" v-model="sortOrder" />
   </div>
 </template>
 
@@ -12,6 +13,8 @@ import {
   CatalogInject,
   type IInjectCatalog,
 } from '~/domain/product/types/IInjectCtalog'
+import type { SortOrders } from '~/enums/SortOrders'
+import type ISelectOption from '~/interfaces/components/ISelectOption'
 
 const router = useRouter()
 const route = useRoute()
@@ -25,32 +28,50 @@ const { data } = await useAPI<{ data: ICatalogSortItem[] }>(
 const options = computed(() => {
   const arr: ICatalogSortItem[] = []
   data.value?.data.forEach((item) => {
-    arr.push(
-      {
-        label: `${item.label} (по возрастанию)`,
-        value: `${item.value}__asc`,
-        icon: ArrowUpIcon,
-        iconRotate: '0deg',
-      },
-      {
-        label: `${item.label} (по убыванию)`,
-        value: `${item.value}__desc`,
-        icon: ArrowUpIcon,
-        iconRotate: '180deg',
-      }
-    )
+    arr.push({
+      label: `${item.label}`,
+      value: `${item.value}`,
+    })
   })
   return arr
 })
+const orderOptions: ISelectOption[] = [
+  {
+    value: 'asc',
+    label: 'По возрастанию',
+    icon: ArrowUpIcon,
+    iconRotate: '0deg',
+  },
+  {
+    value: 'desc',
+    label: 'По убыванию',
+    icon: ArrowUpIcon,
+    iconRotate: '180deg',
+  },
+]
 
-const sortType = ref((route.query.sort as string) || options.value?.[0]?.value)
+const sort = ref((route.query.sort as string) || options.value?.[0]?.value)
+const sortOrder = ref<SortOrders>(
+  (route.query.sort_order as SortOrders) || 'asc'
+)
 
-watch(sortType, onSortTypeChange)
+watch(sort, onSortChange)
+watch(sortOrder, onSortChange)
 
-async function onSortTypeChange() {
-  await router.push({ query: { ...route.query, sort: sortType.value } })
+async function onSortChange() {
+  await router.push({
+    query: { ...route.query, sort: sort.value, sort_order: sortOrder.value },
+  })
   await fetchProducts()
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.catalog-sorts{ 
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.625rem;
+}
+</style>
