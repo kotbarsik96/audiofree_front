@@ -34,7 +34,9 @@ export function useSorts(
     },
   ]
 
-  const sort = ref((route.query.sort as string) || options.value?.[0]?.value)
+  const sort = ref(
+    (route.query.sort as string) || (options.value?.[0]?.value as string)
+  )
   const sortOrder = ref<SortOrders>(
     (route.query.sort_order as SortOrders) || 'asc'
   )

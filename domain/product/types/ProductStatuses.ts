@@ -1,4 +1,4 @@
 export enum ProductStatuses {
-  Active = 'acitve',
+  Active = 'active',
   Inactive = 'inactive',
 }

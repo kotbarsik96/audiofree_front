@@ -9,7 +9,7 @@
       />
     </div>
     <div class="catalog-body__products-wrapper">
-      <Transition name="blur">
+      <Transition name="blur-relative">
         <div
           v-if="!!products?.length"
           class="catalog-body__products"
