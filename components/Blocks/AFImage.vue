@@ -6,10 +6,11 @@
 
 <script setup lang="ts">
 import { useSwiperSlide } from 'swiper/vue'
+import type IImage from '~/domain/images/types/IImage'
 
 const props = withDefaults(
   defineProps<{
-    src: string
+    data: IImage | string
     alt?: string
     loadImmediately?: boolean
   }>(),
@@ -36,7 +37,14 @@ const isSlideVisible = computed(
 const isVisible = computed(
   () => props.loadImmediately || (isSlideVisible.value && isInWindow.value)
 )
-const _src = computed(() => (isVisible.value ? props.src : '#'))
+const _src = computed(() => {
+  let src = '#'
+  if (isVisible.value) {
+    if (typeof props.data === 'string') src = props.data
+    else src = props.data.url
+  }
+  return src
+})
 
 watch(isVisible, () => {
   if (isVisible.value && observer) unsetObserver()

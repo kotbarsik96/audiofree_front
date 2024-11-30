@@ -1,7 +1,7 @@
 <template>
   <div class="cart-item" :class="className">
     <NuxtLink class="cart-item__img-wrapper" :to="productLink">
-      <AFImage class="cart-item__img" :src="firstImg" alt="" />
+      <AFImage class="cart-item__img" :data="firstImg" alt="" />
     </NuxtLink>
     <div class="cart-item__title">
       <NuxtLink :to="productLink">
@@ -59,7 +59,7 @@ const emit = defineEmits<{
 const route = useRoute()
 
 const quantity = ref(props.data.quantity || 0)
-const firstImg = computed(() => props.data.variation.image.url)
+const firstImg = computed(() => props.data.variation.image)
 const totalPrice = computed(
   () => props.data.variation.current_price * quantity.value
 )

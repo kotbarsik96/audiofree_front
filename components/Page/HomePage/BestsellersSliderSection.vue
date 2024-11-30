@@ -25,7 +25,7 @@
               {{ titles[index] }}
             </h3>
             <div class="bestsellers-slider__slide-image">
-              <AFImage :src="product.image.url" />
+              <AFImage :data="product.image" />
             </div>
             <div class="bestsellers-slider__button-container">
               <AFButton

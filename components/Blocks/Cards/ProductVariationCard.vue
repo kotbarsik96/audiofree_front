@@ -1,8 +1,8 @@
 <template>
   <NuxtLink
-    class="product-card _card"
+    class="product-card product-variation-card _card"
     :class="className"
-    :to="`/product/${data.id}/${data.first_variation.id}`"
+    :to="`/product/${data.product_id}/${data.variation_id}`"
   >
     <div class="product-card__inner _card__inner">
       <div class="product-card__top">
@@ -21,12 +21,15 @@
         <AFImage :data="data.image" />
       </div>
       <div class="product-card__title">
-        {{ data.brand.value }} {{ data.name }}
+        {{ data.full_name }}
       </div>
       <div class="product-card__rating">
         <AFRating :value="data.rating_value" />
       </div>
-      <div class="product-card__price">от {{ currency(data.min_price) }}</div>
+      <div class="product-card__price">
+        <span class="--old"> {{ currency(data.price) }} </span>
+        <span> {{ currency(data.current_price) }} </span>
+      </div>
       <div v-if="isInCart" class="product-card__in-cart">
         <CartIcon />
         Товар у вас в корзине
@@ -41,30 +44,37 @@ import AFRating from '~/components/Blocks/AFRating.vue'
 import CheckmarkCircleIcon from '~/assets/images/icons/checkmark-circle.svg'
 import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 import HeartIcon from '~/assets/images/icons/heart.svg'
-import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 import CartIcon from '~/assets/images/icons/cart.svg'
 import AFImage from '~/components/Blocks/AFImage.vue'
 import { currency } from '~/utils/numbers'
+import type IVariationProduct from '~/domain/product/types/IVariationProduct'
 import { Product } from "~/domain/product/Product"
 
 const props = defineProps<{
-  data: ICatalogProduct
+  data: IVariationProduct
 }>()
 
 const productsCollectionStore = useProductCollectionsStore()
 const { collection: productsCollection } = storeToRefs(productsCollectionStore)
 
-const className = computed(() => [`--status-${props.data.status.value_slug}`])
+const className = computed(() => [`--status-${props.data.status}`])
 
-const statusText = computed(() => Product.statusMap(props.data.status.value_slug))
+const statusText = computed(() => Product.statusMap(props.data.status))
 
 const isInCart = computed(() =>
   productsCollection.value?.data.cart.some(
-    (item) => item.product_id === props.data.id
+    (item) => item.product_id === props.data.variation_id
   )
 )
 </script>
 
 <style lang="scss" scoped>
 @import '/scss/components/ProductCard/ProductCard';
+
+.product-variation-card {
+  .--old {
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+}
 </style>

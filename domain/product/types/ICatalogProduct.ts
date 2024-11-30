@@ -1,3 +1,6 @@
+import type IImage from '~/domain/images/types/IImage'
+import type { ProductStatuses } from '~/domain/product/types/ProductStatuses'
+
 export default interface ICatalogProduct {
   id: number
   name: string
@@ -7,16 +10,7 @@ export default interface ICatalogProduct {
   max_price: number
   rating_value: number
   rating_count: number
-  image: {
-    id: number
-    name: string
-    extension: string
-    path: string
-    alt: null | string
-    disk: string
-    url: string
-    relativeUrl: string
-  }
+  image: IImage | string
   first_variation: {
     id: number
     product_id: number
@@ -24,11 +18,11 @@ export default interface ICatalogProduct {
   status: {
     id: number
     value: string
-    value_slug: string
+    value_slug: ProductStatuses
   }
   brand: {
     id: number
     value: string
-    value_slug: string
+    value_slug: ProductStatuses
   }
 }
