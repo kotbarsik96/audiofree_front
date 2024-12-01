@@ -23,7 +23,6 @@
 </template>
 
 <script setup lang="ts">
-// ДОБАВЬ ПАГИНАЦИЮ И ЛЕНИВУЮ ПОДГРУЗКУ
 import SearchIcon from '~/assets/images/icons/search.svg'
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
@@ -49,9 +48,9 @@ const { refresh: refreshSearch } = useDelayedCallback(500, () => {
 })
 
 const {
-  data: listData,
+  list,
   refresh: refreshList,
-  status,
+  isLoading: isLoadingProducts,
 } = usePaginationLazyWrapper<IVariationProduct>(
   intersectionEl,
   '/product/favorites',
@@ -69,9 +68,6 @@ await refreshList()
 const { refresh: refreshListDelayed } = useDelayedCallback(1000, () => {
   refreshList()
 })
-const isLoadingProducts = computed(() => status.value === 'pending')
-
-const list = computed(() => listData.value?.data.data || [])
 
 watch(searchString, refreshSearch)
 watch(
@@ -114,6 +110,8 @@ watch(
     position: relative;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    gap: 0.625rem;
+    min-height: 30rem;
     transition: var(--general-transition);
   }
   &.--loading &__list {
