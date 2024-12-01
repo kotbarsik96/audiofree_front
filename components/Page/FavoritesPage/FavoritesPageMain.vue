@@ -109,7 +109,8 @@ watch(
   &__list {
     position: relative;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, 17rem);
+    justify-content: center;
     gap: 0.625rem;
     min-height: 30rem;
     transition: var(--general-transition);
@@ -118,16 +119,6 @@ watch(
     opacity: 0.5;
   }
 
-  @include adaptive(desktop-small) {
-    &__list {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-  @include adaptive(tablet-small) {
-    &__list {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
   @include adaptive(phone) {
     &__sorts {
       .select {
