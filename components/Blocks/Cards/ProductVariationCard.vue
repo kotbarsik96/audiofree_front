@@ -26,8 +26,10 @@
       <div class="product-card__rating">
         <AFRating :value="data.rating_value" />
       </div>
-      <div class="product-card__price">
-        <span class="--old"> {{ currency(data.price) }} </span>
+      <div class="product-card__price product-variation-card__price">
+        <span v-if="data.price !== data.current_price" class="--old">
+          {{ currency(data.price) }}
+        </span>
         <span> {{ currency(data.current_price) }} </span>
       </div>
       <div v-if="isInCart" class="product-card__in-cart">
@@ -48,7 +50,7 @@ import CartIcon from '~/assets/images/icons/cart.svg'
 import AFImage from '~/components/Blocks/AFImage.vue'
 import { currency } from '~/utils/numbers'
 import type IVariationProduct from '~/domain/product/types/IVariationProduct'
-import { Product } from "~/domain/product/Product"
+import { Product } from '~/domain/product/Product'
 
 const props = defineProps<{
   data: IVariationProduct
@@ -72,6 +74,13 @@ const isInCart = computed(() =>
 @import '/scss/components/ProductCard/ProductCard';
 
 .product-variation-card {
+  &__price {
+    display: flex;
+    gap: 0 0.625rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
   .--old {
     text-decoration: line-through;
     opacity: 0.7;
