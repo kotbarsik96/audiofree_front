@@ -17,12 +17,19 @@
           :data="item"
         />
       </TransitionGroup>
+      <Transition name="blur-relative">
+        <div v-if="list.length < 1" class="favorites-main__empty">
+          <EmptyBoxIcon />
+          <div>К сожалению, ничего не найдено</div>
+        </div>
+      </Transition>
       <div class="favorites-main__intersection-el" ref="intersectionEl"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import EmptyBoxIcon from '~/assets/images/icons/empty-box.svg'
 import SearchIcon from '~/assets/images/icons/search.svg'
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
@@ -84,6 +91,23 @@ watch(
   flex-direction: column;
   gap: 1.25rem;
   margin-bottom: 4rem;
+
+  &__empty {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.625rem;
+    font-weight: 500;
+    @include fontSize(26);
+    
+    svg {
+      width: 6rem;
+      height: 6rem;
+    }
+  }
 
   &__sorts {
     display: flex;
