@@ -113,10 +113,6 @@ const columns = [
         to: '/guarantees-refund',
       },
       {
-        title: 'Пункты самовывоза',
-        to: '/pickup-places',
-      },
-      {
         title: 'Контакты',
         to: '/contacts',
       },
