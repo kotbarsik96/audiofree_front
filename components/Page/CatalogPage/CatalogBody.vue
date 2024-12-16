@@ -9,7 +9,7 @@
       />
     </div>
     <div class="catalog-body__products-wrapper">
-      <Transition name="blur">
+      <Transition name="blur-relative">
         <div
           v-if="!!products?.length"
           class="catalog-body__products"
@@ -105,17 +105,36 @@ async function updateProducts() {
   }
 
   &__products {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     flex: 1 1 auto;
 
     :deep(.product-card) {
       height: auto;
     }
+  }
 
-    @include adaptive(tablet-big) {
+  @include adaptive(tablet-big) {
+    &__products {
       justify-content: center;
+      margin: 0 auto;
+    }
+  }
+  @include adaptive(tablet-small) {
+    &__products {
+      grid-template-columns: repeat(2, 1fr);
+
+      :deep(.product-card) {
+        margin: 0 auto;
+        width: 100%;
+      }
+    }
+  }
+
+  @include adaptive(phone){
+    &__products {
+      grid-template-columns: 1fr;
     }
   }
 }

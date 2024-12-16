@@ -15,7 +15,7 @@ export interface IProductInfo {
   value: string
 }
 
-export interface IProductVariation {
+export interface IProductVariationMin {
   id: number
   product_id: number
   name: string
@@ -39,22 +39,28 @@ export interface IProduct {
   category: IProductTaxonomy
   type: IProductTaxonomy
   info: IProductInfo[]
-  variations: IProductVariation[]
+  variations: IProductVariationMin[]
   rating_value: number
   rating_count: number
 }
 
-export interface IVariation {
-  id: number
+export interface IProductVariation extends IProductVariationMin {
   price: number
   discount: number
-  name: string
   quantity: number
   current_price: number
-  gallery: IImage[]
+  gallery?: IImage[]
+  image: IImage
+}
+
+export interface IVariationWithProduct extends IProductVariation {
+  product: {
+    id: number
+    name: string
+  }
 }
 
 export interface IProductData {
   product: IProduct
-  variation: IVariation
+  variation: IProductVariation
 }

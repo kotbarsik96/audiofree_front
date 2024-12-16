@@ -15,7 +15,7 @@ const props = withDefaults(
     type?: 'button' | 'link' | 'router-link' | 'div'
     icon: string | any
     shadow?: boolean
-    badge?: string | number
+    badge?: string | number | null
     contrast?: boolean
   }>(),
   {

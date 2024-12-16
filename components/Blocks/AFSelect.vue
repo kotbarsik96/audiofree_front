@@ -100,7 +100,7 @@ function toggle() {
   position: relative;
   display: inline-block;
   z-index: 50;
-  border-radius: 9px;
+  border-radius: var(--border-radius);
   background-color: var(--white);
   border: var(--border-width) solid var(--input-border-color);
   @include fontSize(16);
@@ -110,6 +110,7 @@ function toggle() {
     border-color: var(--input-border-color-active);
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+    z-index: 60;
   }
 
   &__value {
@@ -181,6 +182,8 @@ function toggle() {
 
       &:last-child {
         border-bottom: 0;
+        border-bottom-right-radius: var(--border-radius);
+        border-bottom-left-radius: var(--border-radius);
       }
     }
   }
