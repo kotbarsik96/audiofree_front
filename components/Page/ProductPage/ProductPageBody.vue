@@ -96,8 +96,7 @@ const { cartCollection, favoritesCollection } = storeToRefs(
   productCollectionsStore
 )
 
-const { updateQuantity, deleteCartItem } = useCart()
-const { addNotification } = useNotifications()
+const { addToCart, updateQuantity, deleteCartItem } = useCart()
 
 const { data: productData } = await useAPI<{ data: IProductData }>(
   `/product/${route.params.product}/${route.params.variation}`
@@ -144,14 +143,7 @@ async function onToCartClick() {
   if (!variation.value) return
 
   isLoadingCart.value = true
-
-  const response = await updateQuantity(quantity.value, variation.value, false)
-  if (response.ok && response._data.message) {
-    addNotification('success', response._data.message)
-  } else if (response._data.message) {
-    addNotification('error', response._data.message)
-  }
-
+  await addToCart(quantity.value, variation.value, false)
   isLoadingCart.value = false
 }
 async function deleteItem() {
@@ -168,9 +160,9 @@ async function buyOneclick() {
   if (!variation.value) return
 
   isLoadingCart.value = true
-  await updateQuantity(quantity.value, variation.value, true)
-
-  router.push('/cart?oneclick=1')
+  
+  const response = await addToCart(quantity.value, variation.value, true)
+  if(response?.ok) router.push('/cart?oneclick=1')
 
   isLoadingCart.value = false
 }
