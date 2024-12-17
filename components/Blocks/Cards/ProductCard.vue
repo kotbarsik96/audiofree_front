@@ -1,9 +1,5 @@
 <template>
-  <NuxtLink
-    class="product-card _card"
-    :class="className"
-    :to="`/product/${data.id}/${data.first_variation.id}`"
-  >
+  <div class="product-card _card" :class="className">
     <div class="product-card__inner _card__inner">
       <div class="product-card__top">
         <div class="product-card__status">
@@ -14,25 +10,32 @@
           <span>{{ statusText }}</span>
         </div>
         <div class="product-card__circle-buttons">
-          <ButtonIcon contrast :icon="HeartIcon" />
+          <ButtonIcon
+            contrast
+            :icon="HeartIcon"
+            :active="isInFavorites"
+            @click="onFavoritesClick"
+          />
         </div>
       </div>
-      <div class="product-card__img">
+      <NuxtLink class="product-card__img" :to="productLink">
         <AFImage :data="data.image" />
-      </div>
-      <div class="product-card__title">
+      </NuxtLink>
+      <NuxtLink class="product-card__title" :to="productLink">
         {{ data.brand.value }} {{ data.name }}
-      </div>
-      <div class="product-card__rating">
+      </NuxtLink>
+      <NuxtLink class="product-card__rating" :to="productLink">
         <AFRating :value="data.rating_value" />
-      </div>
-      <div class="product-card__price">от {{ currency(data.min_price) }}</div>
-      <div v-if="isInCart" class="product-card__in-cart">
+      </NuxtLink>
+      <NuxtLink class="product-card__price" :to="productLink">
+        от {{ currency(data.min_price) }}
+      </NuxtLink>
+      <NuxtLink v-if="isInCart" class="product-card__in-cart" :to="productLink">
         <CartIcon />
         Товар у вас в корзине
-      </div>
+      </NuxtLink>
     </div>
-  </NuxtLink>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -45,24 +48,48 @@ import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 import CartIcon from '~/assets/images/icons/cart.svg'
 import AFImage from '~/components/Blocks/AFImage.vue'
 import { currency } from '~/utils/numbers'
-import { Product } from "~/domain/product/Product"
+import { Product } from '~/domain/product/Product'
+import { useFavorites } from '~/domain/product/collections/favorites/useFavorites'
 
 const props = defineProps<{
   data: ICatalogProduct
 }>()
 
+const isLoadingFavorites = ref(false)
+
 const productsCollectionStore = useProductCollectionsStore()
-const { collection: productsCollection } = storeToRefs(productsCollectionStore)
+const { cartCollection, favoritesCollection } = storeToRefs(
+  productsCollectionStore
+)
+const { addToFavorites, deleteFavoriteByProduct } = useFavorites()
 
 const className = computed(() => [`--status-${props.data.status.value_slug}`])
 
-const statusText = computed(() => Product.statusMap(props.data.status.value_slug))
+const productLink = computed(
+  () => `/product/${props.data.id}/${props.data.first_variation.id}`
+)
+
+const statusText = computed(() =>
+  Product.statusMap(props.data.status.value_slug)
+)
 
 const isInCart = computed(() =>
-  productsCollection.value?.data.cart.some(
-    (item) => item.product_id === props.data.id
-  )
+  cartCollection.value?.some((item) => item.product_id === props.data.id)
 )
+const isInFavorites = computed(() =>
+  favoritesCollection.value?.some((item) => item.product_id === props.data.id)
+)
+
+async function onFavoritesClick() {
+  if (isLoadingFavorites.value) return
+  isLoadingFavorites.value = true
+
+  await (isInFavorites.value
+    ? deleteFavoriteByProduct(props.data.id)
+    : addToFavorites(props.data.first_variation.id))
+
+  isLoadingFavorites.value = false
+}
 </script>
 
 <style lang="scss" scoped>

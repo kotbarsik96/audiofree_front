@@ -66,7 +66,13 @@
       </div>
       <div class="product-body__side-top-main">
         <div class="product-body__side-top-buttons">
-          <ButtonIcon contrast :icon="HeartIcon" />
+          <ButtonIcon
+            contrast
+            :icon="HeartIcon"
+            :disabled="isLoadingFavorites"
+            :active="isInFavorites"
+            @click="onFavortieClick"
+          />
         </div>
       </div>
     </div>
@@ -87,6 +93,7 @@ import CartIcon from '~/assets/images/icons/cart.svg'
 import HeartIcon from '~/assets/images/icons/heart.svg'
 import type { IProductData } from '~/domain/product/types/IProductData'
 import { useCart } from '~/domain/product/collections/cart/useCart'
+import { useFavorites } from '~/domain/product/collections/favorites/useFavorites'
 
 const router = useRouter()
 const route = useRoute()
@@ -113,8 +120,10 @@ const currentPrice = computed(() => variation.value?.current_price || 0)
 const oldPrice = computed(() =>
   variation.value?.price === currentPrice.value ? null : variation.value?.price
 )
+const { addToFavorites, deleteFavoriteByVariation } = useFavorites()
 
 const isLoadingCart = ref(false)
+const isLoadingFavorites = ref(false)
 
 const inCart = computed(() =>
   cartCollection.value?.find(
@@ -160,11 +169,21 @@ async function buyOneclick() {
   if (!variation.value) return
 
   isLoadingCart.value = true
-  
+
   const response = await addToCart(quantity.value, variation.value, true)
-  if(response?.ok) router.push('/cart?oneclick=1')
+  if (response?.ok) router.push('/cart?oneclick=1')
 
   isLoadingCart.value = false
+}
+async function onFavortieClick() {
+  if (isLoadingFavorites.value || !variation.value) return
+  isLoadingFavorites.value = true
+
+  await (isInFavorites.value
+    ? deleteFavoriteByVariation(variation.value.id)
+    : addToFavorites(variation.value.id))
+
+  isLoadingFavorites.value = false
 }
 </script>
 

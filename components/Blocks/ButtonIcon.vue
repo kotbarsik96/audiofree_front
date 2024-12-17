@@ -17,6 +17,8 @@ const props = withDefaults(
     shadow?: boolean
     badge?: string | number | null
     contrast?: boolean
+    active?: boolean
+    disabled?: boolean
   }>(),
   {
     type: 'button',
@@ -47,7 +49,12 @@ const attrs = computed(() => {
 })
 
 const className = computed(() => {
-  return { shadow: props.shadow, contrast: props.contrast }
+  return {
+    shadow: props.shadow,
+    contrast: props.contrast,
+    active: props.active,
+    disabled: props.disabled,
+  }
 })
 </script>
 
@@ -77,8 +84,15 @@ const className = computed(() => {
   }
 
   &:not(div):hover {
+    background-color: var(--secondary-transparent);
+  }
+  &.active {
     background-color: var(--secondary-2);
     color: var(--white);
+  }
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.5;
   }
 
   &__badge {
