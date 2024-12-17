@@ -38,28 +38,27 @@ export function useCart() {
     variation: IProductVariation,
     isOneclick: boolean
   ) {
-    return new Promise<{ ok: boolean; _data?: any }>((resolve) => {
-      try {
-        $afFetch('product/cart/item', {
-          method: 'DELETE',
-          params: {
-            variation_id: variation.id,
-            is_oneclick: isOneclick ? '1' : '',
-          },
-          onResponse({ response }) {
-            if (response._data.message) {
-              const severity = response.ok ? 'info' : 'error'
-              addNotification(severity, response._data.message)
-            }
-            if (response.ok) {
-              updateCollection()
-            }
+    let _response: Response | undefined
 
-            resolve(response)
-          },
-        })
-      } catch (err) {}
-    })
+    try {
+      await $afFetch('product/cart/item', {
+        method: 'DELETE',
+        params: {
+          variation_id: variation.id,
+          is_oneclick: isOneclick ? '1' : '',
+        },
+        onResponse({ response }) {
+          showResponseMessage(response)
+
+          if (response.ok) {
+            updateCollection()
+            _response = response
+          }
+        },
+      })
+    } catch (err) {}
+
+    return _response
   }
 
   return {

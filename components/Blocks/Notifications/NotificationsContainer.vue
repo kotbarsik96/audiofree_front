@@ -24,7 +24,8 @@ const notifications = getNotificationsList()
   position: fixed;
   bottom: 10px;
   right: 10px;
-  width: 300px;
+  width: 400px;
+  max-width: 90%;
   z-index: 9999;
 }
 </style>

@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import AFButton from '~/components/Blocks/AFButton.vue'
 import CartItem from '~/components/Page/CartPage/CartItem.vue'
-import type ICartItem from '~/domain/cart/ICartItem'
+import type ICartItem from '~/domain/product/collections/cart/ICartItem'
 
 const route = useRoute()
 

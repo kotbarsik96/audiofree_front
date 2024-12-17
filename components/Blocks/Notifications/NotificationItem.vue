@@ -86,7 +86,7 @@ function close() {
   --timer-height: 6px;
 
   position: relative;
-  padding: 20px 10px calc(20px + var(--timer-height)) 10px;
+  padding: 30px 10px calc(20px + var(--timer-height)) 10px;
   border-radius: 8px;
   overflow: hidden;
   background-color: var(--white);

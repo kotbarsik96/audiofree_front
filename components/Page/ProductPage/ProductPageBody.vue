@@ -86,7 +86,7 @@ import ProductSideInfo from '~/components/Blocks/ProductSideInfo.vue'
 import CartIcon from '~/assets/images/icons/cart.svg'
 import HeartIcon from '~/assets/images/icons/heart.svg'
 import type { IProductData } from '~/domain/product/types/IProductData'
-import { useCart } from '~/domain/cart/useCart'
+import { useCart } from '~/domain/product/collections/cart/useCart'
 
 const router = useRouter()
 const route = useRoute()

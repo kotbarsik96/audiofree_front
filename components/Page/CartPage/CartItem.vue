@@ -45,8 +45,8 @@ import CrossIcon from '~/assets/images/icons/cross.svg'
 import AFImage from '~/components/Blocks/AFImage.vue'
 import QuantityInput from '~/components/Blocks/FormElements/QuantityInput.vue'
 import AFDialog from '~/components/Blocks/Dialog/AFDialog.vue'
-import { useCart } from '~/domain/cart/useCart'
-import type ICartItem from '~/domain/cart/ICartItem'
+import { useCart } from '~/domain/product/collections/cart/useCart'
+import type ICartItem from '~/domain/product/collections/cart/ICartItem'
 
 const props = defineProps<{
   data: ICartItem
@@ -103,7 +103,7 @@ async function deleteItem() {
     props.data.variation,
     !!route.query.oneclick
   )
-  if (response.ok) emit('deleteItem')
+  if (response?.ok) emit('deleteItem')
   isLoading.value = false
 }
 async function changeQuantity() {
