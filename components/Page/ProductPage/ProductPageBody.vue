@@ -154,11 +154,11 @@ async function onToCartClick() {
 
   isLoadingCart.value = false
 }
-function deleteItem() {
+async function deleteItem() {
   if (!variation.value) return
 
   isLoadingCart.value = true
-  deleteCartItem(variation.value, false)
+  await deleteCartItem(variation.value, false)
   isLoadingCart.value = false
 }
 function updateQuantityOnChange() {
