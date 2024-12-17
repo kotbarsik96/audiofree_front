@@ -33,22 +33,7 @@
         </div>
         <div class="footer__column">
           <div class="footer__column-title">Контакты</div>
-          <ul class="footer__contacts-list">
-            <li class="footer__contact-item">
-              <FreeCall />
-            </li>
-            <li
-              v-for="item in contacts"
-              :key="item.title"
-              class="footer__contact-item"
-            >
-              <ButtonIcon :icon="item.icon" type="div" />
-              <div>
-                <div class="footer__contact-item-title">{{ item.title }}</div>
-                <div class="footer__contact-item-detail">{{ item.detail }}</div>
-              </div>
-            </li>
-          </ul>
+          <ContactsList class="footer__contacts" />
           <SocialsList class="footer__socials" />
         </div>
       </div>
@@ -71,10 +56,8 @@
 
 <script setup lang="ts">
 import SocialsList from '~/components/Blocks/SocialsList.vue'
-import contacts from '@/enums/footer/contacts'
-import FreeCall from '~/components/Blocks/FreeCall.vue'
-import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 import LogoText from '~/components/Blocks/LogoText.vue'
+import ContactsList from '~/components/Blocks/ContactsList.vue'
 import { useAuthStore } from '@/stores/authStore'
 
 const { openSignupDialog, openLoginDialog } = useAuthStore()
@@ -152,44 +135,19 @@ const columns = [
     margin-bottom: 50px;
   }
 
-  &__contacts-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
+  &__contacts {
+    :deep(.contacts-list__contact-item) {
+      .free-call__title {
+        color: var(--white);
+      }
+      .free-call__number {
+        color: var(--white);
+      }
 
-  &__contact-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-
-    :deep(.free-call__title) {
-      color: var(--white);
+      .icon {
+        color: var(--primary-dark);
+      }
     }
-    :deep(.free-call__number) {
-      color: var(--white);
-    }
-
-    :deep(.icon),
-    .icon {
-      color: var(--primary-dark);
-    }
-
-    :deep(.btn-icon) {
-      background-color: var(--secondary);
-    }
-    :deep(.btn-icon:not(div)):hover {
-      background-color: var(--secondary-2);
-    }
-  }
-
-  &__contact-item-title {
-    @include fontSize(16);
-  }
-
-  &__contact-item-detail {
-    @include fontSize(16);
-    font-weight: 700;
   }
 
   &__socials {
@@ -219,6 +177,16 @@ const columns = [
       align-items: stretch;
     }
 
+    &__contacts {
+      align-items: center;
+
+      :deep(.contacts-list__contact-item) {
+        .btn-icon {
+          display: none;
+        }
+      }
+    }
+
     &__column {
       border-bottom: 1px solid var(--border-footer-color);
       display: flex;
@@ -230,19 +198,6 @@ const columns = [
       &:last-child {
         border-bottom: 0;
         padding-bottom: 0;
-      }
-    }
-
-    &__contacts-list {
-      align-items: center;
-    }
-
-    &__contact-item {
-      text-align: center;
-      align-items: center;
-
-      :deep(.btn-icon) {
-        display: none;
       }
     }
 

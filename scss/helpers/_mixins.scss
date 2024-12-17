@@ -96,7 +96,10 @@
 }
 
 $fHeadlines: (
-  2: 24px 500,
+  1: 2rem 700,
+  2: 1.5rem 500,
+  3: 1.25rem 500,
+  4: 1rem 500,
 );
 @mixin fHeadline($num) {
   $item: map.get($fHeadlines, $num);
