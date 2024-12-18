@@ -1,5 +1,5 @@
 <template>
-  <div class="review-comment _section-box">
+  <div class="review-comment _section-box" :class="{ '--curr-user': fromCurrentUser }">
     <div class="review-comment__head">
       <div class="review-comment__avatar">
         <img src="/assets/images/icons/user.svg?url" alt="" />
@@ -54,6 +54,7 @@ import {
 const props = defineProps<{
   review: IReview
   productId?: number | string
+  fromCurrentUser?: boolean
 }>()
 
 const { $afFetch } = useNuxtApp()
@@ -103,6 +104,10 @@ function editReview() {
 <style lang="scss" scoped>
 .review-comment {
   --comment-padding: 15px 20px;
+
+  &.--curr-user {
+    border: 1px solid var(--black);
+  }
 
   &__head {
     padding: var(--comment-padding);

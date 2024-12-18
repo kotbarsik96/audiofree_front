@@ -10,6 +10,7 @@
       class="user-review__review"
       :review="currentUserReview"
       :productId="productId"
+      fromCurrentUser
     />
   </div>
 </template>

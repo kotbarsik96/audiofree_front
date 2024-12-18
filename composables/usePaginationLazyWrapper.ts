@@ -68,9 +68,10 @@ export async function usePaginationLazyWrapper<T>(
     return responseData
   }
   async function _intersectionCallback(entries: IntersectionObserverEntry[]) {
-    if (isLastPage.value) return
+    if (isLastPage.value || isLoading.value) return
 
     if (entries.some((entry) => entry.isIntersecting)) {
+      page.value++
       await _loadMore()
     }
   }
@@ -78,7 +79,6 @@ export async function usePaginationLazyWrapper<T>(
     if (isLoading.value) return
     isLoading.value = true
 
-    page.value++
     let opts: NitroFetchOptions<string> = toValue(
       ref({
         ...options,
@@ -101,13 +101,18 @@ export async function usePaginationLazyWrapper<T>(
     isLoading.value = false
   }
   async function reset() {
-    page.value = 0
+    page.value = 1
     await _loadMore(true)
+  }
+  async function refresh() {
+    _loadMore()
   }
 
   return {
     list,
+    paginationData,
     isLoading,
     reset,
+    refresh,
   }
 }
