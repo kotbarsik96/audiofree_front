@@ -1,81 +1,113 @@
 import type { UseFetchOptions } from '#app'
 import type IPagination from '~/dataAccess/api/IPagination'
+import { type NitroFetchOptions } from 'nitropack'
 
-export function usePaginationLazyWrapper<T>(
+export type PaginationLazyWrapperOptions<T> = UseFetchOptions<{
+  data: IPagination<T>
+}> &
+  NitroFetchOptions<string>
+
+export async function usePaginationLazyWrapper<T>(
   intersectionEl: Ref<HTMLElement | undefined>,
   url: string,
-  options: UseFetchOptions<{ data: IPagination<T> }>
+  options: PaginationLazyWrapperOptions<T>
 ) {
-  const list = ref<T[]>([])
+  const { $afFetch } = useNuxtApp()
+
+  const list = shallowRef<T[]>([])
   const page = ref(1)
-  let observer: IntersectionObserver
+  const isLoading = ref(false)
+  const paginationData = ref<IPagination<T>>()
 
-  const queryWithDefaults: Record<string, any> = {
-    ...options.query,
-    page,
-  }
-  const optionsWithDefaults: UseFetchOptions<{ data: IPagination<T> }> = {
-    ...options,
-    query: queryWithDefaults,
-    immediate: false,
-    onResponse(responseData) {
-      const response = responseData.response
-      list.value.push(...response._data.data.data)
-
-      if (typeof options.onResponse === 'function')
-        options.onResponse(responseData)
-    },
-  }
-
-  const asyncData = useAPI<{
-    data: IPagination<T>
-  }>(url, optionsWithDefaults)
-
-  const isLoading = computed(() => asyncData.status.value === 'pending')
-
-  const paginationData = computed(() => asyncData.data.value?.data)
   const isLastPage = computed(
     () =>
       !paginationData.value?.last_page ||
       page.value >= paginationData.value?.last_page
   )
 
+  let observer: IntersectionObserver
   onMounted(() => {
     if (intersectionEl.value) {
-      observer = new IntersectionObserver(loadMoreCallback, {
+      observer = new IntersectionObserver(_intersectionCallback, {
         rootMargin: '0px 0px 100px 0px',
         threshold: 1,
       })
       observer.observe(intersectionEl.value)
     }
   })
-
   onUnmounted(() => {
     if (observer) observer.disconnect()
   })
 
-  async function loadMoreCallback(entries: IntersectionObserverEntry[]) {
+  const queryWithDefaults: Record<string, any> = {
+    ...options.query,
+    page,
+  }
+  const optionsWithDefaults: PaginationLazyWrapperOptions<T> = {
+    ...options,
+    method: 'GET',
+    watch: false,
+    query: queryWithDefaults,
+  }
+
+  await _getData()
+
+  /** первое получение данных */
+  async function _getData() {
+    isLoading.value = true
+
+    const responseData = await useAPI<{
+      data: IPagination<T>
+    }>(url, optionsWithDefaults)
+
+    isLoading.value = false
+
+    if (responseData.data.value) list.value = responseData.data.value?.data.data
+    paginationData.value = responseData.data.value?.data
+
+    return responseData
+  }
+  async function _intersectionCallback(entries: IntersectionObserverEntry[]) {
     if (isLastPage.value) return
 
     if (entries.some((entry) => entry.isIntersecting)) {
-      page.value++
-      asyncData.refresh()
+      await _loadMore()
     }
   }
-  async function refresh() {
-    page.value = 1
-    list.value = []
-    await asyncData.refresh()
+  async function _loadMore() {
+    if (isLoading.value) return
+    isLoading.value = true
+
+    page.value++
+    let opts: NitroFetchOptions<string> = toValue(
+      ref({
+        ...options,
+        query: {
+          ...queryWithDefaults,
+          page: page.value,
+        },
+        onResponseError(responseData) {
+          showResponseMessage(responseData.response, { noOkResponse: true })
+          if (typeof options.onResponseError === 'function')
+            options.onResponseError(responseData)
+        },
+      })
+    )
+    const response = await $afFetch<{ data: IPagination<T> } | null>(url, opts)
+    if (response?.data.data) list.value = list.value.concat(response.data.data)
+    paginationData.value = response?.data
+
+    isLoading.value = false
   }
-  function execute() {
-    refresh()
+  async function reset() {
+    page.value = 0
+    list.value = []
+    await _loadMore()
   }
 
   return {
     list,
     isLoading,
-    error: asyncData.error,
-    refresh,
-    execute,
+    reset,
   }
 }
