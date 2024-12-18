@@ -16,7 +16,7 @@ import type ISelectOption from '~/interfaces/components/ISelectOption'
 
 const { fetchProducts } = injectStrict<IInjectCatalog>(CatalogInject)
 
-const { data } = useAPI<{ data: ISelectOption[] }>('/products/catalog/sorts')
+const { data } = await useAPI<{ data: ISelectOption[] }>('/products/catalog/sorts')
 
 const { options, orderOptions, sort, sortOrder } = useSorts(data, fetchProducts)
 </script>

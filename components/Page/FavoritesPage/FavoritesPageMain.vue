@@ -56,13 +56,12 @@ const { refresh: refreshSearch } = useDelayedCallback(500, () => {
 
 const {
   list,
-  refresh: refreshList,
+  reset: resetList,
   isLoading: isLoadingProducts,
-} = usePaginationLazyWrapper<IVariationProduct>(
+} = await usePaginationLazyWrapper<IVariationProduct>(
   intersectionEl,
   '/product/favorites',
   {
-    method: 'GET',
     watch: false,
     query: {
       sort: sort,
@@ -71,16 +70,15 @@ const {
     },
   }
 )
-await refreshList()
-const { refresh: refreshListDelayed } = useDelayedCallback(1000, () => {
-  refreshList()
+const { refresh: resetListDelayed } = useDelayedCallback(1000, () => {
+  resetList()
 })
 
 watch(searchString, refreshSearch)
 watch(
   () => [searchString.value, sort.value, sortOrder.value],
   () => {
-    refreshListDelayed()
+    resetListDelayed()
   }
 )
 </script>
@@ -134,7 +132,6 @@ watch(
     position: relative;
     display: grid;
     grid-template-columns: repeat(auto-fit, 17rem);
-    justify-content: center;
     gap: 0.625rem;
     min-height: 30rem;
     transition: var(--general-transition);
