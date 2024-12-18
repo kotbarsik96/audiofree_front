@@ -74,7 +74,7 @@ export async function usePaginationLazyWrapper<T>(
       await _loadMore()
     }
   }
-  async function _loadMore() {
+  async function _loadMore(resetList?: boolean) {
     if (isLoading.value) return
     isLoading.value = true
 
@@ -94,6 +94,7 @@ export async function usePaginationLazyWrapper<T>(
       })
     )
     const response = await $afFetch<{ data: IPagination<T> } | null>(url, opts)
+    if (resetList) list.value = []
     if (response?.data.data) list.value = list.value.concat(response.data.data)
     paginationData.value = response?.data
 
@@ -101,8 +102,7 @@ export async function usePaginationLazyWrapper<T>(
   }
   async function reset() {
     page.value = 0
-    list.value = []
-    await _loadMore()
+    await _loadMore(true)
   }
 
   return {
