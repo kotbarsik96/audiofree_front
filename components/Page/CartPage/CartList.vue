@@ -17,10 +17,15 @@
           />
         </TransitionGroup>
       </template>
-      <div v-else-if="!isLoading" class="cart-list__empty">
+      <EmptyList
+        v-else-if="!isLoading"
+        shown
+        class="cart-list__empty"
+        icon="empty-cart"
+      >
         <div>Корзина пуста</div>
         <AFButton label="Перейти в каталог" type="nuxt-link" to="/catalog" />
-      </div>
+      </EmptyList>
     </div>
   </div>
 </template>
@@ -28,6 +33,7 @@
 <script setup lang="ts">
 import AFButton from '~/components/Blocks/AFButton.vue'
 import CartItem from '~/components/Page/CartPage/CartItem.vue'
+import EmptyList from '~/components/Blocks/EmptyList.vue'
 import type ICartItem from '~/domain/product/collections/cart/ICartItem'
 
 const route = useRoute()
@@ -56,6 +62,12 @@ function onCartDelete() {
 .cart-list {
   display: grid;
   grid-template-columns: 7rem auto auto auto auto auto;
+
+  &__empty {
+    :deep(a) {
+      margin-top: 1rem;
+    }
+  }
 
   &__header {
     display: grid;

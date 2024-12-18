@@ -21,11 +21,10 @@
             :data="product"
           />
         </div>
-        <div v-else class="catalog-body__empty">
-          <EmptyBoxIcon class="catalog-body__empty-icon" />
+        <EmptyList v-else shown class="catalog-body__empty" icon="empty-box">
           <p>К сожалению, результаты не найдены</p>
           <p>Скорее всего, они появятся при выборе других фильтров</p>
-        </div>
+        </EmptyList>
       </Transition>
     </div>
     <div class="catalog-body__pagination">
@@ -42,7 +41,7 @@
 <script setup lang="ts">
 import AFPagination from '~/components/Blocks/AFPagination.vue'
 import ProductCard from '~/components/Blocks/Cards/ProductCard.vue'
-import EmptyBoxIcon from '~/assets/images/icons/empty-box.svg'
+import EmptyList from '~/components/Blocks/EmptyList.vue'
 import {
   CatalogInject,
   type IInjectCatalog,
@@ -99,11 +98,6 @@ async function updateProducts() {
     text-align: center;
   }
 
-  &__empty-icon {
-    width: 4rem;
-    height: 4rem;
-  }
-
   &__products {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -132,7 +126,7 @@ async function updateProducts() {
     }
   }
 
-  @include adaptive(phone){
+  @include adaptive(phone) {
     &__products {
       grid-template-columns: 1fr;
     }
