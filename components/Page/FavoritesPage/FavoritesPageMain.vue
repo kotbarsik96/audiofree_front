@@ -71,7 +71,6 @@ const {
     },
   }
 )
-await refreshList()
 const { refresh: refreshListDelayed } = useDelayedCallback(1000, () => {
   refreshList()
 })
@@ -134,7 +133,6 @@ watch(
     position: relative;
     display: grid;
     grid-template-columns: repeat(auto-fit, 17rem);
-    justify-content: center;
     gap: 0.625rem;
     min-height: 30rem;
     transition: var(--general-transition);
