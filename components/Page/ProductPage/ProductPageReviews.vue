@@ -1,33 +1,8 @@
 <template>
   <div class="product-reviews">
-    <div v-if="noReviews" class="product-reviews__empty">
-      <svg class="product-reviews__empty-icon" viewBox="0 0 64 64">
-        <g>
-          <path
-            fill="currentColor"
-            d="M60,0H16c-2.211,0-4,1.789-4,4v6H4c-2.211,0-4,1.789-4,4v30c0,2.211,1.789,4,4,4h7c0.553,0,1,0.447,1,1v11
-		c0,1.617,0.973,3.078,2.469,3.695C14.965,63.902,15.484,64,16,64c1.039,0,2.062-0.406,2.828-1.172l14.156-14.156
-		c0,0,0.516-0.672,1.672-0.672S50,48,50,48c2.211,0,4-1.789,4-4v-8h6c2.211,0,4-1.789,4-4V4C64,1.789,62.211,0,60,0z M52,44
-		c0,1.105-0.895,2-2,2c0,0-14.687,0-15.344,0C32.709,46,32,47,32,47S20,59,18,61c-2.141,2.141-4,0.391-4-1c0-1,0-12,0-12
-		c0-1.105-0.895-2-2-2H4c-1.105,0-2-0.895-2-2V14c0-1.105,0.895-2,2-2h46c1.105,0,2,0.895,2,2V44z M62,32c0,1.105-0.895,2-2,2h-6V14
-		c0-2.211-1.789-4-4-4H14V4c0-1.105,0.895-2,2-2h44c1.105,0,2,0.895,2,2V32z"
-          />
-          <path
-            fill="currentColor"
-            d="M13,24h13c0.553,0,1-0.447,1-1s-0.447-1-1-1H13c-0.553,0-1,0.447-1,1S12.447,24,13,24z"
-          />
-          <path
-            fill="currentColor"
-            d="M41,28H13c-0.553,0-1,0.447-1,1s0.447,1,1,1h28c0.553,0,1-0.447,1-1S41.553,28,41,28z"
-          />
-          <path
-            fill="currentColor"
-            d="M34,34H13c-0.553,0-1,0.447-1,1s0.447,1,1,1h21c0.553,0,1-0.447,1-1S34.553,34,34,34z"
-          />
-        </g>
-      </svg>
+    <EmptyList :shown="noReviews" class="product-reviews__empty" icon="chat">
       <p>Отзывов еще нет. Напишите первым!</p>
-    </div>
+    </EmptyList>
     <ReviewForm
       v-if="!currentUserReview"
       :isWriting="true"
@@ -65,6 +40,7 @@
 </template>
 
 <script setup lang="ts">
+import EmptyList from '~/components/Blocks/EmptyList.vue'
 import ReviewForm from '~/components/Blocks/Review/ReviewForm.vue'
 import ReviewComment from '~/components/Blocks/Review/ReviewComment.vue'
 import SmallPreloader from '~/components/Blocks/SmallPreloader.vue'
@@ -210,21 +186,6 @@ function updateWritingReview(value: boolean) {
     display: flex;
     flex-direction: column;
     gap: 0.625rem;
-  }
-
-  &__empty {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-weight: 500;
-    @include fontSize(18);
-  }
-
-  &__empty-icon {
-    width: 5rem;
-    height: 5rem;
-    margin-bottom: 0.625rem;
   }
 
   &__loading-more {
