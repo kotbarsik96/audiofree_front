@@ -58,12 +58,14 @@ provide<IInjectCatalog>(CatalogInject, {
   urlQuery,
 })
 
-const { addBreadcrumb } = useBreadcrumbs()
-addBreadcrumb({
-  index: 2,
-  label: 'Каталог',
-  link: { name: 'CatalogPage' },
-})
+const { setBreadcrumbs } = useBreadcrumbs()
+setBreadcrumbs([
+  {
+    index: 2,
+    label: 'Каталог',
+    link: { name: 'CatalogPage' },
+  },
+])
 </script>
 
 <style lang="scss" scoped>

@@ -25,12 +25,14 @@ import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import ContactsList from '~/components/Blocks/ContactsList.vue'
 import SupportChatUser from '~/components/Blocks/SupportChat/SupportChatUser.vue'
 
-const { addBreadcrumb } = useBreadcrumbs()
-addBreadcrumb({
-  index: 2,
-  label: 'Контакты',
-  link: { name: 'ContactsPage' },
-})
+const { setBreadcrumbs } = useBreadcrumbs()
+setBreadcrumbs([
+  {
+    index: 2,
+    label: 'Контакты',
+    link: { name: 'ContactsPage' },
+  },
+])
 </script>
 
 <style lang="scss" scoped>

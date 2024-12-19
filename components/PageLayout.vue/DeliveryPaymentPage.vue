@@ -21,12 +21,14 @@ import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import DeliveryPaymentCards from '~/components/Page/DeliveryPaymentPage/DeliveryPaymentCards.vue'
 import PaymentMethods from '~/components/Page/DeliveryPaymentPage/PaymentMethods.vue'
 
-const { addBreadcrumb } = useBreadcrumbs()
-addBreadcrumb({
-  index: 2,
-  label: 'Доставка и оплата',
-  link: { name: 'DeliveryPaymentPage' },
-})
+const { setBreadcrumbs } = useBreadcrumbs()
+setBreadcrumbs([
+  {
+    index: 2,
+    label: 'Доставка и оплата',
+    link: { name: 'DeliveryPaymentPage' },
+  },
+])
 </script>
 
 <style lang="scss" scoped>

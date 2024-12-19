@@ -14,12 +14,14 @@
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import CartList from '~/components/Page/CartPage/CartList.vue'
 
-const { addBreadcrumb } = useBreadcrumbs()
-addBreadcrumb({
-  index: 2,
-  label: 'Корзина',
-  link: { name: 'CartPage' },
-})
+const { setBreadcrumbs } = useBreadcrumbs()
+setBreadcrumbs([
+  {
+    index: 2,
+    label: 'Корзина',
+    link: { name: 'CartPage' },
+  },
+])
 </script>
 
 <style lang="scss" scoped>

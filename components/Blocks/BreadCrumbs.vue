@@ -18,9 +18,6 @@
 import { useBreadcrumbs } from '#imports'
 
 const { breadCrumbs } = useBreadcrumbs()
-
-// возможно, сделать "кэш-массив" для хранения крошек на момент ухода со страницы
-// а после загрузки страницы заменять содержимое кэш-массива настоящими хлебными крошками
 </script>
 
 <style lang="scss" scoped>

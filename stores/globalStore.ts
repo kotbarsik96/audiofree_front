@@ -8,6 +8,7 @@ export const useGlobalStore = defineStore('global', () => {
   const productCollectionsStore = useProductCollectionsStore()
 
   const appInitted = ref(false)
+  const pageIsLoading = ref(false)
 
   async function initApp() {
     await Promise.all([
@@ -21,5 +22,6 @@ export const useGlobalStore = defineStore('global', () => {
   return {
     appInitted,
     initApp,
+    pageIsLoading,
   }
 })

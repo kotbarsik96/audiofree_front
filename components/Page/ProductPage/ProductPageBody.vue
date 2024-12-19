@@ -98,10 +98,14 @@ import { useFavorites } from '~/domain/product/collections/favorites/useFavorite
 const router = useRouter()
 const route = useRoute()
 
+const { setBreadcrumbs, breadCrumbs } = useBreadcrumbs()
+
 const productCollectionsStore = useProductCollectionsStore()
 const { cartCollection, favoritesCollection } = storeToRefs(
   productCollectionsStore
 )
+
+setBreadcrumbs(breadCrumbs.value)
 
 const { addToCart, updateQuantity, deleteCartItem } = useCart()
 
@@ -122,7 +126,6 @@ const oldPrice = computed(() =>
 )
 const { addToFavorites, deleteFavoriteByVariation } = useFavorites()
 
-const { setBreadcrumbs } = useBreadcrumbs()
 setBreadcrumbs([
   {
     index: 2,

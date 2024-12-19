@@ -15,12 +15,14 @@ import ProfilePassword from '~/components/Page/ProfilePage/ProfilePassword.vue'
 import ProfileEmail from '~/components/Page/ProfilePage/ProfileEmail.vue'
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 
-const { addBreadcrumb } = useBreadcrumbs()
-addBreadcrumb({
-  index: 2,
-  label: 'Профиль',
-  link: { name: 'ProfilePage' },
-})
+const { setBreadcrumbs } = useBreadcrumbs()
+setBreadcrumbs([
+  {
+    index: 2,
+    label: 'Профиль',
+    link: { name: 'ProfilePage' },
+  },
+])
 </script>
 
 <style lang="scss">
