@@ -3,7 +3,7 @@
     <div class="verified">
       Вы успешно подтвердили адрес электронной почты
       <div class="verified__buttons">
-        <AFButton type="nuxt-link" to="/profile" label="В профиль" />
+        <AFButton type="nuxt-link" :to="{ name: 'ProfilePage' }" label="В профиль" />
         <AFButton
           type="nuxt-link"
           styleType="secondary"
@@ -25,11 +25,11 @@ const { user } = storeToRefs(useUserStore())
 const { $afFetch } = useNuxtApp()
 
 if (!user.value?.confirmations.verify_email) {
-  router.push('/')
+  router.push({ name: 'HomePage' })
 }
 
 if (!route.query.code) {
-  router.push('/')
+  router.push({ name: 'HomePage' })
 }
 
 const isVerified = ref(false)

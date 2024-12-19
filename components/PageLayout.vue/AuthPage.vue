@@ -23,7 +23,7 @@ authWatcher()
 watch(isAuth, authWatcher)
 
 function authWatcher() {
-  if (isAuth.value) router.push('/')
+  if (isAuth.value) router.push({ name: 'HomePage' })
 }
 </script>
 

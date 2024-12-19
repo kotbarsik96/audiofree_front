@@ -15,6 +15,13 @@
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import GRefundPageInfo from '~/components/Page/GuaranteesRefundPage/GRefundPageInfo.vue'
 import GRefundPageSteps from '~/components/Page/GuaranteesRefundPage/GRefundPageSteps.vue'
+
+const { addBreadcrumb } = useBreadcrumbs()
+addBreadcrumb({
+  index: 2,
+  label: 'Гарантия и возврат',
+  link: { name: 'GuaranteesRefundPage' },
+})
 </script>
 
 <style lang="scss" scoped>

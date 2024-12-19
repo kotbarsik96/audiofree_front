@@ -122,6 +122,23 @@ const oldPrice = computed(() =>
 )
 const { addToFavorites, deleteFavoriteByVariation } = useFavorites()
 
+const { setBreadcrumbs } = useBreadcrumbs()
+setBreadcrumbs([
+  {
+    index: 2,
+    label: 'Каталог',
+    link: { name: 'CatalogPage' },
+  },
+  {
+    index: 3,
+    label: `${product.value?.name} (${variation.value?.name})`,
+    link: {
+      name: 'ProductPage',
+      params: { product: product.value?.id, variation: variation.value?.id },
+    },
+  },
+])
+
 const isLoadingCart = ref(false)
 const isLoadingFavorites = ref(false)
 

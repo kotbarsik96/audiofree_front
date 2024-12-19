@@ -46,7 +46,7 @@
           <div class="header__bottom-catalog">
             <NuxtLink
               class="_link _link--text-color"
-              to="/catalog"
+              :to="{ name: 'CatalogPage' }"
               tabindex="0"
             >
               <AFIcon :icon="MenuIcon" />
@@ -131,7 +131,7 @@
             <li class="header-mobile__menu-item">
               <NuxtLink
                 class="header-mobile__menu-item-inner --iconed"
-                to="/catalog"
+                :to="{ name: 'CatalogPage' }"
               >
                 <AFIcon :icon="MenuIcon" />
                 <span>Каталог</span>
@@ -193,12 +193,12 @@ const route = useRoute()
 const iconLinks = computed(() => [
   {
     icon: HeartIcon,
-    to: '/favorites',
+    to: { name: 'FavoritesPage' },
     badge: favoritesCount.value,
   },
   {
     icon: CartIcon,
-    to: '/cart',
+    to: { name: 'CartPage' },
     badge: cartCount.value,
   },
 ])
@@ -206,7 +206,7 @@ const iconLinks = computed(() => [
 const searchValue = ref('')
 
 const bottomLinksMobile = computed(() =>
-  bottomLinks.filter((item) => item.to !== '/')
+  bottomLinks.filter((item) => item.to.name !== 'HomePage')
 )
 
 const isMobileShown = ref(false)

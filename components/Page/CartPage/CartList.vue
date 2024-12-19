@@ -24,7 +24,7 @@
         icon="empty-cart"
       >
         <div>Корзина пуста</div>
-        <AFButton label="Перейти в каталог" type="nuxt-link" to="/catalog" />
+        <AFButton label="Перейти в каталог" type="nuxt-link" :to="{ name: 'CatalogPage' }" />
       </EmptyList>
     </div>
   </div>

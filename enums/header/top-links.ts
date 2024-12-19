@@ -1,14 +1,14 @@
 export default [
   {
     title: "Доставка и оплата",
-    to: '/delivery-payment'
+    to: { name: 'DeliveryPaymentPage' }
   },
   {
     title: "Гарантия и возврат",
-    to: '/guarantees-refund'
+    to: { name: 'GuaranteesRefundPage' }
   },
   {
     title: "Контакты",
-    to: '/contacts'
+    to: { name: 'ContactsPage' }
   },
 ]

@@ -80,7 +80,7 @@ async function checkLink() {
       },
       onResponse({ response }) {
         if (!response.ok) {
-          router.push('/')
+          router.push({ name: 'HomePage' })
           addNotification('error', 'Был произведён переход по неверной ссылке')
         }
       },
@@ -106,7 +106,7 @@ async function onSubmit() {
       onResponse({ response }) {
         if (response.ok) {
           addNotification('success', response._data.message)
-          router.push('/')
+          router.push({ name: 'HomePage' })
         }
       },
       onResponseError({ response }) {

@@ -7,5 +7,6 @@ import ProfilePage from '~/components/PageLayout.vue/ProfilePage.vue'
 
 definePageMeta({
   auth: true,
+  name: 'ProfilePage',
 })
 </script>

@@ -4,4 +4,8 @@
 
 <script setup lang="ts">
 import ResetPasswordPage from '~/components/PageLayout.vue/Confirmation/ResetPasswordPage.vue'
+
+definePageMeta({
+  name: 'ResetPasswordPage'
+})
 </script>

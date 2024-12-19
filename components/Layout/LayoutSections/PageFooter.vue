@@ -59,10 +59,20 @@ import SocialsList from '~/components/Blocks/SocialsList.vue'
 import LogoText from '~/components/Blocks/LogoText.vue'
 import ContactsList from '~/components/Blocks/ContactsList.vue'
 import { useAuthStore } from '@/stores/authStore'
+import type { RouteLocationRaw } from 'vue-router'
 
 const { openSignupDialog, openLoginDialog } = useAuthStore()
 
-const columns = [
+interface IFooterColumn {
+  title: string
+  items: {
+    title: string
+    action?: ((payload: Event) => void)
+    to?: RouteLocationRaw
+  }[]
+}
+
+const columns: IFooterColumn[] = [
   {
     title: 'Личный кабинет',
     items: [
@@ -76,11 +86,11 @@ const columns = [
       },
       {
         title: 'Отложенные товары',
-        to: '/favorites',
+        to: { name: 'FavoritesPage' },
       },
       {
         title: 'Ваши заказы',
-        to: '/profile',
+        to: { name: 'ProfilePage' },
       },
     ],
   },
@@ -89,15 +99,15 @@ const columns = [
     items: [
       {
         title: 'Доставка и оплата',
-        to: '/delivery-payment',
+        to: { name: 'DeliveryPaymentPage' },
       },
       {
         title: 'Гарантия и возврат',
-        to: '/guarantees-refund',
+        to: { name: 'GuaranteesRefundPage' },
       },
       {
         title: 'Контакты',
-        to: '/contacts',
+        to: { name: 'ContactsPage' },
       },
     ],
   },

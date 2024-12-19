@@ -2,6 +2,6 @@ export default [
   {
     title: "Главная",
     bold: true,
-    to: '/'
+    to: { name: 'HomePage' }
   }
 ]
