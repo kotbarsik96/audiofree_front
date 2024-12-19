@@ -18,19 +18,19 @@
           />
         </div>
       </div>
-      <NuxtLink class="product-card__img" :to="productLink">
+      <NuxtLink class="product-card__img" :to="linkToProduct">
         <AFImage :data="data.image" />
       </NuxtLink>
-      <NuxtLink class="product-card__title" :to="productLink">
+      <NuxtLink class="product-card__title" :to="linkToProduct">
         {{ data.brand.value }} {{ data.name }}
       </NuxtLink>
-      <NuxtLink class="product-card__rating" :to="productLink">
+      <NuxtLink class="product-card__rating" :to="linkToProduct">
         <AFRating :value="data.rating_value" />
       </NuxtLink>
-      <NuxtLink class="product-card__price" :to="productLink">
+      <NuxtLink class="product-card__price" :to="linkToProduct">
         от {{ currency(data.min_price) }}
       </NuxtLink>
-      <NuxtLink v-if="isInCart" class="product-card__in-cart" :to="productLink">
+      <NuxtLink v-if="isInCart" class="product-card__in-cart" :to="linkToProduct">
         <CartIcon />
         Товар у вас в корзине
       </NuxtLink>
@@ -65,9 +65,13 @@ const { addToFavorites, deleteFavoriteByProduct } = useFavorites()
 
 const className = computed(() => [`--status-${props.data.status.value_slug}`])
 
-const productLink = computed(
-  () => `/product/${props.data.id}/${props.data.first_variation.id}`
-)
+const linkToProduct = computed(() => ({
+  name: 'ProductPage',
+  params: {
+    product: props.data.id,
+    variation: props.data.first_variation.id,
+  },
+}))
 
 const statusText = computed(() =>
   Product.statusMap(props.data.status.value_slug)

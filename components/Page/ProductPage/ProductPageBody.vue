@@ -98,10 +98,14 @@ import { useFavorites } from '~/domain/product/collections/favorites/useFavorite
 const router = useRouter()
 const route = useRoute()
 
+const { setBreadcrumbs, breadCrumbs } = useBreadcrumbs()
+
 const productCollectionsStore = useProductCollectionsStore()
 const { cartCollection, favoritesCollection } = storeToRefs(
   productCollectionsStore
 )
+
+setBreadcrumbs(breadCrumbs.value)
 
 const { addToCart, updateQuantity, deleteCartItem } = useCart()
 
@@ -121,6 +125,22 @@ const oldPrice = computed(() =>
   variation.value?.price === currentPrice.value ? null : variation.value?.price
 )
 const { addToFavorites, deleteFavoriteByVariation } = useFavorites()
+
+setBreadcrumbs([
+  {
+    index: 2,
+    label: 'Каталог',
+    link: { name: 'CatalogPage' },
+  },
+  {
+    index: 3,
+    label: `${product.value?.name} (${variation.value?.name})`,
+    link: {
+      name: 'ProductPage',
+      params: { product: product.value?.id, variation: variation.value?.id },
+    },
+  },
+])
 
 const isLoadingCart = ref(false)
 const isLoadingFavorites = ref(false)

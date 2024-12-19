@@ -32,7 +32,7 @@
                 class="bestsellers-slider__button"
                 label="Купить"
                 type="nuxt-link"
-                :to="`/product/${product.id}/${product.first_variation.id}`"
+                :to="linkToProduct(product)"
                 styleType="secondary"
               />
             </div>
@@ -49,6 +49,7 @@ import AFImage from '~/components/Blocks/AFImage.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Pagination, EffectFlip } from 'swiper/modules'
 import { Product } from '~/domain/product/Product'
+import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 
 const productService = new Product()
 
@@ -57,6 +58,16 @@ const titles = ['BESTSELLER', 'MUST HAVE', 'GREAT CHOISE']
 const { data } = await productService.getBestsellers(titles.length)
 
 const bestsellers = computed(() => data.value?.data || [])
+
+function linkToProduct(product: ICatalogProduct) {
+  return {
+    name: 'ProductPage',
+    params: {
+      product: product.id,
+      variation: product.first_variation.id,
+    },
+  }
+}
 </script>
 
 <style lang="scss" scoped>

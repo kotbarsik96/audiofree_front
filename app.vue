@@ -14,6 +14,16 @@
 import { useGlobalStore } from '~/stores/globalStore'
 import LayoutWrapper from '~/components/Layout/LayoutWrapper.vue'
 
+const { setBreadcrumbs } = useBreadcrumbs()
+
+setBreadcrumbs([
+  {
+    index: 1,
+    label: 'Главная',
+    link: { name: 'HomePage' },
+  },
+])
+
 onMounted(() => {
   defineIfFirefox()
 })

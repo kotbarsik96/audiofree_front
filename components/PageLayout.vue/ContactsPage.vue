@@ -24,6 +24,15 @@
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import ContactsList from '~/components/Blocks/ContactsList.vue'
 import SupportChatUser from '~/components/Blocks/SupportChat/SupportChatUser.vue'
+
+const { setBreadcrumbs } = useBreadcrumbs()
+setBreadcrumbs([
+  {
+    index: 2,
+    label: 'Контакты',
+    link: { name: 'ContactsPage' },
+  },
+])
 </script>
 
 <style lang="scss" scoped>
@@ -32,7 +41,7 @@ import SupportChatUser from '~/components/Blocks/SupportChat/SupportChatUser.vue
   --cp-padding-y: 1.875rem;
 
   margin-bottom: 3.75rem;
-  
+
   &__box {
     margin-top: 1.125rem;
   }
@@ -66,7 +75,7 @@ import SupportChatUser from '~/components/Blocks/SupportChat/SupportChatUser.vue
     padding-left: 0;
   }
 
-  @include adaptive(tablet-big){
+  @include adaptive(tablet-big) {
     &__box {
       &::before {
         display: none;
@@ -77,7 +86,7 @@ import SupportChatUser from '~/components/Blocks/SupportChat/SupportChatUser.vue
       padding-left: 0;
       padding-right: 0;
     }
-    
+
     &__box-inner {
       background: transparent;
       box-shadow: none;

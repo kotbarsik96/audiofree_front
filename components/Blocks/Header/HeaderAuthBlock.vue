@@ -6,7 +6,7 @@
         <div v-if="isAuth" class="h-auth-block__links-inner">
           <NuxtLink
             class="h-auth-block__btn _link _link--text-color"
-            to="/profile"
+            :to="{ name: 'ProfilePage' }"
             tabindex="0"
           >
             Профиль

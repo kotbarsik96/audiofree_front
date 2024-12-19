@@ -19,25 +19,25 @@
           />
         </div>
       </div>
-      <NuxtLink class="product-card__img" :to="linkProduct">
+      <NuxtLink class="product-card__img" :to="linkToProduct">
         <AFImage :data="data.image" />
       </NuxtLink>
-      <NuxtLink class="product-card__title" :to="linkProduct">
+      <NuxtLink class="product-card__title" :to="linkToProduct">
         {{ data.full_name }}
       </NuxtLink>
-      <NuxtLink class="product-card__rating" :to="linkProduct">
+      <NuxtLink class="product-card__rating" :to="linkToProduct">
         <AFRating :value="data.rating_value" />
       </NuxtLink>
       <NuxtLink
         class="product-card__price product-variation-card__price"
-        :to="linkProduct"
+        :to="linkToProduct"
       >
         <span v-if="data.price !== data.current_price" class="--old">
           {{ currency(data.price) }}
         </span>
         <span> {{ currency(data.current_price) }} </span>
       </NuxtLink>
-      <NuxtLink v-if="isInCart" class="product-card__in-cart" :to="linkProduct">
+      <NuxtLink v-if="isInCart" class="product-card__in-cart" :to="linkToProduct">
         <CartIcon />
         Товар у вас в корзине
       </NuxtLink>
@@ -72,9 +72,13 @@ const className = computed(() => [`--status-${props.data.status}`])
 
 const statusText = computed(() => Product.statusMap(props.data.status))
 
-const linkProduct = computed(
-  () => `/product/${props.data.product_id}/${props.data.variation_id}`
-)
+const linkToProduct = computed(() => ({
+  name: 'ProductPage',
+  params: {
+    product: props.data.product_id,
+    variation: props.data.variation_id,
+  },
+}))
 
 const isLoadingFavorites = ref(false)
 

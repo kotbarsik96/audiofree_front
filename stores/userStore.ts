@@ -61,7 +61,7 @@ export const useUserStore = defineStore('user', () => {
   }
   function checkPageMetaAuth() {
     if (!user.value && route.meta.auth) {
-      if (!isLoadingUser.value) navigateTo('/')
+      if (!isLoadingUser.value) navigateTo({ name: 'HomePage' })
     }
   }
 

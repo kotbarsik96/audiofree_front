@@ -57,6 +57,15 @@ provide<IInjectCatalog>(CatalogInject, {
   fetchingProducts,
   urlQuery,
 })
+
+const { setBreadcrumbs } = useBreadcrumbs()
+setBreadcrumbs([
+  {
+    index: 2,
+    label: 'Каталог',
+    link: { name: 'CatalogPage' },
+  },
+])
 </script>
 
 <style lang="scss" scoped>
