@@ -72,7 +72,7 @@ const className = computed(() => ({
 }))
 
 const productLink = computed(
-  () => `/product/${props.data.variation.product_id}/${props.data.variation_id}`
+  () => `/product/${props.data.variation.product.slug}/${props.data.variation.slug}`
 )
 
 const warningDialogText = ref('')

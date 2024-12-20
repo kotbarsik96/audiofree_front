@@ -9,7 +9,7 @@
       v-else-if="!!currentUserReview"
       class="user-review__review"
       :review="currentUserReview"
-      :productId="productId"
+      :productSlug="productSlug"
       fromCurrentUser
     />
   </div>
@@ -18,12 +18,10 @@
 <script setup lang="ts">
 import ReviewForm from '~/components/Blocks/Review/ReviewForm.vue'
 import ReviewComment from '~/components/Blocks/Review/ReviewComment.vue'
-import {
-  ReviewInjection,
-  type IReviewInjection,
-} from '~/domain/reviews/types/IReviewInjection'
+import { type IReviewInjection } from '~/domain/reviews/types/IReviewInjection'
+import { ReviewInjection } from '~/enums/injections'
 
-const { isWritingReview, currentUserReview, productId } =
+const { isWritingReview, currentUserReview, productSlug } =
   injectStrict<IReviewInjection>(ReviewInjection)
 </script>
 

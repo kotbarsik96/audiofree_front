@@ -19,6 +19,7 @@ export interface IProductVariationMin {
   id: number
   product_id: number
   name: string
+  slug: string
 }
 
 export interface IProductReview extends IReview {
@@ -27,6 +28,7 @@ export interface IProductReview extends IReview {
 
 export interface IProduct {
   id: number
+  slug: string
   name: string
   description: string
   image_id: number
@@ -57,6 +59,7 @@ export interface IVariationWithProduct extends IProductVariation {
   product: {
     id: number
     name: string
+    slug: string
   }
 }
 

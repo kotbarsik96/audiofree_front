@@ -29,9 +29,9 @@ import CatalogSorts from '~/components/Page/CatalogPage/CatalogSorts.vue'
 import type IPagination from '~/dataAccess/api/IPagination'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 import {
-  CatalogInject,
   type IInjectCatalog,
 } from '~/domain/product/types/IInjectCtalog'
+import { CatalogInjection } from '~/enums/injections'
 
 const route = useRoute()
 
@@ -51,7 +51,7 @@ const {
 })
 const fetchingProducts = computed(() => status.value === 'pending')
 
-provide<IInjectCatalog>(CatalogInject, {
+provide<IInjectCatalog>(CatalogInjection, {
   productsData,
   fetchProducts,
   fetchingProducts,

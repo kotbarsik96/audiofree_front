@@ -37,7 +37,11 @@
         </span>
         <span> {{ currency(data.current_price) }} </span>
       </NuxtLink>
-      <NuxtLink v-if="isInCart" class="product-card__in-cart" :to="linkToProduct">
+      <NuxtLink
+        v-if="isInCart"
+        class="product-card__in-cart"
+        :to="linkToProduct"
+      >
         <CartIcon />
         Товар у вас в корзине
       </NuxtLink>
@@ -75,8 +79,8 @@ const statusText = computed(() => Product.statusMap(props.data.status))
 const linkToProduct = computed(() => ({
   name: 'ProductPage',
   params: {
-    product: props.data.product_id,
-    variation: props.data.variation_id,
+    product: props.data.product_slug,
+    variation: props.data.variation_slug,
   },
 }))
 

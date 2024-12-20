@@ -29,7 +29,13 @@
           v-for="item in product.variations"
           :key="item.id"
           :label="item.name"
-          :to="`/product/${product.id}/${item.id}`"
+          :to="{
+            name: 'ProductPage',
+            params: {
+              product: product.slug,
+              variation: item.slug,
+            },
+          }"
         />
       </div>
     </div>
@@ -112,6 +118,13 @@ const { addToCart, updateQuantity, deleteCartItem } = useCart()
 const { data: productData } = await useAPI<{ data: IProductData }>(
   `/product/${route.params.product}/${route.params.variation}`
 )
+
+if (!productData.value) {
+  showError({
+    statusCode: 404,
+  })
+}
+
 const product = computed(() => productData.value?.data.product)
 const variation = computed(() => productData.value?.data.variation)
 const gallery = computed(
@@ -137,7 +150,10 @@ setBreadcrumbs([
     label: `${product.value?.name} (${variation.value?.name})`,
     link: {
       name: 'ProductPage',
-      params: { product: product.value?.id, variation: variation.value?.id },
+      params: {
+        product: product.value?.slug,
+        variation: variation.value?.slug,
+      },
     },
   },
 ])

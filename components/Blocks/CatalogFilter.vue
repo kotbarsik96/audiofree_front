@@ -77,15 +77,15 @@ import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
 import type IFilterItem from '~/domain/product/types/IFilterItem'
 import type { IInjectFiltersData } from '~/domain/product/types/IInjectFiltersData'
 import {
-  CatalogInject,
   type IInjectCatalog,
 } from '~/domain/product/types/IInjectCtalog'
+import { CatalogInjection } from '~/enums/injections'
 
 const route = useRoute()
 const router = useRouter()
 
 const { fetchProducts, urlQuery, fetchingProducts } =
-  injectStrict<IInjectCatalog>(CatalogInject)
+  injectStrict<IInjectCatalog>(CatalogInjection)
 
 const disabledButtons = computed(
   () => fetchingProducts.value && typeof window !== 'undefined'

@@ -88,9 +88,9 @@ import TextareaField from '~/components/Blocks/FormElements/TextareaField.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import AFRating from '~/components/Blocks/AFRating.vue'
 import {
-  ReviewInjection,
   type IReviewInjection,
 } from '~/domain/reviews/types/IReviewInjection'
+import { ReviewInjection } from '~/enums/injections'
 
 const emit = defineEmits<{
   (e: 'update:isWriting', v: boolean): void
@@ -103,7 +103,7 @@ const { openSignupDialog, openLoginDialog } = useAuthStore()
 
 const {
   currentUserReview,
-  productId,
+  productSlug,
   isEditingReview,
   updateAllReviews,
   updateWritingReview,
@@ -146,7 +146,7 @@ async function onSubmit() {
     await $afFetch(`/product/rating`, {
       method: 'POST',
       body: {
-        product_id: productId.value,
+        product_slug: productSlug.value,
         rating_value: rating.value,
         pros: pros.value,
         cons: cons.value,

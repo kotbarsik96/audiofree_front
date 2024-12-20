@@ -68,8 +68,8 @@ const className = computed(() => [`--status-${props.data.status.value_slug}`])
 const linkToProduct = computed(() => ({
   name: 'ProductPage',
   params: {
-    product: props.data.id,
-    variation: props.data.first_variation.id,
+    product: props.data.slug,
+    variation: props.data.first_variation.slug,
   },
 }))
 

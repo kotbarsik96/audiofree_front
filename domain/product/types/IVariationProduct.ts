@@ -7,6 +7,8 @@ export default interface IVariationProduct {
   image: IImage | string
   product_name: string
   variation_name: string
+  product_slug: string
+  variation_slug: string
   full_name: string
   price: number
   current_price: number

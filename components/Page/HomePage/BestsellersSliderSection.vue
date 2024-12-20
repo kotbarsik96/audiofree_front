@@ -63,8 +63,8 @@ function linkToProduct(product: ICatalogProduct) {
   return {
     name: 'ProductPage',
     params: {
-      product: product.id,
-      variation: product.first_variation.id,
+      product: product.slug,
+      variation: product.first_variation.slug,
     },
   }
 }

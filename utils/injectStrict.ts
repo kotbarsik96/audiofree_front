@@ -9,5 +9,3 @@ export function injectStrict<T>(key: InjectionKey<T>, fallback?: T) {
 
   return resolved
 }
-
-export const TabTitleInjection = Symbol('tabTitleInjection')

@@ -43,9 +43,9 @@ import AFPagination from '~/components/Blocks/AFPagination.vue'
 import ProductCard from '~/components/Blocks/Cards/ProductCard.vue'
 import EmptyList from '~/components/Blocks/EmptyList.vue'
 import {
-  CatalogInject,
   type IInjectCatalog,
 } from '~/domain/product/types/IInjectCtalog'
+import { CatalogInjection } from '~/enums/injections';
 
 const route = useRoute()
 const currentPage = computed<number>(() => Number(route.query.page) || 0)
@@ -54,7 +54,7 @@ let lastPage = currentPage.value
 const el = ref<HTMLElement>()
 
 const { fetchingProducts, fetchProducts, productsData } =
-  injectStrict<IInjectCatalog>(CatalogInject)
+  injectStrict<IInjectCatalog>(CatalogInjection)
 const disabledPagination = computed(
   () => fetchingProducts.value && typeof window !== 'undefined'
 )

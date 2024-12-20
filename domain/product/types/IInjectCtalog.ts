@@ -7,5 +7,3 @@ export interface IInjectCatalog {
   productsData: Ref<IPagination<ICatalogProduct> | null>
   fetchProducts: () => Promise<void>
 }
-
-export const CatalogInject = Symbol('catalogInject')

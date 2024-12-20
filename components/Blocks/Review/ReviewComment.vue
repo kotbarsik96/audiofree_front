@@ -48,12 +48,12 @@ import AFRating from '~/components/Blocks/AFRating.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import {
   type IReviewInjection,
-  ReviewInjection,
 } from '~/domain/reviews/types/IReviewInjection'
+import { ReviewInjection } from '~/enums/injections';
 
 const props = defineProps<{
   review: IReview
-  productId?: number | string
+  productSlug?: number | string
   fromCurrentUser?: boolean
 }>()
 
@@ -69,7 +69,7 @@ const { addConfirm } = useConfirmation()
 const { addNotification } = useNotifications()
 
 async function removeReview() {
-  if (!props.productId) return
+  if (!props.productSlug) return
 
   const confirmed = await addConfirm({
     title: 'Вы уверены, что хотите удалить отзыв?',
@@ -82,7 +82,7 @@ async function removeReview() {
     await $afFetch('product/rating', {
       method: 'DELETE',
       params: {
-        product_id: props.productId,
+        product_slug: props.productSlug,
       },
       async onResponse({ response }) {
         if (response.ok) {

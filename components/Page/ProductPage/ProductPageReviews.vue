@@ -16,7 +16,7 @@
       <CurrentUserReview
         v-if="currentUserReview"
         :review="currentUserReview"
-        :productId="productId"
+        :productSlug="productSlug"
       />
       <TransitionGroup v-if="!noReviews" name="blur">
         <ReviewComment
@@ -24,7 +24,7 @@
           :key="comment.id"
           class="product-reviews__comment"
           :review="comment"
-          :productId="productId"
+          :productSlug="productSlug"
         />
       </TransitionGroup>
       <div v-if="isLoadingReviews" class="product-reviews__loading-more">
@@ -43,18 +43,17 @@ import ReviewComment from '~/components/Blocks/Review/ReviewComment.vue'
 import SmallPreloader from '~/components/Blocks/SmallPreloader.vue'
 import CurrentUserReview from '~/components/Blocks/Review/CurrentUserReview.vue'
 import type { IProductReview } from '~/domain/product/types/IProductData'
-import type IPagination from '~/dataAccess/api/IPagination'
 import {
-  ReviewInjection,
   type IReviewInjection,
 } from '~/domain/reviews/types/IReviewInjection'
+import { ReviewInjection } from '~/enums/injections'
 
 const { userId } = storeToRefs(useUserStore())
 const route = useRoute()
 
 const intersectionEl = ref<HTMLElement>()
 
-const productId = computed(() => route.params.product as string)
+const productSlug = computed(() => route.params.product as string)
 const page = ref(1)
 const isUpdatingReviews = ref(false)
 
@@ -66,7 +65,7 @@ const isEditingReview = computed(
 // подготовка запроса отзыва от текущего пользователя
 const { data: currentUserReviewData, execute: loadUserReview } = useAPI<{
   data: IProductReview | null
-}>(`/product/${productId.value}/user-review`, {
+}>(`/product/${productSlug.value}/user-review`, {
   watch: false,
   immediate: false,
 })
@@ -86,7 +85,7 @@ const [
 ] = await Promise.all([
   usePaginationLazyWrapper<IProductReview>(
     intersectionEl,
-    `/products/${productId.value}/reviews`,
+    `/products/${productSlug.value}/reviews`,
     {
       query: {
         page,
@@ -106,7 +105,7 @@ watch(userId, async () => {
 
 provide<IReviewInjection>(ReviewInjection, {
   currentUserReview,
-  productId,
+  productSlug,
   isWritingReview,
   isEditingReview,
   updateAllReviews,

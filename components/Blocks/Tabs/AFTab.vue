@@ -7,6 +7,8 @@
 </template>
 
 <script setup lang="ts">
+import { TabTitleInjection } from '~/enums/injections';
+
 const props = defineProps<{
   title: string
 }>()

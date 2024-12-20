@@ -3,6 +3,7 @@ import type { ProductStatuses } from '~/domain/product/types/ProductStatuses'
 
 export default interface ICatalogProduct {
   id: number
+  slug: string
   name: string
   image_id: number
   status_id: number
@@ -14,6 +15,7 @@ export default interface ICatalogProduct {
   first_variation: {
     id: number
     product_id: number
+    slug: string
   }
   status: {
     id: number

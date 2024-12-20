@@ -5,8 +5,8 @@
         <div v-show="error" class="error__container _container">
           <div class="error__code">{{ error?.statusCode }}</div>
           <div class="error__text">
-            <p v-if="error?.statusCode === 500">Что-то пошло не так</p>
-            <p v-else-if="error?.statusCode === 404">Страница не найдена</p>
+            <p v-if="error?.statusCode === ServerStatuses.SERVER_ERROR">Что-то пошло не так</p>
+            <p v-else-if="error?.statusCode === ServerStatuses.NOT_FOUND">Страница не найдена</p>
             <p>Вы можете перейти на главную страницу</p>
             <AFButton
               class="error__link"
@@ -24,6 +24,7 @@
 <script setup lang="ts">
 import type { NuxtError } from '#app'
 import AFButton from '~/components/Blocks/AFButton.vue'
+import { ServerStatuses } from '~/enums/ServerStatuses';
 
 const props = defineProps<{
   error: NuxtError
