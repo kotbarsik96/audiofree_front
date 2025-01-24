@@ -1,4 +1,5 @@
 import type { LocationQueryValue, RouteQueryAndHash } from 'vue-router'
+import { ServerStatuses } from '~/enums/ServerStatuses'
 
 export function delay(timeoutMs: number) {
   return new Promise((resolve) => {
@@ -109,4 +110,12 @@ export function mapErrors(
   mappers.forEach(([key, refVar]) => {
     if (errors[key]) refVar.value = errors[key][0]
   })
+}
+
+export function isResponseOk(status: number) {
+  return [
+    ServerStatuses.OK,
+    ServerStatuses.CREATED,
+    ServerStatuses.ACCEPTED,
+  ].includes(status)
 }
