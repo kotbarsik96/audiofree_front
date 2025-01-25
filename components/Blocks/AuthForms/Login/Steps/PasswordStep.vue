@@ -1,15 +1,8 @@
 <template>
   <form @submit.prevent="onSubmit">
-    <InputWrapper label="Код авторизации" inputId="code">
-      <TextInput
-        inputmode="numeric"
-        placeholder="______"
-        v-model="code"
-        id="code"
-        maxlength="6"
-      />
-      <template v-if="codeError" #error>{{ codeError }}</template>
-    </InputWrapper>
+    <PasswordInput v-model="password" label="Пароль">
+      <template v-if="passwordError">{{ passwordError }}</template>
+    </PasswordInput>
     <div class="_popup-buttons-column">
       <AFButton label="Войти" type="submit" :disabled="buttonDisabled" />
       <AFButton label="Назад" styleType="secondary" @click="goBack" />
@@ -19,24 +12,23 @@
 
 <script setup lang="ts">
 import AFButton from '~/components/Blocks/AFButton.vue'
-import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
-import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
+import PasswordInput from '~/components/Blocks/FormElements/PasswordInput.vue'
 import { Auth } from '~/domain/auth/Auth'
 import { LoginSteps } from '~/domain/auth/LoginSteps'
 
 const { login, loginStep } = storeToRefs(useAuthStore())
 
 const isLoading = ref(false)
-const code = ref('')
-const codeError = ref('')
+const password = ref('')
+const passwordError = ref('')
 
-const buttonDisabled = computed(() => !code.value || isLoading.value)
+const buttonDisabled = computed(() => !password.value || isLoading.value)
 
 async function onSubmit() {
   isLoading.value = true
 
   try {
-    Auth.login(login.value, 'code', code.value, codeError)
+    await Auth.login(login.value, 'password', password.value, passwordError)
   } catch (e) {
     console.error(e)
   }

@@ -1,19 +1,26 @@
 <template>
   <div class="login-form auth-form">
-    <Transition name="fade-in">
+    <Transition name="fade-in" mode="out-in">
       <component :is="component" />
     </Transition>
+    <div>
+      <button class="_link" type="button" @click="goToResetPassword">
+        Забыли пароль?
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { signupFormComponents } from '~/domain/auth/SignupSteps'
+import { loginFormComponents } from '~/domain/auth/LoginSteps'
 
-const { signupStep } = storeToRefs(useAuthStore())
+const { tab, loginStep } = storeToRefs(useAuthStore())
 
-const component = computed(() => {
-  signupFormComponents[signupStep.value]
-})
+const component = computed(() => loginFormComponents[loginStep.value])
+
+function goToResetPassword() {
+  tab.value = 'reset'
+}
 </script>
 
 <style lang="scss" scoped>

@@ -1,6 +1,6 @@
 <template>
   <div class="auth-form">
-    <Transition name="fade-in">
+    <Transition name="fade-in" mode="out-in">
       <component :is="component" />
     </Transition>
   </div>
@@ -11,9 +11,7 @@ import { signupFormComponents } from '~/domain/auth/SignupSteps'
 
 const { signupStep } = storeToRefs(useAuthStore())
 
-const component = computed(() => {
-  signupFormComponents[signupStep.value]
-})
+const component = computed(() => signupFormComponents[signupStep.value])
 </script>
 
 <style lang="scss" scoped>

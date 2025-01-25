@@ -1,11 +1,15 @@
 <template>
   <form @submit.prevent="onSubmit">
-    <InputWrapper>
-      <TextInput v-model="name" />
+    <InputWrapper label="Ваше имя" inputId="name">
+      <TextInput v-model="name" placeholder="Имя" id="name" />
       <template v-if="errorName" #error>{{ errorName }}</template>
     </InputWrapper>
-    <InputWrapper>
-      <TextInput v-model="login" />
+    <InputWrapper :label="`Логин (${signupLoginType})`" inputId="login">
+      <TextInput
+        v-model="login"
+        id="login"
+        :placeholder="`${signupLoginType}`"
+      />
       <template v-if="errorLogin" #error>{{ errorLogin }}</template>
     </InputWrapper>
     <p>
@@ -16,6 +20,7 @@
       class="auth-form__input"
       v-model="password"
       autocomplete="new-password"
+      placeholder="Пароль"
     >
       <template v-if="errorPassword" #error>
         {{ errorPassword }}
@@ -33,6 +38,7 @@
     </PasswordInput>
     <div class="_popup-buttons-column">
       <AFButton label="Регистрация" type="submit" :disabled="buttonDisabled" />
+      <AFButton label="Назад" styleType="secondary" @click="goBack" />
     </div>
   </form>
 </template>
@@ -44,9 +50,12 @@ import PasswordInput from '~/components/Blocks/FormElements/PasswordInput.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import type INuxtFetchResponse from '~/dataAccess/api/INuxtFetchResponse'
 import { isResponseOk } from '~/utils/general'
+import { SignupSteps } from '~/domain/auth/SignupSteps'
+import { LoginSteps } from '~/domain/auth/LoginSteps'
 
 const { $afFetch } = useNuxtApp()
-const { signupLoginType, dialogShown } = storeToRefs(useAuthStore())
+const { login, signupLoginType, dialogShown, signupStep, tab, loginStep } =
+  storeToRefs(useAuthStore())
 const { addNotification } = useNotifications()
 
 const isLoading = ref(false)
@@ -56,7 +65,6 @@ const { getUser } = userStore
 const { jwt } = storeToRefs(userStore)
 
 const name = ref('')
-const login = ref('')
 const password = ref('')
 const passwordConfirmation = ref('')
 
@@ -67,10 +75,7 @@ const errorPasswordConfirmation = ref('')
 
 const validateAll = useAllValidation([
   getLoginValidation(),
-  useValidation(password, errorPassword, [
-    passwordValidation(),
-    mustPresentValidation(),
-  ]),
+  useValidation(password, errorPassword, [passwordValidation()]),
   useValidation(passwordConfirmation, errorPasswordConfirmation, [
     passwordsMatchValidation(password),
   ]),
@@ -89,8 +94,9 @@ const authTypeText = computed(() => {
 const buttonDisabled = computed(
   () =>
     isLoading.value ||
+    !name.value ||
     !login.value ||
-    (!passwordConfirmation.value && password.value)
+    password.value !== passwordConfirmation.value
 )
 
 async function onSubmit() {
@@ -144,22 +150,16 @@ async function submitWithoutPassword() {
   await $afFetch('/signup', {
     method: 'POST',
     body,
-    async onResponse(response) {
-      if (isResponseOk(response.response.status)) requestLogin()
+    async onResponse({ response }) {
+      if (isResponseOk(response.status)) {
+        if (response._data.message)
+          addNotification('success', response._data.message)
+        tab.value = 'login'
+        loginStep.value = LoginSteps.ConfirmationCodeStep
+      }
     },
     onResponseError({ response }) {
       mapResponseErrors(response)
-    },
-  })
-}
-
-async function requestLogin() {
-  await $afFetch('/profile/request-login', {
-    method: 'POST',
-    onResponse(response) {
-      if (isResponseOk(response.response.status)) {
-        
-      }
     },
   })
 }
@@ -183,6 +183,10 @@ function mapResponseErrors(response: INuxtFetchResponse) {
     ['password', errorPassword],
     ['password_confirmation', errorPasswordConfirmation],
   ])
+}
+
+function goBack() {
+  signupStep.value = SignupSteps.ChooseLoginStep
 }
 </script>
 

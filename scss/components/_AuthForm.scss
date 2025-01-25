@@ -4,14 +4,17 @@
   align-items: center;
   gap: 20px;
 
+  :deep(form) {
+    width: 100%;
+    max-width: 470px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
   &__global-error {
     font-weight: 500;
     @include fontSize(16);
-  }
-
-  &__form {
-    width: 100%;
-    max-width: 470px;
   }
 
   &__inputs {
@@ -30,5 +33,6 @@
     flex-direction: column;
     gap: 10px;
     min-width: 200px;
+    width: 100%;
   }
 }
