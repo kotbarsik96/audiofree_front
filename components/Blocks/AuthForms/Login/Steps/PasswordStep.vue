@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="onSubmit">
     <PasswordInput v-model="password" label="Пароль">
-      <template v-if="passwordError">{{ passwordError }}</template>
+      <template v-if="passwordError" #error>{{ passwordError }}</template>
     </PasswordInput>
     <div class="_popup-buttons-column">
       <AFButton label="Войти" type="submit" :disabled="buttonDisabled" />
