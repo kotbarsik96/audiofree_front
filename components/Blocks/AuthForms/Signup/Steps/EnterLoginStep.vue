@@ -177,8 +177,8 @@ function getLoginValidation() {
 }
 
 function mapResponseErrors(response: INuxtFetchResponse) {
-  mapErrors(response._data.errors, [
-    [signupLoginType.value, errorLogin],
+  mapErrorsFromResponse(response, [
+    [signupLoginType.value.toLowerCase(), errorLogin],
     ['name', errorName],
     ['password', errorPassword],
     ['password_confirmation', errorPasswordConfirmation],

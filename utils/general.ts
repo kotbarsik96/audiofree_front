@@ -1,4 +1,5 @@
 import type { LocationQueryValue, RouteQueryAndHash } from 'vue-router'
+import type INuxtFetchResponse from '~/dataAccess/api/INuxtFetchResponse'
 import { ServerStatuses } from '~/enums/ServerStatuses'
 
 export function delay(timeoutMs: number) {
@@ -103,13 +104,31 @@ export function debugWarn(data: any, wrapperMessage?: string) {
 
 type IErrorMapper = [string, Ref]
 
-export function mapErrors(
-  errors: Record<string, string[]>,
+export function mapErrorsFromResponse(
+  response: INuxtFetchResponse,
   mappers: IErrorMapper[]
 ) {
-  mappers.forEach(([key, refVar]) => {
-    if (errors[key]) refVar.value = errors[key][0]
-  })
+  // если есть массив с ошибками - размапить их в mappers
+  if (response._data.errors) {
+    console.log(mappers);
+    mappers.forEach(([key, refVar]) => {
+      if (response._data.errors[key])
+        refVar.value = response._data.errors[key][0]
+    })
+  }
+  // если массива нет, но есть message
+  else if (response._data.message) {
+    // разместить ошибку в первый элемент mappers[0], если есть
+    if (mappers[0]) {
+      const [_, refVar] = mappers[0]
+      refVar.value = response._data.message
+    }
+    // если mappers[0] нет, то вывести ошибку в нотификацию
+    else {
+      const { addNotification } = useNotifications()
+      addNotification('error', response._data.message)
+    }
+  }
 }
 
 export function isResponseOk(status: number) {

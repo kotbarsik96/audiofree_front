@@ -32,6 +32,8 @@ const codeError = ref('')
 
 const buttonDisabled = computed(() => !code.value || isLoading.value)
 
+watch(code, () => (codeError.value = ''))
+
 async function onSubmit() {
   isLoading.value = true
 
