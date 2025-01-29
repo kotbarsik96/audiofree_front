@@ -49,6 +49,11 @@ button {
   &--text-color {
     color: var(--text-color);
   }
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
 }
 
 ._error {
@@ -126,6 +131,13 @@ button {
     padding: 0.75rem;
     box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.1);
   }
+}
+
+._popup-buttons-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 200px;
 }
 
 @each $h in 1, 2, 3, 4 {

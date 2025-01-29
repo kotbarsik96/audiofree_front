@@ -51,7 +51,7 @@ import AFButton from '~/components/Blocks/AFButton.vue'
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import MaskInput from '~/components/Blocks/FormElements/MaskInput.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
-import { mapErrors } from '~/utils/general'
+import { mapErrorsFromResponse } from '~/utils/general'
 
 const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
@@ -119,7 +119,7 @@ async function onSubmit() {
         }
       },
       onResponseError({ response }) {
-        mapErrors(response._data.errors, [
+        mapErrorsFromResponse(response, [
           ['name', usernameError],
           ['phone_number', phoneNumberError],
           ['house', houseError],

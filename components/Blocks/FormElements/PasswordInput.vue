@@ -1,5 +1,5 @@
 <template>
-  <InputWrapper class="password-input" :icon="KeyIcon" :label="label" :id="id">
+  <InputWrapper class="password-input" :icon="KeyIcon" :label="label" :inputId="id">
     <input
       class="input"
       :type="inputType"

@@ -82,7 +82,7 @@ async function onSubmit() {
         }
       },
       onResponseError({ response }) {
-        mapErrors(response._data.errors, [['email', newEmailError]])
+        mapErrorsFromResponse(response, [['email', newEmailError]])
       },
     })
   } catch (err) {}

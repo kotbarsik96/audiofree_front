@@ -1,16 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
-import type { authTabs } from '@/enums/auth/authTabs'
+import type { authTabs } from '~/domain/auth/authTabs'
+import { LoginSteps } from '~/domain/auth/LoginSteps'
+import { type loginTypes } from '~/domain/auth/loginTypes'
+import { SignupSteps } from '~/domain/auth/SignupSteps'
 
 export const useAuthStore = defineStore('auth', () => {
   const tab = ref<authTabs>('signup')
   const previousTab = ref<authTabs>('signup')
-  const name = ref('')
-  const email = ref('')
-  const password = ref('')
-  const passwordRepeat = ref('')
+  const login = ref('')
   const dialogShown = ref(false)
-  const isLoading = ref(false)
+  const signupStep = ref<SignupSteps>(SignupSteps.ChooseLoginStep)
+  const signupLoginType = ref<loginTypes>('Email')
+  const loginStep = ref<LoginSteps>(LoginSteps.EnterLoginStep)
 
   watch(tab, (_, prevValue) => (previousTab.value = prevValue))
 
@@ -26,18 +28,24 @@ export const useAuthStore = defineStore('auth', () => {
     tab.value = 'signup'
     dialogShown.value = true
   }
+  function closeDialogAndReset() {
+    dialogShown.value = false
+    login.value = ''
+    loginStep.value = LoginSteps.EnterLoginStep
+    signupStep.value = SignupSteps.ChooseLoginStep
+  }
 
   return {
     tab,
     previousTab,
-    name,
-    email,
-    password,
-    passwordRepeat,
+    login,
     dialogShown,
-    isLoading,
+    signupStep,
+    signupLoginType,
+    loginStep,
     goBack,
     openLoginDialog,
     openSignupDialog,
+    closeDialogAndReset,
   }
 })

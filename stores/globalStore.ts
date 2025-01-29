@@ -12,6 +12,7 @@ export const useGlobalStore = defineStore('global', () => {
 
   async function initApp() {
     await Promise.all([
+      userStore.loginIfHasQuery(),
       userStore.getUser(),
       productCollectionsStore.updateCollection(),
     ])

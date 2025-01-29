@@ -78,7 +78,7 @@ async function onSubmit() {
         }
       },
       onResponseError({ response }) {
-        mapErrors(response._data.errors, [
+        mapErrorsFromResponse(response, [
           ['current_password', oldPasswordError],
           ['password', newPasswordError],
         ])

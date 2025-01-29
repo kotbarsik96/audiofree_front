@@ -21,7 +21,7 @@
 .fade-in {
   &-enter-active,
   &-leave-active {
-    transition: var(--general-transition);
+    transition: 0.15s ease-in-out;
   }
 
   &-enter-from,
