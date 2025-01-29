@@ -3,9 +3,11 @@ import type { IProductCollections } from '~/domain/product/types/IProductCollect
 export const useProductCollectionsStore = defineStore(
   'productCollectionsStore',
   () => {
+    const { jwt } = useUserStore()
+
     const {
       data: collection,
-      execute: updateCollection,
+      execute: _updateCollection,
       status,
     } = useAPI<{ data: IProductCollections }>('/profile/products/collections', {
       method: 'GET',
@@ -22,6 +24,10 @@ export const useProductCollectionsStore = defineStore(
     const favoritesCount = computed(
       () => collection.value?.data.favorites.length || null
     )
+
+    function updateCollection() {
+      if (jwt) _updateCollection()
+    }
 
     return {
       collection,

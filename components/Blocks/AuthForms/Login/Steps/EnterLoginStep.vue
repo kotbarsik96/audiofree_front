@@ -44,7 +44,11 @@ async function onSubmit() {
         }
       },
       onResponseError({ response }) {
-        if (response._data.message) loginError.value = response._data.message
+        if (response._data.data?.has_code) {
+          toConfirmationCodeStep()
+        } else {
+          if (response._data.message) loginError.value = response._data.message
+        }
       },
     })
   } catch (e) {

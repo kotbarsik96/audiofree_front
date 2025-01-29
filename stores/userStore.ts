@@ -8,6 +8,7 @@ import { ServerStatuses } from '~/enums/ServerStatuses'
 export const useUserStore = defineStore('user', () => {
   const { addNotification } = useNotifications()
   const route = useRoute()
+  const router = useRouter()
 
   const jwt = useCookie(AppKeys.JWT)
   const { $afFetch } = useNuxtApp()
@@ -64,6 +65,31 @@ export const useUserStore = defineStore('user', () => {
       if (!isLoadingUser.value) navigateTo({ name: 'HomePage' })
     }
   }
+  async function loginIfHasQuery() {
+    const { login, code } = route.query
+
+    if (login && code) {
+      router.replace({ name: 'HomePage' })
+
+      try {
+        await $afFetch('/login', {
+          method: 'POST',
+          body: {
+            login: route.query.login,
+            code: route.query.code,
+          },
+          async onResponse({ response }) {
+            if (isResponseOk(response.status) && response._data.data.token) {
+              updateJwt(response._data.data.token)
+              await getUser()
+            }
+          },
+        })
+      } catch (err) {
+        console.error(err)
+      }
+    }
+  }
 
   return {
     jwt,
@@ -73,5 +99,6 @@ export const useUserStore = defineStore('user', () => {
     getUser,
     logout,
     updateJwt,
+    loginIfHasQuery,
   }
 })
