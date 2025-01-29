@@ -38,7 +38,7 @@
     </PasswordInput>
     <div class="_popup-buttons-column">
       <AFButton label="Регистрация" type="submit" :disabled="buttonDisabled" />
-      <AFButton label="Назад" styleType="secondary" @click="goBack" />
+      <AFButton label="Другой способ входа" styleType="secondary" @click="goBack" />
     </div>
   </form>
 </template>

@@ -46,7 +46,7 @@ const route = useRoute()
 const router = useRouter()
 const { addNotification } = useNotifications()
 
-const { code, email } = route.query
+const { code, login } = route.query
 const password = ref('')
 const passwordRepeat = ref('')
 const passwordError = ref('')
@@ -74,10 +74,7 @@ async function checkLink() {
   try {
     await $afFetch('/profile/reset-password/verify-link', {
       method: 'POST',
-      body: {
-        email: email,
-        code: code,
-      },
+      body: { login, code },
       onResponse({ response }) {
         if (!response.ok) {
           router.push({ name: 'HomePage' })
@@ -99,7 +96,7 @@ async function onSubmit() {
       method: 'POST',
       body: {
         code: code as string,
-        email: email as string,
+        login: login as string,
         password: password.value,
         password_confirmation: passwordRepeat.value,
       },

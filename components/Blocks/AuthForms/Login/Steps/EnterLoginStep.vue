@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="onSubmit">
-    <InputWrapper label="Логин (email, telegram)">
-      <TextInput v-model="login" />
+    <InputWrapper :label="`Логин (${possibleLogins.join(', ')})`" inputId="login">
+      <TextInput v-model="login" id="login" placeholder="Логин" />
       <template v-if="loginError" #error>{{ loginError }}</template>
     </InputWrapper>
     <div class="_popup-buttons-column">
@@ -15,6 +15,7 @@ import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import { LoginSteps } from '~/domain/auth/LoginSteps'
+import { possibleLogins } from '~/domain/auth/loginTypes'
 
 const { loginStep, login } = storeToRefs(useAuthStore())
 const { $afFetch } = useNuxtApp()

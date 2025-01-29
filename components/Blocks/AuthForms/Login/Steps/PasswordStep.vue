@@ -4,8 +4,16 @@
       <template v-if="passwordError" #error>{{ passwordError }}</template>
     </PasswordInput>
     <div class="_popup-buttons-column">
+      <button
+        class="_link"
+        type="button"
+        @click="toConfirmationStep"
+        :disabled="isLoading"
+      >
+        Выслать код авторизации
+      </button>
       <AFButton label="Войти" type="submit" :disabled="buttonDisabled" />
-      <AFButton label="Назад" styleType="secondary" @click="goBack" />
+      <AFButton label="Изменить логин" styleType="secondary" @click="goBack" />
     </div>
   </form>
 </template>
@@ -17,6 +25,8 @@ import { Auth } from '~/domain/auth/Auth'
 import { LoginSteps } from '~/domain/auth/LoginSteps'
 
 const { login, loginStep } = storeToRefs(useAuthStore())
+const { $afFetch } = useNuxtApp()
+const { addNotification } = useNotifications()
 
 const isLoading = ref(false)
 const password = ref('')
@@ -38,6 +48,33 @@ async function onSubmit() {
 
 function goBack() {
   loginStep.value = LoginSteps.EnterLoginStep
+}
+
+async function toConfirmationStep() {
+  isLoading.value = true
+
+  try {
+    await $afFetch('/profile/request-login', {
+      method: 'POST',
+      body: {
+        login: login.value,
+        code_required: true,
+      },
+      onResponse({ response }) {
+        if (isResponseOk(response.status)) {
+          loginStep.value = LoginSteps.ConfirmationCodeStep
+        }
+      },
+      onResponseError({ response }) {
+        if (response._data.message)
+          addNotification('error', response._data.message)
+      },
+    })
+  } catch (err) {
+    console.error(err)
+  }
+
+  isLoading.value = false
 }
 </script>
 

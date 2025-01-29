@@ -12,7 +12,7 @@
     </InputWrapper>
     <div class="_popup-buttons-column">
       <AFButton label="Войти" type="submit" :disabled="buttonDisabled" />
-      <AFButton label="Назад" styleType="secondary" @click="goBack" />
+      <AFButton label="Изменить логин" styleType="secondary" @click="goBack" />
     </div>
   </form>
 </template>

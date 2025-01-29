@@ -66,17 +66,17 @@ export const useUserStore = defineStore('user', () => {
     }
   }
   async function loginIfHasQuery() {
-    const { login, code } = route.query
+    const { auth_login, auth_code } = route.query
 
-    if (login && code) {
+    if (auth_login && auth_code) {
       router.replace({ name: 'HomePage' })
 
       try {
         await $afFetch('/login', {
           method: 'POST',
           body: {
-            login: route.query.login,
-            code: route.query.code,
+            login: auth_login,
+            code: auth_code,
           },
           async onResponse({ response }) {
             if (isResponseOk(response.status) && response._data.data.token) {

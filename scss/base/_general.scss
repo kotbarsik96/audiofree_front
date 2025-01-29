@@ -49,6 +49,11 @@ button {
   &--text-color {
     color: var(--text-color);
   }
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
 }
 
 ._error {

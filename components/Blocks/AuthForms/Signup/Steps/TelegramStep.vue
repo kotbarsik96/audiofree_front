@@ -10,7 +10,7 @@
     </div>
     <div class="_popup-buttons-column">
       <AFButton label="Войти" @click="goToAuth" />
-      <AFButton label="Назад" styleType="secondary" @click="goBack" />
+      <AFButton label="Другой способ входа" styleType="secondary" @click="goBack" />
     </div>
   </div>
 </template>
