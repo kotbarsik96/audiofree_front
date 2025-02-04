@@ -1,14 +1,9 @@
+import { useRouteQuery } from '@vueuse/router'
 import ArrowUpIcon from '~/assets/images/icons/arrow-up.svg'
 import type { SortOrders } from '~/enums/SortOrders'
 import type ISelectOption from '~/interfaces/components/ISelectOption'
 
-export function useSorts(
-  sortData: Ref<{ data: ISelectOption[] } | null>,
-  sortChangeCallback?: Function
-) {
-  const router = useRouter()
-  const route = useRoute()
-
+export function useSorts(sortData: Ref<{ data: ISelectOption[] } | null>) {
   const options = computed(() => {
     const arr: ISelectOption[] = []
     sortData.value?.data.forEach((item) => {
@@ -34,22 +29,8 @@ export function useSorts(
     },
   ]
 
-  const sort = ref(
-    (route.query.sort as string) || (options.value?.[0]?.value as string)
-  )
-  const sortOrder = ref<SortOrders>(
-    (route.query.sort_order as SortOrders) || 'asc'
-  )
-
-  watch(sort, onSortChange)
-  watch(sortOrder, onSortChange)
-
-  async function onSortChange() {
-    await router.push({
-      query: { ...route.query, sort: sort.value, sort_order: sortOrder.value },
-    })
-    if (typeof sortChangeCallback === 'function') sortChangeCallback()
-  }
+  const sort = useRouteQuery('sort', options.value?.[0]?.value)
+  const sortOrder = useRouteQuery('sort_order', 'asc')
 
   return {
     options,

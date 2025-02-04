@@ -1,6 +1,6 @@
 <template>
   <ul class="cf-checkboxes">
-    <li v-for="item in filtersData.filters.value[slug].values" class="cf-checkboxes__item">
+    <li v-for="item in values" class="cf-checkboxes__item">
       <AFCheckbox
         v-if="type === 'checkbox'"
         :value="item.value_slug"
@@ -18,20 +18,27 @@
 
 <script setup lang="ts">
 import AFCheckbox from '~/components/Blocks/FormElements/AFCheckbox.vue'
-import type { IInjectFiltersData } from '~/domain/product/types/IInjectFiltersData'
+import type { IFilterItemValue } from '~/domain/product/types/IFilterItem'
 
 const props = defineProps<{
   slug: string
   type: 'checkbox' | 'checkbox_boolean'
-  filtersData: IInjectFiltersData
+  values: Array<IFilterItemValue>
+  modelValue: Array<string> | boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: Array<string> | boolean | null): void
 }>()
 
 const state = computed({
   get() {
-    return props.filtersData.filterValues.value[props.slug]
+    return props.modelValue
   },
   set(v) {
-    props.filtersData.updateFilters(props.slug, v)
+    if (v === false) emit('update:modelValue', null)
+    else if (v === true) emit('update:modelValue', true)
+    else emit('update:modelValue', v)
   },
 })
 </script>

@@ -21,7 +21,7 @@
         Вы запросили подтверждение адреса эл. почты. Вам было выслано письмо с
         ссылкой для подтверждения
       </span>
-      <AFButton v-else label="Подтвердить адрес" @click="verifyEmail" />
+      <AFButton v-else-if="!emailVerified" label="Подтвердить адрес" @click="verifyEmail" />
     </div>
     <form @submit.prevent="onSubmit">
       <div class="section-form__inputs">
