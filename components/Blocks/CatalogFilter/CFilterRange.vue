@@ -1,26 +1,31 @@
 <template>
-  <div v-if="!!filtersData.filterValues.value[slug]" class="cf-range">
+  <div class="cf-range">
     <div class="cf-range__inputs">
       <NumberInput
         class="cf-range__input"
-        :min="Math.floor(filtersData.filters.value[slug].min || 0)"
+        :min="min"
         :maxFractionDigits="2"
-        :max="filtersData.filterValues.value[slug].max"
+        :max="stateMax"
         v-model="stateMin"
         lazy
       />
       <div class="cf-range__inputs-delimeter">–</div>
       <NumberInput
         class="cf-range__input"
-        :min="filtersData.filterValues.value[slug].min"
+        :min="stateMin"
         :maxFractionDigits="2"
-        :max="Math.floor(filtersData.filters.value[slug].max || 0)"
+        :max="max"
         v-model="stateMax"
         lazy
       />
     </div>
     <div class="cf-range__range">
-      <InputRangeDouble v-model="state" :min="min" :max="max" />
+      <InputRangeDouble
+        v-model:valueMin="stateMin"
+        v-model:valueMax="stateMax"
+        :min="min"
+        :max="max"
+      />
     </div>
   </div>
 </template>
@@ -28,44 +33,36 @@
 <script setup lang="ts">
 import NumberInput from '~/components/Blocks/FormElements/NumberInput.vue'
 import InputRangeDouble from '~/components/Blocks/InputRangeDouble.vue'
-import type { IInjectFiltersData } from '~/domain/product/types/IInjectFiltersData'
 
 const props = defineProps<{
   slug: string
-  filtersData: IInjectFiltersData
+  min: number
+  max: number
+  valueMin: number
+  valueMax: number
 }>()
 
-const state = computed({
-  get() {
-    return props.filtersData.filterValues.value[props.slug]
-  },
-  set(v) {
-    props.filtersData.updateFilters(props.slug, v)
-  },
-})
+const emit = defineEmits<{
+  (e: 'update:valueMin', value: number): void
+  (e: 'update:valueMax', value: number): void
+}>()
+
 const stateMin = computed({
   get() {
-    return state.value[0]
+    return props.valueMin
   },
   set(v) {
-    props.filtersData.updateFilters(props.slug, [v, stateMax.value])
+    emit('update:valueMin', v)
   },
 })
 const stateMax = computed({
   get() {
-    return state.value[1]
+    return props.valueMax
   },
   set(v) {
-    props.filtersData.updateFilters(props.slug, [stateMin.value, v])
+    emit('update:valueMax', v)
   },
 })
-
-const min = computed(() =>
-  Math.floor(props.filtersData.filters.value[props.slug].min as number)
-)
-const max = computed(() =>
-  Math.floor(props.filtersData.filters.value[props.slug].max as number)
-)
 </script>
 
 <style lang="scss" scoped>

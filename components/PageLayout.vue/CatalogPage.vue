@@ -48,8 +48,7 @@ function onLoadingStateUpdate(value: boolean) {
   isFetchingProducts.value = value
 }
 function refetchProducts(){
-  console.log(catalogBodyComponent.value?.$.exposed.b);
-  catalogBodyComponent.value?.fetchProducts()
+  catalogBodyComponent.value?.refetchProducts()
 }
 </script>
 

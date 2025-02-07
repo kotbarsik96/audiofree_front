@@ -54,6 +54,10 @@ const route = useRoute()
 
 const urlQuery = computed(() => route.query)
 
+defineExpose({
+  refetchProducts
+})
+
 const {
   data: productsData,
   execute: fetchProducts,
@@ -82,13 +86,12 @@ watch(isFetchingProducts, (value) => {
   emit('updateLoadingState', value)
 })
 
-defineExpose({
-  fetchProducts
-})
-
 async function onPageChange() {
   await fetchProducts()
   if (el.value) el.value.scrollIntoView()
+}
+async function refetchProducts(){
+  await fetchProducts();
 }
 </script>
 
