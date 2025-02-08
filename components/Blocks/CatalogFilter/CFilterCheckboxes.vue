@@ -17,6 +17,7 @@
 </template>
 
 <script setup lang="ts">
+import { useRouteQuery } from '@vueuse/router'
 import AFCheckbox from '~/components/Blocks/FormElements/AFCheckbox.vue'
 import type { IFilterItemValue } from '~/domain/product/types/IFilterItem'
 
@@ -24,23 +25,37 @@ const props = defineProps<{
   slug: string
   type: 'checkbox' | 'checkbox_boolean'
   values: Array<IFilterItemValue>
-  modelValue: Array<string> | boolean
+  isDependant?: boolean
 }>()
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: Array<string> | boolean | null): void
-}>()
-
-const state = computed({
-  get() {
-    return props.modelValue
-  },
-  set(v) {
-    if (v === false) emit('update:modelValue', null)
-    else if (v === true) emit('update:modelValue', true)
-    else emit('update:modelValue', v)
-  },
+defineExpose({
+  reset,
+  isDependant: props.isDependant,
 })
+
+let state: Ref<any>
+if (props.type === 'checkbox') state = useRouteQuery(props.slug, [])
+if (props.type === 'checkbox_boolean') {
+  state = useRouteQuery<any>(props.slug, null, {
+    transform: {
+      get(value) {
+        if (value === 'false' || !value) return null
+        return true
+      },
+      set(value) {
+        if (!value) return null
+        return value
+      },
+    },
+  })
+}
+
+async function reset() {
+  console.log('resetting checkbox');
+  if (props.type === 'checkbox') state.value = []
+  if (props.type === 'checkbox_boolean') state.value = null
+  await nextTick()
+}
 </script>
 
 <style lang="scss" scoped>

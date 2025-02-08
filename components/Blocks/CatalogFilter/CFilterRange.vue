@@ -31,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import { useRouteQuery } from '@vueuse/router'
 import NumberInput from '~/components/Blocks/FormElements/NumberInput.vue'
 import InputRangeDouble from '~/components/Blocks/InputRangeDouble.vue'
 
@@ -38,31 +39,58 @@ const props = defineProps<{
   slug: string
   min: number
   max: number
-  valueMin: number
-  valueMax: number
+  isDependant?: boolean
 }>()
 
-const emit = defineEmits<{
-  (e: 'update:valueMin', value: number): void
-  (e: 'update:valueMax', value: number): void
-}>()
+defineExpose({
+  reset,
+  isDependant: props.isDependant,
+})
 
-const stateMin = computed({
-  get() {
-    return props.valueMin
-  },
-  set(v) {
-    emit('update:valueMin', v)
-  },
-})
-const stateMax = computed({
-  get() {
-    return props.valueMax
-  },
-  set(v) {
-    emit('update:valueMax', v)
+const stateMin = useRouteQuery(`min_${props.slug}`, Math.floor(props.min), {
+  transform: {
+    get(val) {
+      if (typeof val === 'string') val = Number(val)
+      return val
+    },
+    set(val) {
+      if (typeof val === 'string') val = Number(val)
+      if (val < props.min) val = props.min
+      if (val > stateMax.value) val = stateMax.value
+      return val
+    },
   },
 })
+const stateMax = useRouteQuery(`max_${props.slug}`, Math.floor(props.max), {
+  transform: {
+    get(val) {
+      if (typeof val === 'string') val = Number(val)
+      return val
+    },
+    set(val) {
+      if (typeof val === 'string') val = Number(val)
+      if (val < stateMin.value) val = stateMin.value
+      if (val > props.max) val = props.max
+      return val
+    },
+  },
+})
+
+if (stateMin.value > stateMax.value) stateMin.value = props.min
+
+watch(() => [props.min, props.max], onFilterValuesUpdate)
+
+function onFilterValuesUpdate() {
+  if (stateMin.value < props.min) stateMin.value = props.min
+  if (stateMax.value > props.max) stateMax.value = props.max
+}
+
+async function reset() {
+  console.log('resetting range');
+  stateMin.value = props.min
+  stateMax.value = props.max
+  await nextTick()
+}
 </script>
 
 <style lang="scss" scoped>

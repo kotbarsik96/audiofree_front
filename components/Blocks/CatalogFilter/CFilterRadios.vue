@@ -7,27 +7,27 @@
 </template>
 
 <script setup lang="ts">
+import { useRouteQuery } from '@vueuse/router'
 import AFRadio from '~/components/Blocks/FormElements/AFRadio.vue'
 import type { IFilterItemValue } from '~/domain/product/types/IFilterItem'
 
 const props = defineProps<{
   slug: string
   values: Array<IFilterItemValue>
-  modelValue: string
+  isDependant?: boolean
 }>()
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-}>()
-
-const state = computed({
-  get() {
-    return props.modelValue
-  },
-  set(v) {
-    emit('update:modelValue', v)
-  },
+defineExpose({
+  reset,
+  isDependant: props.isDependant,
 })
+
+const state = useRouteQuery(props.slug, props.values[0]?.value_slug)
+
+async function reset() {
+  state.value = props.values[0]?.value_slug
+  await nextTick()
+}
 </script>
 
 <style lang="scss" scoped>

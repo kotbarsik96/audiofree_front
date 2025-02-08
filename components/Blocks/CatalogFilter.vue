@@ -29,19 +29,25 @@
                   "
                   :type="section.type"
                   :slug="section.slug"
+                  :isDependant="section.is_dependant"
                   :values="section.values"
-                  v-model="filterValues[section.slug]"
+                  ref="filterSectionEl"
                 />
-                <!-- <CFilterRadios
-                  v-else-if="section.type === 'radio'"
+                <CFilterRadios
+                  v-else-if="section.type === 'radio' && section.values"
                   :slug="section.slug"
-                  :filtersData="filtersInjectProps"
+                  :isDependant="section.is_dependant"
+                  :values="section.values"
+                  ref="filterSectionEl"
                 />
                 <CFilterRange
                   v-else-if="section.type === 'range'"
                   :slug="section.slug"
-                  :filtersData="filtersInjectProps"
-                /> -->
+                  :isDependant="section.is_dependant"
+                  :min="Math.floor(section.min ?? 0)"
+                  :max="Math.floor(section.max ?? 0)"
+                  ref="filterSectionEl"
+                />
               </div>
             </div>
           </div>
@@ -74,7 +80,6 @@ import CFilterRadios from '~/components/Blocks/CatalogFilter/CFilterRadios.vue'
 import FilterIcon from '~/assets/images/icons/filter.svg'
 import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
 import type IFilterItem from '~/domain/product/types/IFilterItem'
-import { useRouteQuery } from '@vueuse/router'
 
 const props = defineProps<{
   isFetchingProducts?: boolean
@@ -85,6 +90,14 @@ const emit = defineEmits<{
 }>()
 
 const route = useRoute()
+
+const filterSectionEl = ref<
+  Array<
+    InstanceType<
+      typeof CFilterCheckboxes | typeof CFilterRadios | typeof CFilterRange
+    >
+  >
+>([])
 
 const urlQuery = computed(() => route.query)
 
@@ -101,59 +114,56 @@ const className = computed(() => ({
   shown: mobileShown.value,
 }))
 
-const { data: filtersData } = await useAPI<{ data: IFilterItem[] }>(
-  '/products/catalog/filters',
-  {
-    method: 'GET',
-    query: urlQuery,
-  }
-)
+const {
+  data: filtersData,
+  refresh: refetchFilters,
+  status,
+} = await useAPI<{
+  data: IFilterItem[]
+}>('/products/catalog/filters', {
+  method: 'GET',
+  query: urlQuery,
+  watch: false,
+})
+const pending = computed(() => status.value === 'pending')
 const filters = computed(() => filtersData.value?.data || [])
 
-const filterValues = ref<Record<string, any>>({})
-mapFiltersToValues()
+const { refresh: refetchFiltersDelayed } = useDelayedCallback(250, () => {
+  if (!pending.value) refetchFilters()
+})
 
 watch(mobileShown, () => {
   if (mobileShown.value)
     bodyMobileHeight.value = `${bodyEl.value?.scrollHeight || 0}px`
   else bodyMobileHeight.value = '0px'
 })
+watch(urlQuery, () => refetchFiltersDelayed())
 
 function toggleShown() {
   mobileShown.value = !mobileShown.value
 }
-function mapFiltersToValues() {
-  filters.value.forEach((filter) => {
-    switch (filter.type) {
-      case 'checkbox':
-        filterValues.value[filter.slug] = useRouteQuery(filter.slug, [])
-        break
-      case 'checkbox_boolean':
-        filterValues.value[filter.slug] = useRouteQuery(filter.slug, null, {
-          transform: Boolean,
-        })
-        break
-      case 'radio':
-        filterValues.value[filter.slug] = useRouteQuery(
-          filter.slug,
-          filter.values?.at(0)?.value
-        )
-        break
-      case 'range':
-        let min = filter.min?.toString() || '0'
-        let max = filter.max?.toString() || '0'
-        filterValues.value[filter.slug] = useRouteQuery(filter.slug, [min, max])
-        break
-    }
-  })
-}
 function refetchProducts() {
   emit('refetchProducts')
 }
-function clearFilter() {
-  for (let key in filterValues.value) {
-    // const type = filters.value.find(item => )
-  }
+async function clearFilter() {
+  /** фильтры, независимые от значений в других фильтрах. Обновляются первыми */
+  const independantGroup: Array<Promise<void>> = []
+  /** фильтры, зависимые от значений в других фильтрах. Должны обновляться после independantGroup */
+  const dependantGroup: Array<Promise<void>> = []
+  /** разбить сбросы фильтров на независящие и зависящие */
+  filterSectionEl.value.forEach((component) => {
+    if (typeof component.reset === 'function') {
+      if (component.isDependant) dependantGroup.push(component.reset())
+      else independantGroup.push(component.reset())
+    }
+  })
+
+  await Promise.all(independantGroup)
+
+  await refetchFilters()
+  await nextTick()
+
+  await Promise.all(dependantGroup)
   refetchProducts()
 }
 </script>
