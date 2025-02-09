@@ -1,32 +1,35 @@
 <template>
   <div class="cf-range">
-    <div class="cf-range__inputs">
-      <NumberInput
-        class="cf-range__input"
-        :min="min"
-        :maxFractionDigits="2"
-        :max="stateMax"
-        v-model="stateMin"
-        lazy
-      />
-      <div class="cf-range__inputs-delimeter">–</div>
-      <NumberInput
-        class="cf-range__input"
-        :min="stateMin"
-        :maxFractionDigits="2"
-        :max="max"
-        v-model="stateMax"
-        lazy
-      />
-    </div>
-    <div class="cf-range__range">
-      <InputRangeDouble
-        v-model:valueMin="stateMin"
-        v-model:valueMax="stateMax"
-        :min="min"
-        :max="max"
-      />
-    </div>
+    <template v-if="min < max">
+      <div class="cf-range__inputs">
+        <NumberInput
+          class="cf-range__input"
+          :min="min"
+          :maxFractionDigits="2"
+          :max="stateMax"
+          v-model="stateMin"
+          lazy
+        />
+        <div class="cf-range__inputs-delimeter">–</div>
+        <NumberInput
+          class="cf-range__input"
+          :min="stateMin"
+          :maxFractionDigits="2"
+          :max="max"
+          v-model="stateMax"
+          lazy
+        />
+      </div>
+      <div class="cf-range__range">
+        <InputRangeDouble
+          v-model:valueMin="stateMin"
+          v-model:valueMax="stateMax"
+          :min="min"
+          :max="max"
+        />
+      </div>
+    </template>
+    <div class="cf-range__unavailable" v-else>Выбор недоступен для данных фильтров</div>
   </div>
 </template>
 
@@ -40,6 +43,7 @@ const props = defineProps<{
   min: number
   max: number
   isDependant?: boolean
+  resetTimeout: number
 }>()
 
 defineExpose({
@@ -83,13 +87,17 @@ watch(() => [props.min, props.max], onFilterValuesUpdate)
 function onFilterValuesUpdate() {
   if (stateMin.value < props.min) stateMin.value = props.min
   if (stateMax.value > props.max) stateMax.value = props.max
+  if (stateMin.value > stateMax.value) stateMin.value = stateMax.value
 }
 
-async function reset() {
-  console.log('resetting range');
-  stateMin.value = props.min
-  stateMax.value = props.max
-  await nextTick()
+function reset() {
+  return new Promise<void>((resolve) => {
+    stateMin.value = props.min
+    stateMax.value = props.max
+    nextTick().then(() => {
+      setTimeout(resolve, props.resetTimeout)
+    })
+  })
 }
 </script>
 
@@ -113,6 +121,11 @@ async function reset() {
 
   &__range {
     width: 100%;
+  }
+
+  &__unavailable {
+    font-weight: 500;
+    @include fontSize(16);
   }
 }
 </style>

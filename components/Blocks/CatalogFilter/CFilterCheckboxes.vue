@@ -26,6 +26,7 @@ const props = defineProps<{
   type: 'checkbox' | 'checkbox_boolean'
   values: Array<IFilterItemValue>
   isDependant?: boolean
+  resetTimeout?: number
 }>()
 
 defineExpose({
@@ -34,7 +35,22 @@ defineExpose({
 })
 
 let state: Ref<any>
-if (props.type === 'checkbox') state = useRouteQuery(props.slug, [])
+if (props.type === 'checkbox') {
+  state = useRouteQuery(props.slug, [], {
+    transform: {
+      get(val) {
+        if (typeof val === 'string') return [val]
+        if (!val) return []
+        return val
+      },
+      set(val) {
+        if (typeof val === 'string') return [val]
+        if (!val) return []
+        return val
+      },
+    },
+  })
+}
 if (props.type === 'checkbox_boolean') {
   state = useRouteQuery<any>(props.slug, null, {
     transform: {
@@ -50,11 +66,14 @@ if (props.type === 'checkbox_boolean') {
   })
 }
 
-async function reset() {
-  console.log('resetting checkbox');
-  if (props.type === 'checkbox') state.value = []
-  if (props.type === 'checkbox_boolean') state.value = null
-  await nextTick()
+function reset() {
+  return new Promise<void>((resolve) => {
+    if (props.type === 'checkbox') state.value = []
+    if (props.type === 'checkbox_boolean') state.value = null
+    nextTick().then(() => {
+      setTimeout(resolve, props.resetTimeout)
+    })
+  })
 }
 </script>
 

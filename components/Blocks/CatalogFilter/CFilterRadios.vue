@@ -15,6 +15,7 @@ const props = defineProps<{
   slug: string
   values: Array<IFilterItemValue>
   isDependant?: boolean
+  resetTimeout: number
 }>()
 
 defineExpose({
@@ -24,9 +25,13 @@ defineExpose({
 
 const state = useRouteQuery(props.slug, props.values[0]?.value_slug)
 
-async function reset() {
-  state.value = props.values[0]?.value_slug
-  await nextTick()
+function reset() {
+  return new Promise<void>((resolve) => {
+    state.value = props.values[0]?.value_slug
+    nextTick().then(() => {
+      setTimeout(resolve, props.resetTimeout)
+    })
+  })
 }
 </script>
 
