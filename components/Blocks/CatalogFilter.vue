@@ -30,7 +30,6 @@
                   :type="section.type"
                   :slug="section.slug"
                   :isDependant="section.is_dependant"
-                  :resetTimeout="resetTimeout"
                   :values="section.values"
                   ref="filterSectionEl"
                 />
@@ -38,7 +37,6 @@
                   v-else-if="section.type === 'radio' && section.values"
                   :slug="section.slug"
                   :isDependant="section.is_dependant"
-                  :resetTimeout="resetTimeout"
                   :values="section.values"
                   ref="filterSectionEl"
                 />
@@ -48,7 +46,6 @@
                   :isDependant="section.is_dependant"
                   :min="Math.floor(section.min ?? 0)"
                   :max="Math.floor(section.max ?? 0)"
-                  :resetTimeout="resetTimeout"
                   ref="filterSectionEl"
                 />
               </div>
@@ -83,6 +80,7 @@ import CFilterRadios from '~/components/Blocks/CatalogFilter/CFilterRadios.vue'
 import FilterIcon from '~/assets/images/icons/filter.svg'
 import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
 import type IFilterItem from '~/domain/product/types/IFilterItem'
+import { FilterRangePrefixes } from '~/domain/product/types/FilterRangePrefixes'
 
 const props = defineProps<{
   isFetchingProducts?: boolean
@@ -116,7 +114,6 @@ const bodyEl = ref<HTMLElement>()
 
 const mobileShown = ref(false)
 const bodyMobileHeight = ref('0px')
-const resetTimeout = 250
 
 const className = computed(() => ({
   shown: mobileShown.value,
@@ -158,25 +155,11 @@ async function clearFilter() {
   isResettingFilters.value = true
 
   try {
-    /** фильтры, независимые от значений в других фильтрах. Обновляются первыми */
-    const independantGroup: Array<() => Promise<void>> = []
-    /** фильтры, зависимые от значений в других фильтрах. Должны обновляться после independantGroup */
-    const dependantGroup: Array<() => Promise<void>> = []
-    /** разбить сбросы фильтров на независящие и зависящие */
-    filterSectionEl.value.forEach((component) => {
-      if (typeof component.reset === 'function') {
-        if (component.isDependant) dependantGroup.push(component.reset)
-        else independantGroup.push(component.reset)
-      }
-    })
-
-    await Promise.all(independantGroup.map((func) => func()))
-
+    await clearRouteQuery()
     await refetchFilters()
-    await nextTick()
-
-    await Promise.all(dependantGroup.map((func) => func()))
-    clearRouteQuery()
+    filterSectionEl.value.forEach((component) => {
+      if (typeof component.reset === 'function') component.reset()
+    })
     refetchProducts()
   } catch (err) {
     console.error(err)
@@ -184,15 +167,19 @@ async function clearFilter() {
 
   isResettingFilters.value = false
 }
-function clearRouteQuery() {
+async function clearRouteQuery() {
   const clearedQuery = { ...route.query }
   const slugs = filters.value.map((section) => section.slug)
   for (let key in clearedQuery) {
     let _key = key
-    if (_key.startsWith('min_') || _key.startsWith('max_')) _key = _key.slice(3)
+    const isRangePrefix =
+      _key.startsWith(FilterRangePrefixes.MIN) ||
+      _key.startsWith(FilterRangePrefixes.MAX)
+    if (isRangePrefix) _key = _key.slice(4)
+
     if (slugs.includes(_key)) delete clearedQuery[key]
   }
-  router.replace({ name: route.name, query: clearedQuery })
+  await router.replace({ name: route.name, query: clearedQuery })
 }
 </script>
 

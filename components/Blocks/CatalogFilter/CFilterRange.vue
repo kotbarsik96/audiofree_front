@@ -29,7 +29,9 @@
         />
       </div>
     </template>
-    <div class="cf-range__unavailable" v-else>Выбор недоступен для данных фильтров</div>
+    <div class="cf-range__unavailable" v-else>
+      Выбор недоступен для данных фильтров
+    </div>
   </div>
 </template>
 
@@ -37,48 +39,54 @@
 import { useRouteQuery } from '@vueuse/router'
 import NumberInput from '~/components/Blocks/FormElements/NumberInput.vue'
 import InputRangeDouble from '~/components/Blocks/InputRangeDouble.vue'
+import { FilterRangePrefixes } from '~/domain/product/types/FilterRangePrefixes'
 
 const props = defineProps<{
   slug: string
   min: number
   max: number
-  isDependant?: boolean
-  resetTimeout: number
 }>()
 
 defineExpose({
   reset,
-  isDependant: props.isDependant,
 })
 
-const stateMin = useRouteQuery(`min_${props.slug}`, Math.floor(props.min), {
-  transform: {
-    get(val) {
-      if (typeof val === 'string') val = Number(val)
-      return val
+const stateMin = useRouteQuery(
+  `${FilterRangePrefixes.MIN}${props.slug}`,
+  Math.floor(props.min),
+  {
+    transform: {
+      get(val) {
+        if (typeof val === 'string') val = Number(val)
+        return val
+      },
+      set(val) {
+        if (typeof val === 'string') val = Number(val)
+        if (val < props.min) val = props.min
+        if (val > stateMax.value) val = stateMax.value
+        return val
+      },
     },
-    set(val) {
-      if (typeof val === 'string') val = Number(val)
-      if (val < props.min) val = props.min
-      if (val > stateMax.value) val = stateMax.value
-      return val
+  }
+)
+const stateMax = useRouteQuery(
+  `${FilterRangePrefixes.MAX}${props.slug}`,
+  Math.floor(props.max),
+  {
+    transform: {
+      get(val) {
+        if (typeof val === 'string') val = Number(val)
+        return val
+      },
+      set(val) {
+        if (typeof val === 'string') val = Number(val)
+        if (val < stateMin.value) val = stateMin.value
+        if (val > props.max) val = props.max
+        return val
+      },
     },
-  },
-})
-const stateMax = useRouteQuery(`max_${props.slug}`, Math.floor(props.max), {
-  transform: {
-    get(val) {
-      if (typeof val === 'string') val = Number(val)
-      return val
-    },
-    set(val) {
-      if (typeof val === 'string') val = Number(val)
-      if (val < stateMin.value) val = stateMin.value
-      if (val > props.max) val = props.max
-      return val
-    },
-  },
-})
+  }
+)
 
 if (stateMin.value > stateMax.value) stateMin.value = props.min
 
@@ -91,13 +99,8 @@ function onFilterValuesUpdate() {
 }
 
 function reset() {
-  return new Promise<void>((resolve) => {
-    stateMin.value = props.min
-    stateMax.value = props.max
-    nextTick().then(() => {
-      setTimeout(resolve, props.resetTimeout)
-    })
-  })
+  stateMin.value = props.min
+  stateMax.value = props.max
 }
 </script>
 

@@ -14,24 +14,16 @@ import type { IFilterItemValue } from '~/domain/product/types/IFilterItem'
 const props = defineProps<{
   slug: string
   values: Array<IFilterItemValue>
-  isDependant?: boolean
-  resetTimeout: number
 }>()
 
 defineExpose({
   reset,
-  isDependant: props.isDependant,
 })
 
 const state = useRouteQuery(props.slug, props.values[0]?.value_slug)
 
 function reset() {
-  return new Promise<void>((resolve) => {
-    state.value = props.values[0]?.value_slug
-    nextTick().then(() => {
-      setTimeout(resolve, props.resetTimeout)
-    })
-  })
+  state.value = props.values[0]?.value_slug
 }
 </script>
 

@@ -25,13 +25,10 @@ const props = defineProps<{
   slug: string
   type: 'checkbox' | 'checkbox_boolean'
   values: Array<IFilterItemValue>
-  isDependant?: boolean
-  resetTimeout?: number
 }>()
 
 defineExpose({
   reset,
-  isDependant: props.isDependant,
 })
 
 let state: Ref<any>
@@ -67,13 +64,8 @@ if (props.type === 'checkbox_boolean') {
 }
 
 function reset() {
-  return new Promise<void>((resolve) => {
-    if (props.type === 'checkbox') state.value = []
-    if (props.type === 'checkbox_boolean') state.value = null
-    nextTick().then(() => {
-      setTimeout(resolve, props.resetTimeout)
-    })
-  })
+  if (props.type === 'checkbox') state.value = []
+  if (props.type === 'checkbox_boolean') state.value = null
 }
 </script>
 
