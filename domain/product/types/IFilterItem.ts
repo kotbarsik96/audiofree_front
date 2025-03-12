@@ -13,6 +13,4 @@ export default interface IFilterItem {
   values?: Array<IFilterItemValue>
   min?: number
   max?: number
-  /** определяет, зависит ли фильтр от других значений фильтров */
-  is_dependant?: boolean
 }

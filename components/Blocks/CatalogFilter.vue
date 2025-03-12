@@ -29,21 +29,18 @@
                   "
                   :type="section.type"
                   :slug="section.slug"
-                  :isDependant="section.is_dependant"
                   :values="section.values"
                   ref="filterSectionEl"
                 />
                 <CFilterRadios
                   v-else-if="section.type === 'radio' && section.values"
                   :slug="section.slug"
-                  :isDependant="section.is_dependant"
                   :values="section.values"
                   ref="filterSectionEl"
                 />
                 <CFilterRange
                   v-else-if="section.type === 'range'"
                   :slug="section.slug"
-                  :isDependant="section.is_dependant"
                   :min="Math.floor(section.min ?? 0)"
                   :max="Math.floor(section.max ?? 0)"
                   ref="filterSectionEl"
