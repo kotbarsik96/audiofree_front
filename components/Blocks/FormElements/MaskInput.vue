@@ -77,7 +77,7 @@ function handleInput(insertedValue: string) {
   for (let index = 0; index < insertedValue.length; index++) {
     const symbol = insertedValue[index]
 
-    // если текущий провяемый символ находится на месте заменяемого символа в маске
+    // если текущий проверяемый символ находится на месте заменяемого символа в маске
     if (isReplacer(index)) {
       if (symbol !== props.prettyValueReplacer) unmaskedValue += symbol
     } else {
