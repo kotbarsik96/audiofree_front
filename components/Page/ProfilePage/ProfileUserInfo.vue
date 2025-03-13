@@ -13,7 +13,7 @@
       <InputWrapper
         class="section-form__input"
         label="Телефон"
-        inputId="username"
+        inputId="phoneNumber"
       >
         <MaskInput
           v-model="phoneNumber"

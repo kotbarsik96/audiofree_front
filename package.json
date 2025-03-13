@@ -11,11 +11,13 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.5.4",
+    "@vueuse/core": "^12.5.0",
+    "@vueuse/router": "^12.5.0",
     "nuxt": "^3.13.0",
     "swiper": "^11.1.14",
     "vite-svg-loader": "^5.1.0",
     "vue": "latest",
-    "vue-router": "latest"
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "sass-embedded": "^1.79.3"

@@ -39,9 +39,7 @@ import ProductVariationCard from '~/components/Blocks/Cards/ProductVariationCard
 import { useSorts } from '~/domain/product/useSorts'
 import type ISelectOption from '~/interfaces/components/ISelectOption'
 import type IVariationProduct from '~/domain/product/types/IVariationProduct'
-
-const route = useRoute()
-const router = useRouter()
+import { useRouteQuery } from '@vueuse/router'
 
 const intersectionEl = ref<HTMLElement>()
 
@@ -50,10 +48,7 @@ const { data: sortData } = await useAPI<{ data: ISelectOption[] }>(
 )
 const { options, orderOptions, sort, sortOrder } = useSorts(sortData)
 
-const searchString = ref(route.query.search as string)
-const { refresh: refreshSearch } = useDelayedCallback(500, () => {
-  router.push({ query: { ...route.query, search: searchString.value } })
-})
+const searchString = useRouteQuery('search') as Ref<string>
 
 const {
   list,
@@ -75,7 +70,6 @@ const { refresh: resetListDelayed } = useDelayedCallback(1000, () => {
   resetList()
 })
 
-watch(searchString, refreshSearch)
 watch(
   () => [searchString.value, sort.value, sortOrder.value],
   () => {

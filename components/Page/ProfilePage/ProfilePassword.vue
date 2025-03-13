@@ -2,14 +2,18 @@
   <form class="section-form _section-box" @submit.prevent="onSubmit">
     <h2 class="_h2">Сменить пароль</h2>
     <div class="section-form__inputs">
-      <InputWrapper label="Текущий (старый) пароль">
-        <PasswordInput v-model="oldPassword" autocomplete="current-password" />
+      <InputWrapper label="Текущий (старый) пароль" inputId="current-password">
+        <PasswordInput
+          v-model="oldPassword"
+          autocomplete="current-password"
+          id="current-password"
+        />
         <template v-if="oldPasswordError" #error>
           {{ oldPasswordError }}
         </template>
       </InputWrapper>
-      <InputWrapper label="Новый пароль">
-        <PasswordInput v-model="newPassword" autocomplete="new-password" />
+      <InputWrapper label="Новый пароль" inputId="new-password">
+        <PasswordInput v-model="newPassword" autocomplete="new-password" id="new-password" />
         <template v-if="newPasswordError" #error>
           {{ newPasswordError }}
         </template>
@@ -17,10 +21,12 @@
       <InputWrapper
         class="section-form__input --repeat"
         label="Новый пароль еще раз"
+        inputId="new-password-repeat"
       >
         <PasswordInput
           v-model="newPasswordRepeat"
           autocomplete="new-password"
+          id="new-password-repeat"
         />
       </InputWrapper>
     </div>

@@ -13,7 +13,7 @@ import CheckmarkIcon from '~/assets/images/icons/checkmark.svg'
 import AFIcon from '~/components/Blocks/AFIcon.vue'
 
 const props = defineProps<{
-  modelValue: boolean | string[]
+  modelValue: boolean | null | string[]
   label?: string
   value?: string
 }>()

@@ -3,7 +3,7 @@
     <div class="_container">
       <div class="catalog__inner">
         <aside class="catalog__sidebar">
-          <CatalogFilter />
+          <CatalogFilter :isFetchingProducts="isFetchingProducts" @refetchProducts="refetchProducts" />
           <!-- карточка ads -->
         </aside>
         <div class="catalog__page-header">
@@ -11,10 +11,13 @@
             <BreadCrumbs />
             <h1 class="_page-header__title">Каталог</h1>
           </div>
-          <CatalogSorts class="catalog__sorts" />
+          <CatalogSorts
+            class="catalog__sorts"
+            :isFetchingProducts="isFetchingProducts"
+          />
         </div>
         <div class="catalog__main">
-          <CatalogBody />
+          <CatalogBody ref="catalogBodyComponent" @updateLoadingState="onLoadingStateUpdate" />
         </div>
       </div>
     </div>
@@ -26,37 +29,11 @@ import CatalogFilter from '~/components/Blocks/CatalogFilter.vue'
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import CatalogBody from '~/components/Page/CatalogPage/CatalogBody.vue'
 import CatalogSorts from '~/components/Page/CatalogPage/CatalogSorts.vue'
-import type IPagination from '~/dataAccess/api/IPagination'
-import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
-import {
-  type IInjectCatalog,
-} from '~/domain/product/types/IInjectCtalog'
-import { CatalogInjection } from '~/enums/injections'
+import { useTemplateRef } from 'vue'
 
-const route = useRoute()
+const catalogBodyComponent = useTemplateRef('catalogBodyComponent')
 
-const urlQuery = computed<Record<string, any>>(() => ({
-  ...parseRouteQuery(route.query),
-  per_page: 9,
-}))
-
-const {
-  data: productsData,
-  execute: fetchProducts,
-  status,
-} = useAPI<IPagination<ICatalogProduct>>('/products/catalog', {
-  query: urlQuery,
-  immediate: false,
-  watch: false,
-})
-const fetchingProducts = computed(() => status.value === 'pending')
-
-provide<IInjectCatalog>(CatalogInjection, {
-  productsData,
-  fetchProducts,
-  fetchingProducts,
-  urlQuery,
-})
+const isFetchingProducts = ref(false)
 
 const { setBreadcrumbs } = useBreadcrumbs()
 setBreadcrumbs([
@@ -66,6 +43,13 @@ setBreadcrumbs([
     link: { name: 'CatalogPage' },
   },
 ])
+
+function onLoadingStateUpdate(value: boolean) {
+  isFetchingProducts.value = value
+}
+function refetchProducts(){
+  catalogBodyComponent.value?.refetchProducts()
+}
 </script>
 
 <style lang="scss" scoped>

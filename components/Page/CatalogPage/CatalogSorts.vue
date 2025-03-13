@@ -7,18 +7,18 @@
 
 <script setup lang="ts">
 import AFSelect from '~/components/Blocks/AFSelect.vue'
-import { CatalogInjection } from '~/enums/injections'
-import {
-  type IInjectCatalog,
-} from '~/domain/product/types/IInjectCtalog'
 import { useSorts } from '~/domain/product/useSorts'
 import type ISelectOption from '~/interfaces/components/ISelectOption'
 
-const { fetchProducts } = injectStrict<IInjectCatalog>(CatalogInjection)
+const props = defineProps<{
+  isFetchingProducts?: boolean
+}>()
 
-const { data } = await useAPI<{ data: ISelectOption[] }>('/products/catalog/sorts')
+const { data } = await useAPI<{ data: ISelectOption[] }>(
+  '/products/catalog/sorts'
+)
 
-const { options, orderOptions, sort, sortOrder } = useSorts(data, fetchProducts)
+const { options, orderOptions, sort, sortOrder } = useSorts(data)
 </script>
 
 <style lang="scss" scoped>

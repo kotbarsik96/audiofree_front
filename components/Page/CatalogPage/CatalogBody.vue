@@ -42,43 +42,56 @@
 import AFPagination from '~/components/Blocks/AFPagination.vue'
 import ProductCard from '~/components/Blocks/Cards/ProductCard.vue'
 import EmptyList from '~/components/Blocks/EmptyList.vue'
-import {
-  type IInjectCatalog,
-} from '~/domain/product/types/IInjectCtalog'
-import { CatalogInjection } from '~/enums/injections';
+import type IPagination from '~/dataAccess/api/IPagination'
+import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
+import { useRouteQuery } from '@vueuse/router'
+
+const emit = defineEmits<{
+  (e: 'updateLoadingState', value: boolean): void
+}>()
 
 const route = useRoute()
-const currentPage = computed<number>(() => Number(route.query.page) || 0)
-let lastPage = currentPage.value
 
-const el = ref<HTMLElement>()
+const urlQuery = computed(() => route.query)
 
-const { fetchingProducts, fetchProducts, productsData } =
-  injectStrict<IInjectCatalog>(CatalogInjection)
-const disabledPagination = computed(
-  () => fetchingProducts.value && typeof window !== 'undefined'
-)
+defineExpose({
+  refetchProducts
+})
 
-await fetchProducts()
+const {
+  data: productsData,
+  execute: fetchProducts,
+  status,
+} = await useAPI<IPagination<ICatalogProduct>>('/products/catalog', {
+  query: urlQuery,
+  watch: false,
+})
 
+const isFetchingProducts = computed(() => status.value === 'pending')
 const products = computed(() => productsData.value?.data)
 const productsKey = computed(() =>
   (products.value || []).map((el) => el.id).join('')
 )
+
+const disabledPagination = computed(
+  () => isFetchingProducts.value && typeof window !== 'undefined'
+)
+
+const currentPage = useRouteQuery('page', '1', { transform: Number })
+
+const el = ref<HTMLElement>()
+
 watch(currentPage, onPageChange)
+watch(isFetchingProducts, (value) => {
+  emit('updateLoadingState', value)
+})
 
-async function onPageChange(newPage: number) {
-  if (newPage === lastPage || !newPage) return
-
-  lastPage = newPage
-
-  await updateProducts()
+async function onPageChange() {
+  await fetchProducts()
   if (el.value) el.value.scrollIntoView()
 }
-async function updateProducts() {
-  try {
-    await fetchProducts()
-  } catch (err) {}
+async function refetchProducts(){
+  await fetchProducts();
 }
 </script>
 

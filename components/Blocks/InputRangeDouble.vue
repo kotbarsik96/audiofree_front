@@ -29,13 +29,15 @@ import { computed, onMounted, ref } from 'vue'
 import { getCoords } from '~/utils/getCoords'
 
 const props = defineProps<{
-  modelValue: number[]
+  valueMin: number
+  valueMax: number
   min: number
   max: number
 }>()
 
 const emit = defineEmits<{
-  (emit: 'update:modelValue', value: number[]): void
+  (emit: 'update:valueMin', value: number): void
+  (emit: 'update:valueMax', value: number): void
 }>()
 
 const scale = ref<HTMLElement>()
@@ -44,18 +46,18 @@ const thumbRight = ref<HTMLElement>()
 
 const _valueMin = computed({
   get() {
-    return props.modelValue[0]
+    return props.valueMin
   },
   set(value) {
-    emit('update:modelValue', [handleValue(value), _valueMax.value])
+    emit('update:valueMin', handleValue(value))
   },
 })
 const _valueMax = computed({
   get() {
-    return props.modelValue[1]
+    return props.valueMax
   },
   set(value) {
-    emit('update:modelValue', [_valueMin.value, handleValue(value)])
+    emit('update:valueMax', handleValue(value))
   },
 })
 /** числовое значение 100% */
@@ -138,7 +140,7 @@ function updateScaleWidth() {
 
 function getClosestThumb(coord: number): 'left' | 'right' {
   let closestThumb: 'left' | 'right' = 'left'
-  const percent = coord / (scaleWidth.value / 100) 
+  const percent = coord / (scaleWidth.value / 100)
 
   if (
     thumbPositions.value.right - percent <=
