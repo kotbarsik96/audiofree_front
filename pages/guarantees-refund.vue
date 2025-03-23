@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import GuaranteesRefundPage from '~/components/PageLayout.vue/GuaranteesRefundPage.vue'
+import GuaranteesRefundPage from '~/components/PageLayout/GuaranteesRefundPage.vue'
 
 definePageMeta({
   name: 'GuaranteesRefundPage'

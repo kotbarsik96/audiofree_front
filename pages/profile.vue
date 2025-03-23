@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import ProfilePage from '~/components/PageLayout.vue/ProfilePage.vue'
+import ProfilePage from '~/components/PageLayout/ProfilePage.vue'
 
 definePageMeta({
   auth: true,
