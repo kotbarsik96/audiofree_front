@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import ContactsPage from '~/components/PageLayout.vue/ContactsPage.vue'
+import ContactsPage from '~/components/PageLayout/ContactsPage.vue'
 
 definePageMeta({
   name: 'ContactsPage'

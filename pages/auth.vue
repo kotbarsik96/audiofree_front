@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import AuthPage from '~/components/PageLayout.vue/AuthPage.vue'
+import AuthPage from '~/components/PageLayout/AuthPage.vue'
 
 definePageMeta({
   name: 'AuthPage'

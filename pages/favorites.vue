@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import LogInToSeePage from '~/components/Blocks/LogInToSeePage.vue'
-import FavoritesPage from '~/components/PageLayout.vue/FavoritesPage.vue'
+import FavoritesPage from '~/components/PageLayout/FavoritesPage.vue'
 
 definePageMeta({
   name: 'FavoritesPage',
