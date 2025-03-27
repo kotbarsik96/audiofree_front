@@ -1,6 +1,8 @@
 <template>
   <component :is="component" class="btn-icon" :class="className" v-bind="attrs">
-    <div v-if="badge || badge === 0" class="btn-icon__badge">{{ badge }}</div>
+    <ClientOnly>
+      <div v-if="badge || badge === 0" class="btn-icon__badge">{{ badge }}</div>
+    </ClientOnly>
     <AFIcon :icon="icon" />
   </component>
 </template>
