@@ -76,7 +76,7 @@ const { getUser } = useUserStore()
 const { addNotification } = useNotifications()
 
 const { validate } = useAllValidation([
-  useValidation(phoneNumber, phoneNumberError, [phoneNumberValidation()]),
+  useValidation(phoneNumber, phoneNumberError, [phoneNumberValidation(null)]),
 ])
 
 const isLoading = ref(true)

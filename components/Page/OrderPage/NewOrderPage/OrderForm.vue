@@ -21,6 +21,7 @@
               placeholder="Телефон"
               :mask="phoneMask"
               v-model="phone"
+              @unmaskedChange="onPhoneMaskChange"
             />
             <template v-if="phoneError" #error>{{ phoneError }}</template>
           </InputWrapper>
@@ -141,6 +142,7 @@ const name = ref(savedData.value.name || user?.name || '')
 const email = ref(savedData.value.email || user?.email || '')
 const telegram = ref(savedData.value.telegram || user?.telegram || '')
 const phone = ref(savedData.value.phone || user?.phone_number || '')
+const phoneUnmasked = ref('')
 const comment = ref(savedData.value.comment || '')
 const address = ref(savedData.value.address || '')
 
@@ -153,11 +155,20 @@ const addressError = ref()
 
 const validateAll = useAllValidation([
   useValidation(name, nameError, [mustPresentValidation()]),
-  useValidation(email, emailError, [emailValidation()]),
-  useValidation(telegram, telegramError, [mustPresentValidation()]),
-  useValidation(phone, phoneError, [phoneNumberValidation()]),
+  useValidation(email, emailError, [
+    mustPresentWithout([telegram, phoneUnmasked]),
+    emailValidation(),
+  ]),
+  useValidation(telegram, telegramError, [
+    mustPresentWithout([email, phoneUnmasked]),
+  ]),
+  useValidation(phone, phoneError, [
+    mustPresentWithout([email, telegram], {
+      unmaskedValue: phoneUnmasked,
+    }),
+    phoneNumberValidation(phoneUnmasked),
+  ]),
   useValidation(comment, commentError, [minLengthValidation(3)]),
-  // подумать
   useValidation(address, addressError, [minLengthValidation(3)]),
 ])
 
@@ -206,6 +217,9 @@ function onSubmit() {
   if (validateAll.validate()) {
   }
 }
+function onPhoneMaskChange(unmaskedValue: string) {
+  phoneUnmasked.value = unmaskedValue
+}
 </script>
 
 <style lang="scss" scoped>
@@ -222,7 +236,7 @@ function onSubmit() {
 .oform-col {
   padding: 0 3.125rem;
   border-left: 1px solid var(--input-border-color);
-  flex: 1 1 auto;
+  flex: 1 1 33%;
   display: flex;
   flex-direction: column;
 
@@ -299,25 +313,36 @@ function onSubmit() {
 }
 
 @include adaptive(tablet-big) {
+  .oform {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
   .columns {
-    flex-direction: column;
-    align-items: center;
+    display: block;
+    padding: 0;
+    border-top: 0;
   }
 
   .oform-col {
-    padding: 3rem 0;
+    margin: 0 calc(var(--container-padding-x) * -1);
+    padding: 3rem var(--container-padding-x);
     border-left: 0;
     border-top: 1px solid var(--input-border-color);
-    max-width: 500px;
-    width: 100%;
+    flex: 1 1 auto;
 
     &:first-child {
-      border-top: 0;
+      padding-left: var(--container-padding-x);
     }
   }
 
   .col-title {
     margin-bottom: 1.75rem;
+  }
+
+  .summary {
+    margin-inline: calc(var(--container-padding-x) * -1);
+    padding-inline: var(--container-padding-x);
   }
 }
 </style>

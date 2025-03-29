@@ -47,6 +47,31 @@ export function mustPresentValidation(
   }
 }
 
+interface IMustPresentWithoutValidationOptions {
+  /** Указывается, когда валидируется значение из MaskInput */
+  unmaskedValue?: Ref<string>
+  /** Указать другое сообщение при ошибке */
+  message?: string
+}
+
+/** Поле обязательно только тогда, когда не указаны остальные поля в массиве without */
+export function mustPresentWithout(
+  without: Array<Ref<string>>,
+  options?: IMustPresentWithoutValidationOptions
+) {
+  return function (value: string) {
+    const otherFieldIsPresented = without.some((field) => !!field.value)
+    const hasValue = options?.unmaskedValue
+      ? !!options.unmaskedValue.value
+      : !!value
+
+    if (!hasValue && !otherFieldIsPresented)
+      return options?.message || 'Не указано ни одно из обязательных полей'
+
+    return false
+  }
+}
+
 export function passwordsMatchValidation(
   password: Ref<string>
 ): ValidatorCallback<string> {
@@ -56,9 +81,11 @@ export function passwordsMatchValidation(
   }
 }
 
-export function phoneNumberValidation(): ValidatorCallback<string> {
+export function phoneNumberValidation(
+  unmasked: Ref<string> | null
+): ValidatorCallback<string> {
   return function (value: string) {
-    if (!value.match(/\+7 \(\d\d\d\) \d\d\d \d\d \d\d/))
+    if (!!unmasked?.value && !value.match(/\+7 \(\d\d\d\) \d\d\d \d\d \d\d/))
       return 'Неверный формат номера телефона'
 
     return false
