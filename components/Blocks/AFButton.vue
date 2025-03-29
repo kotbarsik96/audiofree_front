@@ -72,7 +72,7 @@ const attrs = computed(() => {
   justify-content: center;
   border: 1px solid transparent;
   @include fontSize(16);
-    font-weight: 700;
+  font-weight: 700;
   transition: var(--general-transition);
 
   &:hover:not(:disabled) {
@@ -124,6 +124,11 @@ const attrs = computed(() => {
   }
   &--bg-green {
     background-color: var(--secondary-1);
+  }
+  &.--large {
+    min-width: 270px;
+    padding-block: 1.25rem;
+    border-radius: 220px;
   }
 
   &:disabled,

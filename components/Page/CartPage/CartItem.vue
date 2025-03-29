@@ -54,6 +54,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'deleteItem'): void
+  (e: 'changeQuantity'): void
 }>()
 
 const route = useRoute()
@@ -72,7 +73,8 @@ const className = computed(() => ({
 }))
 
 const productLink = computed(
-  () => `/product/${props.data.variation.product.slug}/${props.data.variation.slug}`
+  () =>
+    `/product/${props.data.variation.product.slug}/${props.data.variation.slug}`
 )
 
 const warningDialogText = ref('')
@@ -114,6 +116,7 @@ async function changeQuantity() {
     !!route.query.oneclick
   )
   isLoading.value = false
+  emit('changeQuantity')
 }
 </script>
 
@@ -233,6 +236,7 @@ async function changeQuantity() {
     > * {
       padding: 0;
       border-right: 0;
+      border-left: 0;
       display: block;
     }
 

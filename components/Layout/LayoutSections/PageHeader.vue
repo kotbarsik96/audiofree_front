@@ -104,7 +104,7 @@
               :icon="item.icon"
               type="router-link"
               :to="item.to"
-              badge="2"
+              :badge="item.badge"
             />
           </li>
         </ul>

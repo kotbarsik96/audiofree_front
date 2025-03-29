@@ -3,9 +3,11 @@
 </template>
 
 <script setup lang="ts">
-import OrdersListPage from '~/components/PageLayout/Order/OrdersListPage.vue';
+import OrdersListPage from '~/components/PageLayout/Order/OrdersListPage.vue'
+
+definePageMeta({
+  name: 'OrderPage',
+})
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

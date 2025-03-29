@@ -1,31 +1,59 @@
 <template>
   <div class="cart-list">
-    <div v-if="hasCart" class="cart-list__header">
-      <div class="cart-list__header-item --name">Название товара:</div>
-      <div class="cart-list__header-item --price">Цена за штуку:</div>
-      <div class="cart-list__header-item --quantity">Количество:</div>
-      <div class="cart-list__header-item --total-price">Сумма:</div>
-    </div>
-    <div class="cart-list__body" :class="{ '--loading': isLoading }">
-      <template v-if="hasCart">
-        <TransitionGroup name="fade-in">
-          <CartItem
-            v-for="item in cart?.data"
-            :key="item.id"
-            :data="item"
-            @deleteItem="onCartDelete"
+    <div class="cart-list__list-body">
+      <div v-if="hasCart" class="cart-list__header">
+        <div class="cart-list__header-item --name">Название товара:</div>
+        <div class="cart-list__header-item --price">Цена за штуку:</div>
+        <div class="cart-list__header-item --quantity">Количество:</div>
+        <div class="cart-list__header-item --total-price">Сумма:</div>
+      </div>
+      <div class="cart-list__body" :class="{ '--loading': isLoading }">
+        <template v-if="hasCart">
+          <TransitionGroup name="fade-in">
+            <CartItem
+              v-for="item in cart?.data"
+              :key="item.id"
+              :data="item"
+              @deleteItem="onCartDelete"
+              @changeQuantity="onQuantityChange"
+            />
+          </TransitionGroup>
+        </template>
+        <EmptyList
+          v-else-if="!isLoading"
+          shown
+          class="cart-list__empty"
+          icon="empty-cart"
+        >
+          <div>Корзина пуста</div>
+          <AFButton
+            label="Перейти в каталог"
+            type="nuxt-link"
+            :to="{ name: 'CatalogPage' }"
           />
-        </TransitionGroup>
-      </template>
-      <EmptyList
-        v-else-if="!isLoading"
-        shown
-        class="cart-list__empty"
-        icon="empty-cart"
-      >
-        <div>Корзина пуста</div>
-        <AFButton label="Перейти в каталог" type="nuxt-link" :to="{ name: 'CatalogPage' }" />
-      </EmptyList>
+        </EmptyList>
+      </div>
+    </div>
+    <div v-if="hasCart" class="cart-footer">
+      <div class="summary">
+        <table>
+          <tbody>
+            <tr>
+              <td>Сумма заказа:</td>
+              <td>
+                <TextPreloader v-if="isLoading" />
+                <template v-else>{{ totalCost }} ₽</template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <AFButton
+        class="order-btn --large"
+        label="Оформить заказ"
+        type="nuxt-link"
+        :to="toOrderPage"
+      />
     </div>
   </div>
 </template>
@@ -34,9 +62,15 @@
 import AFButton from '~/components/Blocks/AFButton.vue'
 import CartItem from '~/components/Page/CartPage/CartItem.vue'
 import EmptyList from '~/components/Blocks/EmptyList.vue'
+import TextPreloader from '~/components/Blocks/TextPreloader.vue'
 import type ICartItem from '~/domain/product/collections/cart/ICartItem'
 
 const route = useRoute()
+
+const toOrderPage = computed(() => ({
+  name: 'NewOrderPage',
+  query: { is_oneclick: route.query.oneclick },
+}))
 
 const {
   data: cart,
@@ -45,7 +79,7 @@ const {
 } = await useAPI<{ data: ICartItem[] }>('/product/cart', {
   method: 'GET',
   params: {
-    is_oneclick: route.query.oneclick ? '1' : '',
+    is_oneclick: route.query.oneclick,
   },
   immediate: true,
 })
@@ -53,15 +87,29 @@ const {
 const isLoading = computed(() => status.value === 'pending')
 const hasCart = computed(() => !!cart.value?.data?.length)
 
+const totalCost = computed(() =>
+  cart.value?.data
+    .reduce(
+      (prev, current) => current.variation.current_price * current.quantity + prev,
+      0
+    )
+    .toFixed(2)
+)
+
 function onCartDelete() {
+  refresh()
+}
+function onQuantityChange() {
   refresh()
 }
 </script>
 
 <style lang="scss" scoped>
 .cart-list {
-  display: grid;
-  grid-template-columns: 7rem auto auto auto auto auto;
+  &__list-body {
+    display: grid;
+    grid-template-columns: 7rem auto auto auto auto auto;
+  }
 
   &__empty {
     :deep(a) {
@@ -116,6 +164,38 @@ function onCartDelete() {
 
     &__header {
       display: none;
+    }
+  }
+}
+
+.cart-footer {
+  padding-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  .summary {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color: var(--text-color);
+    width: 100%;
+    border-bottom: 1px solid var(--input-border-color);
+    padding-bottom: 2.25rem;
+    margin-bottom: 2.25rem;
+
+    .text-preloader {
+      width: 5.25em;
+    }
+
+    td:first-child {
+      font-weight: 700;
+      padding-right: 2rem;
+      @include fontSize(18);
+    }
+    td:last-child {
+      font-weight: 700;
+      @include fontSize(24);
     }
   }
 }
