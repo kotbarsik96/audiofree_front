@@ -7,7 +7,8 @@ export class Auth {
   ) {
     const { closeDialogAndReset } = useAuthStore()
     const { addNotification } = useNotifications()
-    const { updateJwt, getUser } = useUserStore()
+    const { updateJwt } = useUserStore()
+    const { initApp } = useGlobalStore()
 
     await useNuxtApp().$afFetch('/login', {
       method: 'POST',
@@ -20,7 +21,7 @@ export class Auth {
           updateJwt(response._data.data.token)
           closeDialogAndReset()
           await nextTick()
-          await getUser()
+          await initApp()
           if (response._data.message)
             addNotification('success', response._data.message)
         }
@@ -29,5 +30,26 @@ export class Auth {
         if (response._data.message) errorRef.value = response._data.message
       },
     })
+  }
+  public static async logout() {
+    const userStore = useUserStore()
+    const { resetUser, checkPageMetaAuth } = userStore
+    const { jwt } = storeToRefs(userStore)
+    const { addNotification } = useNotifications()
+    const { $afFetch } = useNuxtApp()
+    const { initApp } = useGlobalStore()
+
+    jwt.value = null
+
+    await $afFetch('/logout', {
+      method: 'POST',
+      onResponse({ response }) {
+        addNotification('info', response._data.message)
+        resetUser()
+        initApp()
+      },
+    })
+
+    checkPageMetaAuth()
   }
 }
