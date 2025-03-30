@@ -9,9 +9,11 @@
       <div class="confirmation__title">
         {{ data.title }}
       </div>
-      <div v-if="data.detail" class="confirmation__detail">
-        {{ data.detail }}
-      </div>
+      <div
+        v-if="data.detail"
+        class="confirmation__detail"
+        v-html="data.detail"
+      ></div>
       <div class="confirmation__buttons">
         <AFButton :label="data.yesButtonText" @click="yes" />
         <AFButton

@@ -47,6 +47,7 @@
           />
           <InputWrapper>
             <TextareaField v-model="address" />
+            <template v-if="addressError" #error>{{ addressError }}</template>
           </InputWrapper>
         </div>
       </div>
@@ -84,7 +85,12 @@
         </div>
       </div>
     </div>
-    <AFButton class="submit-btn --large" type="submit" label="Оформить заказ" />
+    <AFButton
+      class="submit-btn --large"
+      type="submit"
+      label="Оформить заказ"
+      :disabled="isLoading"
+    />
   </form>
 </template>
 
@@ -106,6 +112,10 @@ import {
   type TPaymentTypes,
 } from '~/domain/order/types/TPaymentTypes'
 
+const emit = defineEmits<{
+  (e: 'orderCreated'): void
+}>()
+
 const { setBreadcrumbs } = useBreadcrumbs()
 setBreadcrumbs([
   {
@@ -122,6 +132,11 @@ setBreadcrumbs([
 
 const { user } = useUserStore()
 const route = useRoute()
+const router = useRouter()
+
+const { addNotification } = useNotifications()
+
+const { addConfirm } = useConfirmation()
 
 const savedData = useCookie<Record<string, any>>('creating_order', {
   default: () => ({}),
@@ -133,8 +148,16 @@ const { data: creationData } = await useAPI<{ data: ICreationOrderData }>(
   '/order/creation-data',
   {
     params: { is_oneclick: isOneclick },
+    onResponseError({ response }) {
+      if (response._data.message) {
+        addNotification('info', response._data.message)
+      }
+      router.push({ name: 'CartPage' })
+    },
   }
 )
+
+const { $afFetch } = useNuxtApp()
 
 const summary = computed(() => creationData.value?.data.summary)
 
@@ -153,6 +176,8 @@ const phoneError = ref()
 const commentError = ref()
 const addressError = ref()
 
+const isLoading = ref(false)
+
 const validateAll = useAllValidation([
   useValidation(name, nameError, [mustPresentValidation()]),
   useValidation(email, emailError, [
@@ -168,7 +193,6 @@ const validateAll = useAllValidation([
     }),
     phoneNumberValidation(phoneUnmasked),
   ]),
-  useValidation(comment, commentError, [minLengthValidation(3)]),
   useValidation(address, addressError, [minLengthValidation(3)]),
 ])
 
@@ -185,6 +209,17 @@ const deliveryPlace = ref<TDeliveryPlaces>(
 const paymentType = ref<TPaymentTypes>(
   savedData.value.paymentType || availablePaymentTypes.value[0]
 )
+
+const requestBody = computed(() => ({
+  orderer_name: name.value,
+  email: email.value,
+  telegram: telegram.value,
+  phone_number: phone.value,
+  delivery_place: deliveryPlace.value,
+  delivery_address: address.value,
+  desired_payment_type: paymentType.value,
+  is_oneclick: isOneclick.value,
+}))
 
 const { refresh: updateSave } = useDelayedCallback(500, () => {
   savedData.value = {
@@ -213,12 +248,83 @@ watch(
   updateSave
 )
 
-function onSubmit() {
-  if (validateAll.validate()) {
-  }
-}
 function onPhoneMaskChange(unmaskedValue: string) {
   phoneUnmasked.value = unmaskedValue
+}
+
+async function onSubmit() {
+  isLoading.value = true
+  if (validateAll.validate()) {
+    try {
+      await orderAttempt()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+  isLoading.value = false
+}
+
+/** Попытка оформить заказ. Если товара не хватает - выведет диалог */
+async function orderAttempt() {
+  await $afFetch('/order/new-attempt', {
+    method: 'POST',
+    body: requestBody.value,
+    onResponse({ response }) {
+      if (isResponseOk(response.status)) {
+        emit('orderCreated')
+      }
+    },
+    async onResponseError({ response }) {
+      if (response._data.reason === 'failed_quantity') {
+        const yesButtonText = 'Продолжить'
+        const noButtonText = 'Отмена'
+
+        const proceed = await addConfirm({
+          title: 'Внимание!',
+          detail: `${response._data.message}. <br /> <br /> Нажмите "${yesButtonText}", чтобы оформить заказ, тогда недостающие товары будут вычтены.`,
+          noButtonText,
+          yesButtonText,
+        })
+
+        if (proceed) {
+          await makeNewOrder()
+        }
+      } else {
+        mapErrorsFromResponse(response, [
+          ['name', nameError],
+          ['email', emailError],
+          ['telegram', telegramError],
+          ['phone_number', phoneError],
+          ['delivery_address', addressError],
+        ])
+
+        addNotification(
+          'error',
+          response._data.message || 'Не удалось оформить заказ'
+        )
+      }
+    },
+  })
+}
+/** Оформить заказ, удалив нехватающие товары.
+ *
+ * ! Вызывается только при нажатии "Продолжить в orderAttempt" */
+async function makeNewOrder() {
+  await $afFetch('/order/new', {
+    method: 'POST',
+    body: requestBody.value,
+    onResponse({ response }) {
+      if (isResponseOk(response.status)) {
+        emit('orderCreated')
+      }
+    },
+    onResponseError({ response }) {
+      addNotification(
+        'error',
+        response._data.message || 'Не удалось оформить заказ'
+      )
+    },
+  })
 }
 </script>
 
@@ -307,7 +413,8 @@ function onPhoneMaskChange(unmaskedValue: string) {
     }
   }
 }
-.submit-btn {
+.submit-btn,
+.submit-btn[class] {
   display: block;
   margin-left: auto;
 }

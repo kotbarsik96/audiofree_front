@@ -129,7 +129,9 @@ async function onSubmit() {
         ])
       },
     })
-  } catch (err) {}
+  } catch (err) {
+    console.error(err)
+  }
 
   isLoading.value = false
 }

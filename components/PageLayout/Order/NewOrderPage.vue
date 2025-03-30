@@ -5,14 +5,22 @@
         <BreadCrumbs />
         <h1 class="_page-header__title">Оформление заказа</h1>
       </div>
-      <OrderForm />
+      <OrderForm v-if="!isCreated" @orderCreated="onCreatedOrder" />
+      <SuccessfullyCreatedOrder v-else />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import OrderForm from '~/components/Page/OrderPage/NewOrderPage/OrderForm.vue';
-import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue';
+import OrderForm from '~/components/Page/OrderPage/NewOrderPage/OrderForm.vue'
+import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
+import SuccessfullyCreatedOrder from '~/components/Page/OrderPage/NewOrderPage/SuccessfullyCreatedOrder.vue'
+
+const isCreated = ref(false)
+
+function onCreatedOrder() {
+  isCreated.value = true
+}
 </script>
 
 <style lang="scss" scoped></style>

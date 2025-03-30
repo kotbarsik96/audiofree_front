@@ -110,7 +110,6 @@ export function mapErrorsFromResponse(
 ) {
   // если есть массив с ошибками - размапить их в mappers
   if (response._data.errors) {
-    console.log(mappers);
     mappers.forEach(([key, refVar]) => {
       if (response._data.errors[key])
         refVar.value = response._data.errors[key][0]

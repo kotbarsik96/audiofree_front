@@ -37,7 +37,9 @@ export const useUserStore = defineStore('user', () => {
     if (jwt.value) {
       try {
         await _getUser()
-      } catch (err) {}
+      } catch (err) {
+        console.error(err)
+      }
     }
 
     checkPageMetaAuth()

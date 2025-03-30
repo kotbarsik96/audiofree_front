@@ -26,7 +26,9 @@ export function useCart() {
           if (response.ok) updateCollection()
         },
       })
-    } catch (err) {}
+    } catch (err) {
+      console.error(err)
+    }
 
     return _response
   }
@@ -56,7 +58,9 @@ export function useCart() {
           else if (quantity < 1) quantity = 1
         },
       })
-    } catch (err) {}
+    } catch (err) {
+      console.error(err)
+    }
 
     return _response
   }
@@ -82,7 +86,9 @@ export function useCart() {
           }
         },
       })
-    } catch (err) {}
+    } catch (err) {
+      console.error(err)
+    }
 
     return _response
   }

@@ -6,7 +6,7 @@
 import OrdersListPage from '~/components/PageLayout/Order/OrdersListPage.vue'
 
 definePageMeta({
-  name: 'OrderPage',
+  name: 'OrdersPage',
 })
 </script>
 

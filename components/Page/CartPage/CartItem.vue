@@ -80,12 +80,16 @@ const productLink = computed(
 const warningDialogText = ref('')
 const warningDialogShown = ref(false)
 
-if (quantity.value > props.data.variation.quantity) {
+if (quantity.value > props.data.variation.quantity || quantity.value < 1) {
   quantity.value = props.data.variation.quantity
-  changeQuantity()
-  warningDialogText.value =
-    'Обратите внимание! <br /> Количество некоторых товаров в корзине было уменьшено'
-  warningDialogShown.value = true
+  if (quantity.value < 1) {
+    deleteItem()
+  } else {
+    changeQuantity()
+    warningDialogText.value =
+      'Обратите внимание! <br /> Количество некоторых товаров в корзине было уменьшено, т.к. их недостаточно на складе'
+    warningDialogShown.value = true
+  }
 }
 
 const { refresh: refreshChangeTimeout } = useDelayedCallback(
