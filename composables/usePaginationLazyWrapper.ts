@@ -62,6 +62,7 @@ export async function usePaginationLazyWrapper<T>(
 
     isLoading.value = false
 
+    console.log(responseData.data.value);
     if (responseData.data.value) list.value = responseData.data.value?.data.data
     paginationData.value = responseData.data.value?.data
 

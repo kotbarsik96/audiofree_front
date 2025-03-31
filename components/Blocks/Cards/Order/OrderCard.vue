@@ -16,13 +16,20 @@
         </div>
       </div>
       <div class="order-body">
-        <div>Доставка в {{ deliveryPlacesMap[data.delivery_place] }}</div>
-        <div v-if="data.delivery_place === 'pickup_point'">
-          Адрес: {{ data.delivery_address }}
-        </div>
-        <div>
-          Статус:
-          <OrderStatus :status="data.order_status" />
+        <div class="texts">
+          <div>
+            Доставка в
+            <span class="detail">
+              {{ deliveryPlacesMap[data.delivery_place] }}
+            </span>
+          </div>
+          <div v-if="data.delivery_place === 'pickup_point'">
+            Адрес: <span class="detail">{{ data.delivery_address }}</span>
+          </div>
+          <div>
+            Статус:
+            <OrderStatus :status="data.order_status" />
+          </div>
         </div>
         <AFImage :data="data.image" />
       </div>
@@ -52,7 +59,7 @@ const costString = computed(
 <style lang="scss" scoped>
 .order-card {
   --padding-y: 0.75rem;
-  --padding-x: 0.5rem;
+  --padding-x: 1rem;
 
   ._card__inner {
     padding: 0;
@@ -76,19 +83,43 @@ const costString = computed(
   }
   .order-body {
     padding: var(--padding-y) var(--padding-x);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
 
-    > div {
-      color: var(--text-color);
-      font-weight: 600;
-      @include fontSize(18);
+    .texts {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-width: 0;
+      overflow-wrap: break-word;
     }
+
+    .detail {
+      font-weight: 600;
+      @include fontSize(21);
+    }
+  }
+  .order-body .texts > div {
+    color: var(--text-color);
+    font-weight: 500;
+    min-width: 0;
+    @include fontSize(18);
   }
   .image {
     display: block;
     margin-top: 1rem;
     object-fit: contain;
-    width: 250px;
-    height: 250px;
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+  }
+
+  @include adaptive(phone-big) {
+    .order-body {
+      display: block;
+    }
   }
 }
 </style>
