@@ -20,7 +20,9 @@ export function useFavorites() {
           if (response.ok) updateCollection()
         },
       })
-    } catch (err) {}
+    } catch (err) {
+      console.error(err)
+    }
 
     return _response
   }
@@ -48,7 +50,9 @@ export function useFavorites() {
           if (response.ok) updateCollection()
         },
       })
-    } catch (err) {}
+    } catch (err) {
+      console.error(err)
+    }
 
     return _response
   }

@@ -54,6 +54,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'deleteItem'): void
+  (e: 'changeQuantity'): void
 }>()
 
 const route = useRoute()
@@ -72,18 +73,23 @@ const className = computed(() => ({
 }))
 
 const productLink = computed(
-  () => `/product/${props.data.variation.product.slug}/${props.data.variation.slug}`
+  () =>
+    `/product/${props.data.variation.product.slug}/${props.data.variation.slug}`
 )
 
 const warningDialogText = ref('')
 const warningDialogShown = ref(false)
 
-if (quantity.value > props.data.variation.quantity) {
+if (quantity.value > props.data.variation.quantity || quantity.value < 1) {
   quantity.value = props.data.variation.quantity
-  changeQuantity()
-  warningDialogText.value =
-    'Обратите внимание! <br /> Количество некоторых товаров в корзине было уменьшено'
-  warningDialogShown.value = true
+  if (quantity.value < 1) {
+    deleteItem()
+  } else {
+    changeQuantity()
+    warningDialogText.value =
+      'Обратите внимание! <br /> Количество некоторых товаров в корзине было уменьшено, т.к. их недостаточно на складе'
+    warningDialogShown.value = true
+  }
 }
 
 const { refresh: refreshChangeTimeout } = useDelayedCallback(
@@ -114,6 +120,7 @@ async function changeQuantity() {
     !!route.query.oneclick
   )
   isLoading.value = false
+  emit('changeQuantity')
 }
 </script>
 
@@ -233,6 +240,7 @@ async function changeQuantity() {
     > * {
       padding: 0;
       border-right: 0;
+      border-left: 0;
       display: block;
     }
 

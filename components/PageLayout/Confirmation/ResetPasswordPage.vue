@@ -82,7 +82,9 @@ async function checkLink() {
         }
       },
     })
-  } catch (e) {}
+  } catch (e) {
+    console.error(e)
+  }
 
   isLoading.value = false
 }
@@ -111,7 +113,9 @@ async function onSubmit() {
           addNotification('error', response._data.message)
       },
     })
-  } catch (e) {}
+  } catch (e) {
+    console.error(e)
+  }
 
   isLoading.value = false
 }

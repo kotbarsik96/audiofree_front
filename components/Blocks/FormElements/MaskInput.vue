@@ -4,6 +4,7 @@
     type="text"
     :value="value"
     ref="inputEl"
+    :data-unmasked="unmaskedValue"
     @input="onInput"
   />
 </template>
@@ -29,6 +30,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'update:modelValue', v: typeof props.modelValue): void
+  (e: 'unmaskedChange', v: string): void
 }>()
 
 const letterRegexp = /[A-Za-z]/
@@ -52,6 +54,22 @@ const prettyMask = computed(() => {
   )
 
   return props.mask.replace(regexp, props.prettyValueReplacer)
+})
+
+const unmaskedValue = computed(() => {
+  let unmasked = ''
+
+  value.value.split('').forEach((symbol, index) => {
+    if (isReplacer(index) && symbol !== props.prettyValueReplacer) {
+      unmasked += symbol
+    }
+  })
+
+  return unmasked
+})
+
+watch(unmaskedValue, () => {
+  emit('unmaskedChange', unmaskedValue.value)
 })
 
 if (!checkMatch(value.value)) {

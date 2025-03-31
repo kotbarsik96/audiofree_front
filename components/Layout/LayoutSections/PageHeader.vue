@@ -58,7 +58,7 @@
               <NuxtLink
                 :to="link.to"
                 class="header__bottom-link"
-                :class="{ bold: link.bold }"
+                :class="{ '--bold': link.bold }"
                 tabindex="0"
               >
                 {{ link.title }}
@@ -104,7 +104,7 @@
               :icon="item.icon"
               type="router-link"
               :to="item.to"
-              badge="2"
+              :badge="item.badge"
             />
           </li>
         </ul>
@@ -346,7 +346,7 @@ function closeMenu(e: Event) {
     display: inline-block;
     transition: var(--general-transition);
 
-    &:first-child {
+    &.--bold {
       font-weight: 700;
     }
 

@@ -130,6 +130,11 @@ button {
     border-radius: var(--border-radius);
     padding: 0.75rem;
     box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.1);
+    transition: var(--general-transition);
+  }
+
+  &.--clickable:hover &__inner {
+    box-shadow: 0px 1px 18px rgb(165, 165, 165);
   }
 }
 

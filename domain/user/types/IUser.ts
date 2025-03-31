@@ -6,6 +6,7 @@ export default interface IUser {
   email_verified_at: string
   name: string
   phone_number: null | string
+  telegram: null | string
   location: null | string
   street: null | string
   house: null | string

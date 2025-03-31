@@ -40,7 +40,7 @@
     </div>
     <div class="footer__bottom">
       <div class="footer__bottom-container _container">
-        <div>© 2024 audiofree.ru Все права защищены</div>
+        <div>© {{ currentYear }} audiofree.ru Все права защищены</div>
         <div>
           <LogoText hideText link />
         </div>
@@ -67,10 +67,12 @@ interface IFooterColumn {
   title: string
   items: {
     title: string
-    action?: ((payload: Event) => void)
+    action?: (payload: Event) => void
     to?: RouteLocationRaw
   }[]
 }
+
+const currentYear = new Date().getFullYear()
 
 const columns: IFooterColumn[] = [
   {
@@ -90,7 +92,7 @@ const columns: IFooterColumn[] = [
       },
       {
         title: 'Ваши заказы',
-        to: { name: 'ProfilePage' },
+        to: { name: 'OrdersPage' },
       },
     ],
   },

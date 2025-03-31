@@ -18,7 +18,7 @@
         <MaskInput
           v-model="phoneNumber"
           id="phoneNumber"
-          mask="+7 (999) 999 99 99"
+          :mask="phoneMask"
           inputmode="numeric"
         />
         <template #error v-if="phoneNumberError">{{
@@ -51,6 +51,7 @@ import AFButton from '~/components/Blocks/AFButton.vue'
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import MaskInput from '~/components/Blocks/FormElements/MaskInput.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
+import phoneMask from '~/domain/mask-input/phoneMask'
 import { mapErrorsFromResponse } from '~/utils/general'
 
 const userStore = useUserStore()
@@ -75,7 +76,7 @@ const { getUser } = useUserStore()
 const { addNotification } = useNotifications()
 
 const { validate } = useAllValidation([
-  useValidation(phoneNumber, phoneNumberError, [phoneNumberValidation()]),
+  useValidation(phoneNumber, phoneNumberError, [phoneNumberValidation(null)]),
 ])
 
 const isLoading = ref(true)
@@ -128,7 +129,9 @@ async function onSubmit() {
         ])
       },
     })
-  } catch (err) {}
+  } catch (err) {
+    console.error(err)
+  }
 
   isLoading.value = false
 }

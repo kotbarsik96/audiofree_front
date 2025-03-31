@@ -91,7 +91,9 @@ async function removeReview() {
         }
       },
     })
-  } catch (err) {}
+  } catch (err) {
+    console.error(err)
+  }
 
   isLoading.value = false
 }

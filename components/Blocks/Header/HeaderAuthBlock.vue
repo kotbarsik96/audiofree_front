@@ -14,7 +14,7 @@
           <div class="h-auth-block__delimeter">/</div>
           <button
             class="h-auth-block__btn _link _link--text-color"
-            @click="userStore.logout"
+            @click="Auth.logout()"
           >
             Выйти
           </button>
@@ -47,6 +47,7 @@ import AFIcon from '~/components/Blocks/AFIcon.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/userStore'
+import { Auth } from '~/domain/auth/Auth'
 
 const { openLoginDialog, openSignupDialog } = useAuthStore()
 const userStore = useUserStore()

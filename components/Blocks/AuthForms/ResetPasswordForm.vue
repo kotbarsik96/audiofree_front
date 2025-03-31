@@ -77,7 +77,9 @@ async function send() {
         if (response._data.message) loginError.value = response._data.message
       },
     })
-  } catch (e) {}
+  } catch (e) {
+    console.error(e)
+  }
 
   isLoading.value = false
 }

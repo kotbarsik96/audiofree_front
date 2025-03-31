@@ -85,7 +85,9 @@ async function onSubmit() {
         mapErrorsFromResponse(response, [['email', newEmailError]])
       },
     })
-  } catch (err) {}
+  } catch (err) {
+    console.error(err)
+  }
 
   isLoading.value = false
 }
