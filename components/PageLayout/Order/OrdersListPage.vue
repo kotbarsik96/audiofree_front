@@ -6,8 +6,8 @@
         <h1 class="_page-header__title">Список ваших заказов</h1>
       </div>
       <div class="sorts">
-        <AFSelect :options="orderOptions" v-model="sortOrder" />
         <AFSelect :options="options" v-model="sort" />
+        <AFSelect :options="orderOptions" v-model="sortOrder" />
       </div>
       <div class="inputs">
         <InputWrapper :icon="SearchIcon">
@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import EmptyList from '~/components/Blocks/EmptyList.vue'
-import OrderCard from '~/components/Blocks/Cards/Order/OrderCard.vue'
+import OrderCard from '~/components/Blocks/Order/OrderCard.vue'
 import AFSelect from '~/components/Blocks/AFSelect.vue'
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
@@ -44,7 +44,7 @@ setBreadcrumbs([
   {
     index: 2,
     label: 'Ваши заказы',
-    link: { name: 'OrdersList' },
+    link: { name: 'OrdersPage' },
   },
 ])
 
@@ -94,9 +94,11 @@ watch(
   padding: 0 0 3rem 0;
 
   .sorts {
+    padding-top: 1rem;
     display: flex;
     align-items: center;
     gap: 0.625rem;
+    flex-wrap: wrap;
 
     .select {
       width: var(--input-width);

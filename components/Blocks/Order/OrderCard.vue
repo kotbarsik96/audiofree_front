@@ -1,6 +1,6 @@
 <template>
   <NuxtLink
-    class="order-card _card"
+    class="order-card _card --clickable"
     :to="{ name: 'OrderPage', params: { id: data.id } }"
   >
     <div class="_card__inner">
@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import AFImage from '~/components/Blocks/AFImage.vue'
-import OrderStatus from '~/components/Blocks/Cards/Order/OrderStatus.vue'
+import OrderStatus from '~/components/Blocks/Order/OrderStatus.vue';
 import type { IOrderListItem } from '~/domain/order/interfaces/IOrderListItem'
 import { deliveryPlacesMap } from '~/domain/order/types/TDeliveryPlaces'
 
