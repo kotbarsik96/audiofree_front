@@ -18,6 +18,20 @@ import SuccessfullyCreatedOrder from '~/components/Page/OrderPage/NewOrderPage/S
 
 const isCreated = ref(false)
 
+const { setBreadcrumbs } = useBreadcrumbs()
+setBreadcrumbs([
+  {
+    index: 2,
+    label: 'Корзина',
+    link: { name: 'CartPage' },
+  },
+  {
+    index: 3,
+    label: 'Оформление заказа',
+    link: { name: 'NewOrderPage' },
+  },
+])
+
 function onCreatedOrder() {
   isCreated.value = true
 }

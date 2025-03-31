@@ -116,20 +116,6 @@ const emit = defineEmits<{
   (e: 'orderCreated'): void
 }>()
 
-const { setBreadcrumbs } = useBreadcrumbs()
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Корзина',
-    link: { name: 'CartPage' },
-  },
-  {
-    index: 3,
-    label: 'Оформление заказа',
-    link: { name: 'NewOrderPage' },
-  },
-])
-
 const { user } = useUserStore()
 const route = useRoute()
 const router = useRouter()

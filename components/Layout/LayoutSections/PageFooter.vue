@@ -92,7 +92,7 @@ const columns: IFooterColumn[] = [
       },
       {
         title: 'Ваши заказы',
-        to: { name: 'ProfilePage' },
+        to: { name: 'OrdersPage' },
       },
     ],
   },
