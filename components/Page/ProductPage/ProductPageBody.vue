@@ -49,12 +49,12 @@
       <AFButton
         v-else
         label="В корзину"
-        :disabled="isLoadingCart"
+        :disabled="toCartDisabled"
         @click="onToCartClick"
       />
       <AFButton
         label="Купить в 1 клик"
-        :disabled="isLoadingCart"
+        :disabled="toCartDisabled"
         styleType="secondary"
         @click="buyOneclick"
       />
@@ -65,6 +65,10 @@
         <span class="_bold">
           {{ product.id }}
         </span>
+      </div>
+      <div v-if="outOfStock" class="product-body__oos">Товар закончился</div>
+      <div v-else-if="smallStock" class="product-body__small-stock">
+        Внимание: осталось {{ variation.quantity }} шт.
       </div>
       <div v-if="inCart" class="product-body__side-top-text">
         <CartIcon class="icon" />
@@ -177,6 +181,14 @@ const { refresh: quantityRefreshCallback } = useDelayedCallback(
   250,
   updateQuantityOnChange
 )
+
+const outOfStock = computed(() =>
+  !variation.value || variation.value.quantity < 1
+)
+const smallStock = computed(
+  () => !variation.value || variation.value.quantity < 5
+)
+const toCartDisabled = computed(() => isLoadingCart.value || outOfStock.value)
 
 watch(quantity, () => {
   if (inCart.value) {
@@ -334,6 +346,16 @@ async function onFavortieClick() {
     display: flex;
     gap: 0.75rem;
     justify-content: flex-end;
+  }
+
+  &__oos {
+    color: var(--red);
+    @include fontSize(18);
+  }
+
+  &__small-stock{ 
+    color: var(--rating-fill-color);
+    @include fontSize(18);
   }
 
   &__side-info {

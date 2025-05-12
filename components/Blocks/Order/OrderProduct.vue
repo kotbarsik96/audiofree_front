@@ -13,6 +13,9 @@
         </div>
       </div>
       <AFImage :data="data.variation.image" />
+      <div class="amount">
+        {{ data.product_quantity }} шт.
+      </div>
     </div>
   </NuxtLink>
 </template>
@@ -59,6 +62,11 @@ const linkToProduct = computed(() => ({
       height: 200px;
       object-fit: contain;
     }
+  }
+  .amount {
+    margin-block-start: 1rem;
+    @include fontSize(16);
+    font-weight: 600;
   }
 }
 </style>
