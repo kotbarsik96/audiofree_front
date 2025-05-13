@@ -70,6 +70,12 @@ function linkToProduct(product: ICatalogProduct) {
 }
 </script>
 
+<style>
+@import '/scss/plugins/swiper.scss';
+@import '/scss/plugins/swiper-effect-flip.scss';
+@import '/scss/plugins/swiper-pagination.scss';
+</style>
+
 <style lang="scss" scoped>
 @use '~/scss/plugins/swiper-effect-flip.scss';
 @use '~/scss/plugins/swiper-pagination.scss';

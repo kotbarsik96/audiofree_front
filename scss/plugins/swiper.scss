@@ -10,7 +10,7 @@
  * Released on: September 12, 2024
  */
 
-@import 'swiper-vars.scss';
+@use 'swiper-vars.scss';
 @at-root {
   @font-face {
     font-family: 'swiper-icons';
@@ -22,7 +22,6 @@
 }
 @at-root {
   :root {
-    --swiper-theme-color: #{$themeColor};
     /*
     --swiper-preloader-color: var(--swiper-theme-color);
     --swiper-wrapper-transition-timing-function: initial;
