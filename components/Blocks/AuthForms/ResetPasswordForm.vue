@@ -12,9 +12,6 @@
           inputId="login"
         >
           <TextInput v-model="login" placeholder="Логин" id="login" />
-          <template v-if="loginError" #error>
-            {{ loginError }}
-          </template>
         </InputWrapper>
         <div class="auth-form__buttons">
           <AFButton
@@ -46,35 +43,28 @@ import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import { possibleLogins } from '~/domain/auth/loginTypes'
 
-const { previousTab, tab, login } = storeToRefs(useAuthStore())
-const { addNotification } = useNotifications()
+const { previousTab, tab, savedLogin } = storeToRefs(useAuthStore())
+
+const login = ref(savedLogin.value)
 
 const messageSentText = ref()
 const isLoading = ref(false)
-const loginError = ref('')
-const { validate, startWatching } = useValidation(login, loginError, [
-  mustPresentValidation(),
-])
 
 const { $afFetch } = useNuxtApp()
 
-async function send() {
-  startWatching()
-  if (!validate()) return
+watch(login, () => (savedLogin.value = login.value))
 
+async function send() {
   isLoading.value = true
 
   try {
     await $afFetch('/profile/reset-password/request', {
       method: 'POST',
-      body: { login: login.value },
+      body: { login: savedLogin.value },
       onResponse({ response }) {
         if (response.ok && response._data.message) {
           messageSentText.value = response._data.message
         }
-      },
-      onResponseError({ response }) {
-        if (response._data.message) loginError.value = response._data.message
       },
     })
   } catch (e) {

@@ -24,7 +24,7 @@ import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
 import { Auth } from '~/domain/auth/Auth'
 import { LoginSteps } from '~/domain/auth/LoginSteps'
 
-const { login, loginStep } = storeToRefs(useAuthStore())
+const { savedLogin, loginStep } = storeToRefs(useAuthStore())
 
 const isLoading = ref(false)
 const code = ref('')
@@ -38,7 +38,7 @@ async function onSubmit() {
   isLoading.value = true
 
   try {
-    Auth.login(login.value, 'code', code.value, codeError)
+    Auth.login(savedLogin.value, 'code', code.value, codeError)
   } catch (e) {
     console.error(e)
   }

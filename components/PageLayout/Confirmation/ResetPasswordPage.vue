@@ -41,28 +41,34 @@ import AFButton from '~/components/Blocks/AFButton.vue'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useNotifications } from '@/composables/useNotifications'
+import {
+  useValidationField,
+  useValidationForm,
+} from '~/domain/validaiton/useValidation'
+import { mustPresentValidation } from '~/domain/validaiton/validators/mustPresentValidation'
+import { passwordValidation } from '~/domain/validaiton/validators/passwordValidation'
+import { passwordsMatchValidation } from '~/domain/validaiton/validators/passwordsMatchValidation'
 
 const route = useRoute()
 const router = useRouter()
 const { addNotification } = useNotifications()
 
 const { code, login } = route.query
-const password = ref('')
-const passwordRepeat = ref('')
-const passwordError = ref('')
-const passwordRepeatError = ref('')
 const isLoading = ref(false)
 
-const validation = useAllValidation([
-  useValidation(password, passwordError, [
+const form = useValidationForm({
+  password: useValidationField('', [
     mustPresentValidation(),
     passwordValidation(),
   ]),
-  useValidation(passwordRepeat, passwordRepeatError, [
-    mustPresentValidation(),
-    passwordsMatchValidation(password),
-  ]),
-])
+  passwordRepeat: useValidationField('', []),
+})
+
+const { password, passwordRepeat } = form.getFieldRefs()
+const { password: passwordError, passwordRepeat: passwordRepeatError } =
+  form.getErrorRefs()
+
+form.fields.passwordRepeat.addValidator(passwordsMatchValidation(password))
 
 const { $afFetch } = useNuxtApp()
 
@@ -89,7 +95,7 @@ async function checkLink() {
   isLoading.value = false
 }
 async function onSubmit() {
-  if (!validation.validate()) return
+  if (!form.validateAll()) return
 
   isLoading.value = true
 

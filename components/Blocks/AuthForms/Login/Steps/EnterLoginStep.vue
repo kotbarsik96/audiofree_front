@@ -1,6 +1,9 @@
 <template>
   <form @submit.prevent="onSubmit">
-    <InputWrapper :label="`Логин (${possibleLogins.join(', ')})`" inputId="login">
+    <InputWrapper
+      :label="`Логин (${possibleLogins.join(', ')})`"
+      inputId="login"
+    >
       <TextInput v-model="login" id="login" placeholder="Логин" />
       <template v-if="loginError" #error>{{ loginError }}</template>
     </InputWrapper>
@@ -17,16 +20,20 @@ import AFButton from '~/components/Blocks/AFButton.vue'
 import { LoginSteps } from '~/domain/auth/LoginSteps'
 import { possibleLogins } from '~/domain/auth/loginTypes'
 
-const { loginStep, login } = storeToRefs(useAuthStore())
+const { loginStep, savedLogin } = storeToRefs(useAuthStore())
 const { $afFetch } = useNuxtApp()
 const { addNotification } = useNotifications()
 
+const login = ref(savedLogin.value)
 const isLoading = ref(false)
 const loginError = ref('')
 
 const buttonDisabled = computed(() => !login.value || isLoading.value)
 
-watch(login, () => (loginError.value = ''))
+watch(login, () => {
+  savedLogin.value = login.value
+  loginError.value = ''
+})
 
 async function onSubmit() {
   isLoading.value = true
