@@ -17,10 +17,11 @@ import AFButton from '~/components/Blocks/AFButton.vue'
 import { LoginSteps } from '~/domain/auth/LoginSteps'
 import { possibleLogins } from '~/domain/auth/loginTypes'
 
-const { loginStep, login } = storeToRefs(useAuthStore())
+const { loginStep, savedLogin } = storeToRefs(useAuthStore())
 const { $afFetch } = useNuxtApp()
 const { addNotification } = useNotifications()
 
+const login = ref(savedLogin.value)
 const isLoading = ref(false)
 const loginError = ref('')
 

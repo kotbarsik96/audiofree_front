@@ -2,7 +2,9 @@
   <form @submit.prevent="onSubmit">
     <InputWrapper label="Ваше имя" inputId="name">
       <TextInput v-model="name" placeholder="Имя" id="name" />
-      <template v-if="errorName" #error>{{ errorName }}</template>
+      <template v-if="form.fields.name.hasError.value" #error>
+        {{ nameError }}
+      </template>
     </InputWrapper>
     <InputWrapper :label="`Логин (${signupLoginType})`" inputId="login">
       <TextInput
@@ -10,7 +12,9 @@
         id="login"
         :placeholder="`${signupLoginType}`"
       />
-      <template v-if="errorLogin" #error>{{ errorLogin }}</template>
+      <template v-if="form.fields.login.hasError.value" #error>
+        {{ loginError }}
+      </template>
     </InputWrapper>
     <p>
       Оставьте пустыми поля для ввода пароля, чтобы авторизоваться по
@@ -22,8 +26,8 @@
       autocomplete="new-password"
       placeholder="Пароль"
     >
-      <template v-if="errorPassword" #error>
-        {{ errorPassword }}
+      <template v-if="form.fields.password.hasError.value" #error>
+        {{ passwordError }}
       </template>
     </PasswordInput>
     <PasswordInput
@@ -32,13 +36,17 @@
       placeholder="Пароль еще раз"
       autocomplete="new-password"
     >
-      <template v-if="errorPasswordConfirmation" #error>
-        {{ errorPasswordConfirmation }}
+      <template v-if="form.fields.passwordConfirmation.hasError.value" #error>
+        {{ passwordConfirmationError }}
       </template>
     </PasswordInput>
     <div class="_popup-buttons-column">
       <AFButton label="Регистрация" type="submit" :disabled="buttonDisabled" />
-      <AFButton label="Другой способ входа" styleType="secondary" @click="goBack" />
+      <AFButton
+        label="Другой способ входа"
+        styleType="secondary"
+        @click="goBack"
+      />
     </div>
   </form>
 </template>
@@ -52,9 +60,17 @@ import type INuxtFetchResponse from '~/dataAccess/api/INuxtFetchResponse'
 import { isResponseOk } from '~/utils/general'
 import { SignupSteps } from '~/domain/auth/SignupSteps'
 import { LoginSteps } from '~/domain/auth/LoginSteps'
+import {
+  useFormValidation,
+  useValidationField,
+} from '~/domain/validaiton/useValidation'
+import { passwordValidation } from '~/domain/validaiton/validators/passwordValidation'
+import { passwordsMatchValidation } from '~/domain/validaiton/validators/passwordsMatchValidation'
+import { emailValidation } from '~/domain/validaiton/validators/emailValidation'
+import { mustPresentValidation } from '~/domain/validaiton/validators/mustPresentValidation'
 
 const { $afFetch } = useNuxtApp()
-const { login, signupLoginType, dialogShown, signupStep, tab, loginStep } =
+const { savedLogin, signupLoginType, dialogShown, signupStep, tab, loginStep } =
   storeToRefs(useAuthStore())
 const { addNotification } = useNotifications()
 
@@ -64,22 +80,16 @@ const userStore = useUserStore()
 const { getUser } = userStore
 const { jwt } = storeToRefs(userStore)
 
-const name = ref('')
-const password = ref('')
-const passwordConfirmation = ref('')
-
-const errorName = ref('')
-const errorLogin = ref('')
-const errorPassword = ref('')
-const errorPasswordConfirmation = ref('')
-
-const validateAll = useAllValidation([
-  getLoginValidation(),
-  useValidation(password, errorPassword, [passwordValidation()]),
-  useValidation(passwordConfirmation, errorPasswordConfirmation, [
-    passwordsMatchValidation(password),
-  ]),
-])
+const form = useFormValidation({
+  name: useValidationField<string>('', [mustPresentValidation()]),
+  login: getLoginValidation(),
+  password: useValidationField<string>('', [passwordValidation()]),
+  passwordConfirmation: useValidationField<string>('', []),
+})
+form.linkFields('password', 'passwordConfirmation')
+form.fields.passwordConfirmation.addValidator(
+  passwordsMatchValidation(form.fields.password.value)
+)
 
 const authTypeText = computed(() => {
   let text = ''
@@ -99,8 +109,18 @@ const buttonDisabled = computed(
     password.value !== passwordConfirmation.value
 )
 
+const { login, name, password, passwordConfirmation } = form.getFieldRefs()
+const {
+  login: loginError,
+  name: nameError,
+  password: passwordError,
+  passwordConfirmation: passwordConfirmationError,
+} = form.getErrorRefs()
+
+watch(login, () => (savedLogin.value = login.value))
+
 async function onSubmit() {
-  if (!validateAll.validate()) return
+  if (!form.validateAll()) return
 
   isLoading.value = true
 
@@ -168,7 +188,7 @@ function getLoginValidation() {
   let validation
   switch (signupLoginType.value) {
     case 'Email':
-      validation = useValidation(login, errorLogin, [
+      validation = useValidationField('', [
         emailValidation(),
         mustPresentValidation(),
       ])
@@ -178,10 +198,10 @@ function getLoginValidation() {
 
 function mapResponseErrors(response: INuxtFetchResponse) {
   mapErrorsFromResponse(response, [
-    [signupLoginType.value.toLowerCase(), errorLogin],
-    ['name', errorName],
-    ['password', errorPassword],
-    ['password_confirmation', errorPasswordConfirmation],
+    [signupLoginType.value.toLowerCase(), loginError],
+    ['name', nameError],
+    ['password', passwordError],
+    ['password_confirmation', passwordConfirmationError],
   ])
 }
 

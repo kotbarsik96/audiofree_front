@@ -1,5 +1,4 @@
 import type { WatchHandle } from 'vue'
-import type { TValidationError } from './interfaces/TValidationError'
 import type { ValidatorCallback } from './interfaces/ValidatorCallback'
 import type { TFormValidationField } from './interfaces/TFormValidationField'
 
@@ -8,7 +7,8 @@ export function useValidationField<T>(
   validators: Array<ValidatorCallback<T>>
 ) {
   const value = ref<T>(initialValue)
-  const error = ref<TValidationError | null>(null)
+  const error = ref<string>()
+  const validated = ref(false)
   let watcher: WatchHandle | undefined
 
   function validate() {
@@ -28,21 +28,29 @@ export function useValidationField<T>(
       }
     }
 
-    if (isValid) error.value = null
+    if (isValid) error.value = undefined
+    validated.value = true
 
     return isValid
+  }
+  function addValidator(validator: ValidatorCallback<any>) {
+    validators.push(validator)
   }
 
   return {
     value,
     error,
     validate,
+    validated,
+    addValidator,
     hasError: computed(() => !!error.value),
-    errorMsg: computed(() => error.value?.error),
   }
 }
 
-export function useFormValidation(validationFields: TFormValidationField) {
+export function useFormValidation<
+  T extends TFormValidationField,
+  Key extends keyof T
+>(validationFields: T) {
   function validateAll() {
     let isAllValid = true
 
@@ -55,21 +63,40 @@ export function useFormValidation(validationFields: TFormValidationField) {
     return isAllValid
   }
 
-  function getErrors() {
-    const errors: Record<string, string> = {}
+  function getErrorRefs() {
+    const errors: Record<Key, Ref> = {} as Record<Key, Ref>
 
     for (let [fieldName, fieldData] of Object.entries(validationFields)) {
       if (fieldData.hasError) {
-        errors[fieldName] = fieldData.errorMsg.value as string
+        errors[fieldName as Key] = fieldData.error
       }
     }
 
     return errors
   }
 
+  /** При изменении sourceField будет изменён и targetField */
+  function linkFields(sourceFieldKey: Key, targetFieldKey: Key) {
+    watch(validationFields[sourceFieldKey].value, () => {
+      validationFields[targetFieldKey].validate()
+    })
+  }
+
+  function getFieldRefs() {
+    const fields: Record<Key, Ref> = {} as Record<Key, Ref>
+
+    for (let [fieldName, fieldData] of Object.entries(validationFields)) {
+      fields[fieldName as Key] = fieldData.value
+    }
+
+    return fields
+  }
+
   return {
     validateAll,
-    getErrors,
+    getErrorRefs,
     fields: validationFields,
+    linkFields,
+    getFieldRefs,
   }
 }

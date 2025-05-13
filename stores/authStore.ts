@@ -8,7 +8,7 @@ import { SignupSteps } from '~/domain/auth/SignupSteps'
 export const useAuthStore = defineStore('auth', () => {
   const tab = ref<authTabs>('signup')
   const previousTab = ref<authTabs>('signup')
-  const login = ref('')
+  const savedLogin = ref('')
   const dialogShown = ref(false)
   const signupStep = ref<SignupSteps>(SignupSteps.ChooseLoginStep)
   const signupLoginType = ref<loginTypes>('Email')
@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
   function closeDialogAndReset() {
     dialogShown.value = false
-    login.value = ''
+    savedLogin.value = ''
     loginStep.value = LoginSteps.EnterLoginStep
     signupStep.value = SignupSteps.ChooseLoginStep
   }
@@ -38,7 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     tab,
     previousTab,
-    login,
+    savedLogin,
     dialogShown,
     signupStep,
     signupLoginType,
