@@ -24,5 +24,5 @@ function goToResetPassword() {
 </script>
 
 <style lang="scss" scoped>
-@import '@/scss/components/_AuthForm';
+@use '~/scss/components/AuthForm.scss';
 </style>

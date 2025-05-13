@@ -66,7 +66,7 @@ function hide() {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    @include fontSize(19);
+    font: var(--text-18);
     font-weight: 700;
     color: var(--text-color);
     position: relative;

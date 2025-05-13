@@ -79,6 +79,8 @@ watch(
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .favorites-main {
   display: flex;
   flex-direction: column;
@@ -128,7 +130,7 @@ watch(
     opacity: 0.5;
   }
 
-  @include adaptive(phone) {
+  @include mixins.adaptive(phone) {
     &__sorts {
       .select {
         min-width: unset;

@@ -70,9 +70,15 @@ function linkToProduct(product: ICatalogProduct) {
 }
 </script>
 
+<style>
+@import '/scss/plugins/swiper.scss';
+@import '/scss/plugins/swiper-effect-flip.scss';
+@import '/scss/plugins/swiper-pagination.scss';
+</style>
+
 <style lang="scss" scoped>
-@import '~/scss/plugins/swiper-effect-flip';
-@import '~/scss/plugins/swiper-pagination';
+@use '~/scss/plugins/swiper-effect-flip.scss';
+@use '~/scss/plugins/swiper-pagination.scss';
 
 .bestsellers-section {
   padding-top: 90px;
@@ -144,12 +150,12 @@ function linkToProduct(product: ICatalogProduct) {
     font-weight: 700;
 
     div:first-child {
-      @include fontSize(24);
+      font: var(--text-24);
       line-height: 0px;
     }
 
     div:last-child {
-      @include fontSize(64);
+      font-size: 4rem;
       line-height: 75px;
     }
   }
@@ -158,7 +164,7 @@ function linkToProduct(product: ICatalogProduct) {
     position: absolute;
     z-index: 10;
     text-align: center;
-    @include fontSize(192);
+    font-size: 12rem;
     font-weight: 700;
     line-height: 225px;
     color: #fff;
@@ -185,7 +191,7 @@ function linkToProduct(product: ICatalogProduct) {
     margin-top: 20px;
 
     .button {
-      @include fontSize(16);
+      font: var(--text-16);
       line-height: 18px;
       padding: 15px 50px;
       min-width: 255px;

@@ -21,7 +21,7 @@ const props = defineProps<{
   border-radius: 5px;
   color: var(--white);
   display: inline-block;
-  @include fontSize(16);
+  font: var(--text-16);
 
   &.--preparing {
     background-color: #2049a9;

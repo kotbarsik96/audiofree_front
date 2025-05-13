@@ -61,6 +61,8 @@ const className = computed(() => {
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .btn-icon {
   position: relative;
   display: inline-flex;
@@ -113,7 +115,7 @@ const className = computed(() => {
     font-weight: 700;
   }
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     background-color: transparent;
     width: auto;
     height: auto;

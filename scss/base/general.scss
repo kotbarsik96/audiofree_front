@@ -1,20 +1,22 @@
+@use '/scss/mixins.scss';
+
 html {
   line-height: 120%;
   font-weight: 400;
   font-family: var(--font-roboto-flex);
   font-size: clamp(0.875em, 0.5svw + 0.6em, 1.15em);
 
-  @include scrollbar();
+  @include mixins.scrollbar();
   * {
-    @include scrollbar();
+    @include mixins.scrollbar();
   }
 }
 
 :root:has(.firefox) {
-  @include scrollbarFirefox();
+  @include mixins.scrollbarFirefox();
 
   * {
-    @include scrollbarFirefox();
+    @include mixins.scrollbarFirefox();
   }
 }
 
@@ -34,7 +36,7 @@ button {
 
 ._link {
   text-decoration: none;
-  @include fontSize(16);
+  font: var(--text-16);
   color: var(--primary);
   transition: var(--general-transition);
 
@@ -58,7 +60,7 @@ button {
 
 ._error {
   color: var(--red);
-  @include fontSize(16);
+  font: var(--text-16);
 }
 
 ._bold {
@@ -89,7 +91,7 @@ button {
 ._page {
   margin-top: 3.75rem;
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     margin-top: 1.5rem;
   }
 }
@@ -100,7 +102,7 @@ button {
   gap: 0.5rem;
 
   &__title {
-    @include fontSize(36);
+    font: var(--text-36);
     font-weight: 700;
   }
 }
@@ -147,7 +149,7 @@ button {
 
 @each $h in 1, 2, 3, 4 {
   ._h#{$h} {
-    @include fHeadline($h);
+    font: var(--text-#{$h});
   }
 }
 

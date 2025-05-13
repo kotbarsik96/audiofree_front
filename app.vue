@@ -37,5 +37,12 @@ function defineIfFirefox() {
 </script>
 
 <style>
-@import '~/scss/styles.scss';
+@import '/scss/base/reset.scss';
+@import '/scss/base/fonts.scss';
+@import '/scss/base/transition.scss';
+@import '/scss/base/general.scss';
+@import '/scss/variables/colors.scss';
+@import '/scss/variables/fonts.scss';
+@import '/scss/variables/sizes.scss';
+@import '/scss/variables/transitions.scss';
 </style>

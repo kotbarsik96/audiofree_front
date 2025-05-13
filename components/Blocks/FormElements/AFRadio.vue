@@ -28,5 +28,5 @@ const _value = computed({
 </script>
 
 <style lang="scss" scoped>
-@import '~/scss/components/_AFRadio';
+@use '~/scss/components/AFRadio.scss';
 </style>

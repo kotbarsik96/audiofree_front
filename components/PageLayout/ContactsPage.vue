@@ -36,6 +36,8 @@ setBreadcrumbs([
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .contacts {
   --cp-padding-x: 1.875rem;
   --cp-padding-y: 1.875rem;
@@ -75,7 +77,7 @@ setBreadcrumbs([
     padding-left: 0;
   }
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     &__box {
       &::before {
         display: none;

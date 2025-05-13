@@ -8,18 +8,10 @@ export default defineNuxtConfig({
   modules: ['@pinia/nuxt'],
 
   devServer: {
-    port: 3002
+    port: 3002,
   },
 
   vite: {
-    css: {
-      preprocessorOptions: {
-        scss: {
-          api: 'modern-compiler',
-          additionalData: '@import "~/scss/settings.scss";',
-        },
-      },
-    },
     plugins: [
       svgLoader({
         svgo: false,

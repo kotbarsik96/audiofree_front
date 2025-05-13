@@ -117,6 +117,8 @@ const columns: IFooterColumn[] = [
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .footer {
   color: var(--white);
 
@@ -138,11 +140,11 @@ const columns: IFooterColumn[] = [
   }
 
   &__column-link {
-    @include fontSize(16);
+    font: var(--text-16);
   }
 
   &__column-title {
-    @include fontSize(18);
+    font: var(--text-18);
     font-weight: 500;
     margin-bottom: 50px;
   }
@@ -176,10 +178,10 @@ const columns: IFooterColumn[] = [
     display: flex;
     justify-content: space-between;
     align-items: center;
-    @include fontSize(16);
+    font: var(--text-16);
   }
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     &__main {
       padding: 2.375rem 0 1.125rem 0;
     }
@@ -214,7 +216,7 @@ const columns: IFooterColumn[] = [
     }
 
     &__column-title {
-      @include fontSize(24);
+      font: var(--text-24);
       margin-bottom: 1.5rem;
     }
 

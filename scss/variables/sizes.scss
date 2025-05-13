@@ -1,0 +1,5 @@
+:root {
+  --container-width: max(73.125rem, 1170px);
+  --container-padding-x: 15px;
+  --container-unpadding: calc(var(--container-padding-x) * -1);
+}

@@ -105,6 +105,8 @@ function onQuantityChange() {
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .cart-list {
   &__list-body {
     display: grid;
@@ -122,8 +124,8 @@ function onQuantityChange() {
     grid-template-columns: subgrid;
     grid-column: span 6;
     color: var(--text-color-light);
+    font: var(--text-16);
     font-weight: 500;
-    @include fontSize(16);
 
     .--name {
       grid-column: 2 / 3;
@@ -154,11 +156,11 @@ function onQuantityChange() {
     flex-direction: column;
     align-items: center;
     gap: 0.625rem;
+    font: var(--text-18);
     font-weight: 500;
-    @include fontSize(18);
   }
 
-  @include adaptive(tablet-small) {
+  @include mixins.adaptive(tablet-small) {
     display: flex;
     flex-direction: column;
 
@@ -189,13 +191,13 @@ function onQuantityChange() {
     }
 
     td:first-child {
-      font-weight: 700;
       padding-right: 2rem;
-      @include fontSize(18);
+      font: var(--text-18);
+      font-weight: 700;
     }
     td:last-child {
+      font: var(--text-24);
       font-weight: 700;
-      @include fontSize(24);
     }
   }
 }

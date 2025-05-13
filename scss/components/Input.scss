@@ -6,7 +6,7 @@
   width: 100%;
   outline: none;
   background-color: var(--white);
-  @include fontSize(16);
+  font: var(--text-16);
 
   &::placeholder {
     color: var(--input-placeholder-color);

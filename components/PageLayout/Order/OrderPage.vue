@@ -90,13 +90,15 @@ const paidString = computed(() =>
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .order {
   padding: 0 0 3rem 0;
 
   .general {
     margin-top: 1.5rem;
+    font: var(--text-18);
     font-weight: 500;
-    @include fontSize(18);
   }
   .detail {
     font-weight: 600;
@@ -121,7 +123,7 @@ const paidString = computed(() =>
     gap: 1rem;
   }
 
-  @include adaptive(tablet-small) {
+  @include mixins.adaptive(tablet-small) {
     .products-list {
       justify-content: center;
     }

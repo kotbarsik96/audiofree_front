@@ -124,14 +124,15 @@ function clearAll() {
 </script>
 
 <style lang="scss" scoped>
-@import '/scss/components/SectionForm';
+@use '/scss/mixins.scss';
+@use '~/scss/components/SectionForm.scss';
 
 .section-form {
   &__input.--repeat {
     grid-column: 2 / 3;
   }
 
-  @include adaptive(phone-big) {
+  @include mixins.adaptive(phone-big) {
     &__input.--repeat {
       grid-column: span 1;
     }

@@ -43,13 +43,13 @@ const props = defineProps<{
   }
 
   &__code {
-    font-weight: 800;
     color: var(--primary);
-    @include fontSize(70);
+    font-size: 4.5rem;
+    font-weight: 800;
   }
 
   &__text {
-    @include fontSize(21);
+    font: var(--text-20);
     font-weight: 500;
     color: var(--text-color);
   }

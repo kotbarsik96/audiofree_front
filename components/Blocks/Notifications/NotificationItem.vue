@@ -116,7 +116,7 @@ function close() {
   }
 
   &__body {
-    @include fontSize(16);
+    font: var(--text-16);
     font-weight: 500;
     display: flex;
     align-items: center;

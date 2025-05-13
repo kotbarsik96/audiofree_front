@@ -25,9 +25,9 @@ import OperatorIcon from '~/assets/images/icons/operator.svg'
     justify-content: center;
     gap: 1rem;
     align-items: center;
-    font-weight: 500;
     text-align: center;
-    @include fontSize(18);
+    font: var(--text-18);
+    font-weight: 500;
 
     .icon {
       width: 5rem;

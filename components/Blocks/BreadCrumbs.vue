@@ -31,7 +31,7 @@ const { breadCrumbs } = useBreadcrumbs()
     display: inline-block;
     color: var(--breadcrumbs-color);
     transition: var(--general-transition);
-    @include fontSize(16);
+    font: var(--text-16);
 
     &::before {
       content: '';

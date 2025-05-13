@@ -28,7 +28,7 @@ const { isWritingReview, currentUserReview, productSlug } =
 <style lang="scss" scoped>
 .user-review {
   &__title {
-    @include fontSize(21);
+    font: var(--text-20);
     font-weight: 500;
   }
 }

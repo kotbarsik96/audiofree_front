@@ -15,6 +15,8 @@ import refundSteps from '~/enums/guarantees-refund/refundSteps'
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .grefund-steps {
   &__title {
     margin-bottom: 1.25rem;
@@ -27,7 +29,7 @@ import refundSteps from '~/enums/guarantees-refund/refundSteps'
     counter-reset: refundSteps;
   }
 
-  @include adaptive(phone-big){
+  @include mixins.adaptive(phone-big){
     &__list {
       gap: 1rem;
       grid-template-columns: 1fr;

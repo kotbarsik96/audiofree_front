@@ -32,7 +32,7 @@ const props = defineProps<{
     align-items: center;
     gap: 9px;
     transition: var(--general-transition);
-    @include fontSize(18);
+    font: var(--text-18);
     font-weight: 700;
 
     .icon {
@@ -41,7 +41,7 @@ const props = defineProps<{
   }
 
   &__text {
-    @include fontSize(16);
+    font: var(--text-16);
     line-height: 1;
     transition: var(--general-transition);
   }

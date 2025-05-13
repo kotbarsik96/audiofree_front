@@ -31,8 +31,8 @@ const iconComponent = computed(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  font: var(--text-18);
   font-weight: 500;
-  @include fontSize(18);
 
   &__icon {
     width: 5rem;

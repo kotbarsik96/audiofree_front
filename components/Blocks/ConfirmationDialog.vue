@@ -68,14 +68,14 @@ function onAnimationEnd() {
   }
 
   &__title {
-    @include fontSize(18);
+    font: var(--text-18);
     font-weight: 700;
     color: var(--text-color);
     text-align: center;
   }
 
   &__detail {
-    @include fontSize(16);
+    font: var(--text-16);
     font-weight: 500;
     color: var(--text-color-light);
     text-align: center;

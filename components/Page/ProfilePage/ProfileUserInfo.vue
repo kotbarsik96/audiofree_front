@@ -146,5 +146,5 @@ async function onSubmit() {
 </script>
 
 <style lang="scss" scoped>
-@import '/scss/components/SectionForm';
+@use '~/scss/components/SectionForm.scss';
 </style>

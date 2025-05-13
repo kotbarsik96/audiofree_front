@@ -1,0 +1,7 @@
+:root {
+  --general-transition: all 0.25s ease-in-out, font-size 0s, line-height 0s,
+    margin 0s, padding 0s, gap 0s;
+  --spoiler-body-transition-property: max-height, padding;
+  --spoiler-body-transition-duration: 0.25s;
+  --spoiler-body-transition-tfunc: ease;
+}

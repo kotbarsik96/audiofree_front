@@ -19,6 +19,8 @@ const props = defineProps<{
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .grefund-info-card {
   display: grid;
   grid-template-rows: subgrid;
@@ -46,18 +48,18 @@ const props = defineProps<{
   &__title {
     grid-column: 2 / 3;
     grid-row: 1 / 2;
+    font: var(--text-18);
     font-weight: 700;
-    @include fontSize(18);
   }
 
   &__detail {
     grid-column: 1 / -1;
     grid-row: 2 / 3;
     margin-top: 1rem;
-    @include fontSize(18);
+    font: var(--text-18);
   }
   
-  @include adaptive(phone-big){
+  @include mixins.adaptive(phone-big){
     &::before {
       display: none;
     }

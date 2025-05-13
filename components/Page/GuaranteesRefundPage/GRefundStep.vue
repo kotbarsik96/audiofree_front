@@ -17,6 +17,8 @@ import ChevronRightIcon from '~/assets/images/icons/chevron-right.svg'
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .grefund-step {
   &__inner {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -41,12 +43,12 @@ import ChevronRightIcon from '~/assets/images/icons/chevron-right.svg'
     background: var(--white);
     box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.09);
     color: var(--primary);
-    font-weight: 900;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    @include fontSize(20);
-
+    font: var(--text-20);
+    font-weight: 900;
+    
     &::before {
       content: counters(refundSteps, '', decimal-leading-zero);
       counter-increment: refundSteps;
@@ -64,10 +66,10 @@ import ChevronRightIcon from '~/assets/images/icons/chevron-right.svg'
 
   &__body {
     padding: 1.5rem 1.125rem;
-    @include fontSize(16);
+    font: var(--text-16);
   }
 
-  @include adaptive(phone-big) {
+  @include mixins.adaptive(phone-big) {
     &::before {
       display: none;
     }

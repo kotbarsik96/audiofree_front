@@ -92,7 +92,7 @@ function updateValue(option: DropdownOption) {
   position: relative;
   transition: var(--general-transition);
   z-index: 50;
-  @include fontSize(16);
+  font: var(--text-16);
 
   &.shown {
     border-radius: var(--s-bradius) var(--s-bradius) 0 0;
@@ -118,7 +118,7 @@ function updateValue(option: DropdownOption) {
 
   &__icon {
     flex: 0 0 10px;
-    @include fontSize(10);
+    font-size: 0.6rem;
     color: var(--white);
     transform: rotate(90deg);
     transition: var(--general-transition);

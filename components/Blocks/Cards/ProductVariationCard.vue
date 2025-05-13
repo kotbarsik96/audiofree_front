@@ -110,7 +110,7 @@ async function onFavoritesClick() {
 </script>
 
 <style lang="scss" scoped>
-@import '/scss/components/ProductCard/ProductCard';
+@use '~/scss/components/ProductCard/ProductCard.scss';
 
 .product-variation-card {
   &__price {
