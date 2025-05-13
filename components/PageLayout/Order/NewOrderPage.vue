@@ -32,6 +32,10 @@ setBreadcrumbs([
   },
 ])
 
+watch(isCreated, () => {
+  window.scrollTo({ top: 0 })
+})
+
 function onCreatedOrder() {
   isCreated.value = true
 }

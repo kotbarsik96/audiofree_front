@@ -31,8 +31,8 @@ import AFButton from '~/components/Blocks/AFButton.vue'
 
   .text {
     margin: 2rem 0;
+    font: var(--text-30);
     font-weight: 600;
-    font: var(--text-30);;
   }
 }
 </style>
