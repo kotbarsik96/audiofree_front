@@ -78,6 +78,7 @@
     }
   }
 }
+
 @mixin scrollbarFirefox() {
   scrollbar-width: thin;
   scrollbar-color: var(--primary) var(--white);
@@ -88,24 +89,4 @@
     display: none;
   }
   scrollbar-width: none;
-}
-
-@mixin fontSize($sizePx, $lineHeight: 130%) {
-  font-size: #{calc($sizePx / 16)}rem;
-  line-height: $lineHeight;
-}
-
-$fHeadlines: (
-  1: 2rem 700,
-  2: 1.5rem 500,
-  3: 1.25rem 500,
-  4: 1rem 500,
-);
-@mixin fHeadline($num) {
-  $item: map.get($fHeadlines, $num);
-  $fontSize: nth($item, 1);
-  $fontWeight: nth($item, 2);
-
-  font-weight: $fontWeight;
-  font-size: $fontSize;
 }

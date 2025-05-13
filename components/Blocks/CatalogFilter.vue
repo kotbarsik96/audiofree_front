@@ -181,6 +181,8 @@ async function clearRouteQuery() {
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .ct-filter {
   --padding-x: 1.25rem;
 
@@ -195,7 +197,7 @@ async function clearRouteQuery() {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    @include fontSize(20);
+    font: var(--text-20);
     font-weight: 500;
   }
 
@@ -221,7 +223,7 @@ async function clearRouteQuery() {
   }
 
   &__section-name {
-    @include fontSize(18);
+    font: var(--text-18);
     font-weight: 500;
     margin-bottom: 1.25rem;
   }
@@ -241,7 +243,7 @@ async function clearRouteQuery() {
     }
   }
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     max-width: 25rem;
     margin: 0 auto;
 

@@ -128,7 +128,7 @@ function handleMinmax(value: number) {
     color: var(--text-color-light);
     width: 3.75rem;
     text-align: center;
-    @include fontSize(19);
+    font: var(--text-18);
   }
 
   &__arrow--more {

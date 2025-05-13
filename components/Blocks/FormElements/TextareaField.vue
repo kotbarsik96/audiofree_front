@@ -46,7 +46,7 @@ function handleInput(value?: string) {
   outline: none;
   background-color: var(--white);
   resize: none;
-  @include fontSize(16);
+  font: var(--text-16);
 
   &::placeholder {
     color: var(--input-placeholder-color);

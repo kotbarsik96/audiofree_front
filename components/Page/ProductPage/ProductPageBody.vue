@@ -236,6 +236,8 @@ async function onFavortieClick() {
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .product-body {
   display: grid;
   grid-template-columns: 27rem 1fr auto;
@@ -259,7 +261,8 @@ async function onFavortieClick() {
   }
 
   &__block-title {
-    @include fontSize(14, 145%);
+    font: var(--text-14);
+    line-height: 145%;
     font-weight: 500;
     color: var(--black);
   }
@@ -281,14 +284,14 @@ async function onFavortieClick() {
   }
 
   &__price-current {
-    @include fontSize(30);
+    font: var(--text-30);;
     font-weight: 700;
   }
 
   &__price-old {
     text-decoration: line-through;
     color: var(--text-color-light);
-    @include fontSize(19);
+    font: var(--text-18);
     font-weight: 300;
   }
 
@@ -326,7 +329,7 @@ async function onFavortieClick() {
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    @include fontSize(16);
+    font: var(--text-16);
 
     .icon {
       flex-shrink: 0;
@@ -350,12 +353,12 @@ async function onFavortieClick() {
 
   &__oos {
     color: var(--red);
-    @include fontSize(18);
+    font: var(--text-18);
   }
 
   &__small-stock{ 
     color: var(--rating-fill-color);
-    @include fontSize(18);
+    font: var(--text-18);
   }
 
   &__side-info {
@@ -369,7 +372,7 @@ async function onFavortieClick() {
     }
   }
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     grid-template-columns: 28rem 1fr;
     grid-template-rows: repeat(9, auto);
 
@@ -425,7 +428,7 @@ async function onFavortieClick() {
     }
   }
 
-  @include adaptive(tablet-small) {
+  @include mixins.adaptive(tablet-small) {
     grid-template-columns: 1fr;
     grid-template-rows: repeat(10, auto);
     width: 100%;

@@ -76,12 +76,12 @@ async function send() {
 </script>
 
 <style lang="scss" scoped>
-@import '@/scss/components/_AuthForm';
+@use '~/scss/components/AuthForm.scss';
 
 .email-sent {
   text-align: center;
   margin: 30px auto;
   color: var(--primary);
-  @include fHeadline(2);
+  font: var(--text-h2);
 }
 </style>

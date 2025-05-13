@@ -211,7 +211,7 @@ async function cancelEdit() {
   padding: 15px 20px;
 
   &__title {
-    @include fontSize(21);
+    font: var(--text-20);
     font-weight: 700;
     margin-bottom: 1rem;
   }
@@ -225,7 +225,7 @@ async function cancelEdit() {
 
   &__input {
     :deep(.input-wrapper__label) {
-      @include fontSize(16);
+      font: var(--text-16);
     }
   }
 

@@ -14,13 +14,15 @@ import guarantees from '~/enums/guarantees-refund/guarantees'
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .grefund-info {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
   grid-template-rows: auto 1fr;
   gap: 2rem;
 
-  @include adaptive(phone-big){
+  @include mixins.adaptive(phone-big){
     gap: 1rem;
   }
 }

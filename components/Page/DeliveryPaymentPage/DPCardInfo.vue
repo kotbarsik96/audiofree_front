@@ -50,13 +50,13 @@ const props = defineProps<{
 
   &__title {
     margin-bottom: 1.25rem;
+    font: var(--text-18);
     font-weight: 500;
-    @include fontSize(18);
   }
 
   &__detail {
+    font: var(--text-14);
     font-weight: 400;
-    @include fontSize(14);
   }
 }
 </style>

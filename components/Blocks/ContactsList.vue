@@ -24,6 +24,8 @@ import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .contacts-list {
   display: flex;
   flex-direction: column;
@@ -43,15 +45,15 @@ import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
   }
 
   &__contact-item-title {
-    @include fontSize(16);
+    font: var(--text-16);
   }
 
   &__contact-item-detail {
-    @include fontSize(16);
+    font: var(--text-16);
     font-weight: 700;
   }
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     &__contact-item {
       :deep(.btn-icon) {
         width: 2rem;

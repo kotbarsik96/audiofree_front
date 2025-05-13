@@ -20,9 +20,15 @@ const props = defineProps<{
 }>()
 </script>
 
+<style>
+@import '/scss/plugins/swiper.scss';
+@import '/scss/plugins/swiper-effect-flip.scss';
+@import '/scss/plugins/swiper-pagination.scss';
+</style>
+
 <style lang="scss" scoped>
 .gallery-slider {
-  &__slider{ 
+  &__slider {
     width: 100%;
   }
 

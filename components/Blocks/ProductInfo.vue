@@ -24,6 +24,8 @@ const props = defineProps<{
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .product-info {
   --cell-border-radius: 9px;
 
@@ -53,7 +55,7 @@ const props = defineProps<{
     }
   }
 
-  @include adaptive(tablet-big){
+  @include mixins.adaptive(tablet-big){
     &__table {
       td {
         padding: 10px;
@@ -61,7 +63,7 @@ const props = defineProps<{
     }
   }
 
-  @include adaptive(phone-big){
+  @include mixins.adaptive(phone-big){
     &__table {
       td  {
         &:first-child,

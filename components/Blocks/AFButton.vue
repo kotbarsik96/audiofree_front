@@ -71,7 +71,7 @@ const attrs = computed(() => {
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
-  @include fontSize(16);
+  font: var(--text-16);
   font-weight: 700;
   transition: var(--general-transition);
 
@@ -103,14 +103,14 @@ const attrs = computed(() => {
   }
 
   &__label {
-    @include fontSize(16);
+    font: var(--text-16);
     font-weight: 700;
   }
 
   &__icon {
     width: 20px;
     height: 20px;
-    @include fontSize(20);
+    font: var(--text-20);
   }
 
   // modifiers

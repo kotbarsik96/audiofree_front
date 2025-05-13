@@ -96,6 +96,8 @@ async function refetchProducts(){
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .catalog-body {
   display: flex;
   flex-direction: column;
@@ -122,13 +124,13 @@ async function refetchProducts(){
     }
   }
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     &__products {
       justify-content: center;
       margin: 0 auto;
     }
   }
-  @include adaptive(tablet-small) {
+  @include mixins.adaptive(tablet-small) {
     &__products {
       grid-template-columns: repeat(2, 1fr);
 
@@ -139,7 +141,7 @@ async function refetchProducts(){
     }
   }
 
-  @include adaptive(phone) {
+  @include mixins.adaptive(phone) {
     &__products {
       grid-template-columns: 1fr;
     }

@@ -62,7 +62,7 @@ const { isAuth } = storeToRefs(userStore)
   gap: 0.5rem;
 
   &__icon {
-    @include fontSize(18);
+    font: var(--text-18);
     width: 18px;
     height: 18px;
     color: var(--primary-dark);
@@ -70,7 +70,7 @@ const { isAuth } = storeToRefs(userStore)
 
   &__links {
     color: var(--text-color);
-    @include fontSize(16);
+    font: var(--text-16);
     min-width: 8rem;
   }
 
@@ -80,7 +80,7 @@ const { isAuth } = storeToRefs(userStore)
   }
 
   &__btn {
-    @include fontSize(16);
+    font: var(--text-16);
   }
 }
 </style>

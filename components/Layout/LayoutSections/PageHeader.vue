@@ -243,6 +243,8 @@ function closeMenu(e: Event) {
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .header {
   --header-height: 165px;
   z-index: 999;
@@ -324,7 +326,7 @@ function closeMenu(e: Event) {
       justify-content: center;
       align-items: center;
       gap: 1rem;
-      @include fontSize(18);
+      font: var(--text-18);
       font-weight: 500;
     }
   }
@@ -373,7 +375,7 @@ function closeMenu(e: Event) {
     }
   }
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     --header-height: 53px;
     --search-btn-size: 22px;
 
@@ -392,7 +394,7 @@ function closeMenu(e: Event) {
     }
   }
 
-  @include adaptive(desktop-small) {
+  @include mixins.adaptive(desktop-small) {
     &__top-logo {
       :deep(.logo-text__logo) span:last-child {
         display: none;
@@ -478,7 +480,7 @@ function closeMenu(e: Event) {
   }
 
   &__menu-btn {
-    @include fontSize(21);
+    font: var(--text-20);
     color: var(--primary-dark);
   }
 
@@ -488,7 +490,7 @@ function closeMenu(e: Event) {
   }
 
   &__logo {
-    @include fontSize(18);
+    font: var(--text-18);
     font-weight: 700;
     color: var(--primary-dark);
   }
@@ -540,13 +542,13 @@ function closeMenu(e: Event) {
   }
 
   &__menu-item-inner {
-    @include fontSize(16);
+    font: var(--text-16);
 
     &.--iconed {
       display: flex;
       align-items: center;
       gap: 22px;
-      @include fontSize(16);
+      font: var(--text-16);
       font-weight: 500;
 
       .icon {
@@ -556,7 +558,7 @@ function closeMenu(e: Event) {
       }
     }
     &.--close {
-      @include fontSize(18);
+      font: var(--text-18);
       font-weight: 700;
 
       .icon {

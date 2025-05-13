@@ -1,13 +1,4 @@
 :root {
-  // размеры
-  --container-width: max(73.125rem, 1170px);
-  --container-padding-x: 15px;
-  --container-unpadding: calc(var(--container-padding-x) * -1);
-
-  // шрифты
-  --font-roboto-flex: RobotoFlex, sans-serif;
-
-  // цвета и градиенты
   --black: #000000;
   --white: #ffffff;
   --primary: #8b75c8;
@@ -32,11 +23,4 @@
   --input-text-color: var(--black);
   --info-row-bg: #f6f6f6;
   --tab-inactive-text: #c2c2c2;
-
-  // transitions
-  --general-transition: all 0.25s ease-in-out, font-size 0s, line-height 0s,
-    margin 0s, padding 0s, gap 0s;
-  --spoiler-body-transition-property: max-height, padding;
-  --spoiler-body-transition-duration: 0.25s;
-  --spoiler-body-transition-tfunc: ease;
 }

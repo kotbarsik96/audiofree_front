@@ -21,9 +21,9 @@ const { openSignupDialog, openLoginDialog } = useAuthStore()
 <style lang="scss" scoped>
 .lts {
   padding: 10rem 0;
-  font-weight: 500;
   text-align: center;
-  @include fontSize(21);
+  font: var(--text-20);
+  font-weight: 500;
 
   ._link {
     font: inherit;

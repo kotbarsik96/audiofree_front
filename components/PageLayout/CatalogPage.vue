@@ -53,6 +53,8 @@ function refetchProducts(){
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .catalog {
   --column-width: 17rem;
 
@@ -90,7 +92,7 @@ function refetchProducts(){
     gap: 2.75rem;
   }
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     &__page-header {
       flex-direction: column;
       align-items: flex-start;
@@ -125,7 +127,7 @@ function refetchProducts(){
     }
   }
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     &__sorts {
       align-self: center;
     }

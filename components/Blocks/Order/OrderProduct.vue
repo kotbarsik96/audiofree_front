@@ -47,7 +47,7 @@ const linkToProduct = computed(() => ({
     height: 100%;
   }
   .info {
-    @include fontSize(18);
+    font: var(--text-18);
     font-weight: 500;
     text-align: center;
     display: flex;
@@ -65,7 +65,7 @@ const linkToProduct = computed(() => ({
   }
   .amount {
     margin-block-start: 1rem;
-    @include fontSize(16);
+    font: var(--text-16);
     font-weight: 600;
   }
 }

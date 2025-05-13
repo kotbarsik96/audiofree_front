@@ -57,6 +57,8 @@ const costString = computed(
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .order-card {
   --padding-y: 0.75rem;
   --padding-x: 1rem;
@@ -72,12 +74,12 @@ const costString = computed(
 
     > div {
       color: var(--text-color);
+      font: var(--text-18);
       font-weight: 500;
-      @include fontSize(18);
 
       > span {
+        font: var(--text-20);
         font-weight: 600;
-        @include fontSize(21);
       }
     }
   }
@@ -97,15 +99,15 @@ const costString = computed(
     }
 
     .detail {
+      font: var(--text-20);
       font-weight: 600;
-      @include fontSize(21);
     }
   }
   .order-body .texts > div {
     color: var(--text-color);
-    font-weight: 500;
     min-width: 0;
-    @include fontSize(18);
+    font: var(--text-18);
+    font-weight: 500;
   }
   .image {
     display: block;
@@ -116,7 +118,7 @@ const costString = computed(
     flex-shrink: 0;
   }
 
-  @include adaptive(phone-big) {
+  @include mixins.adaptive(phone-big) {
     .order-body {
       display: block;
     }

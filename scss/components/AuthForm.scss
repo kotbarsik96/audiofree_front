@@ -13,8 +13,8 @@
   }
 
   &__global-error {
+    font: var(--text-16);
     font-weight: 500;
-    @include fontSize(16);
   }
 
   &__inputs {

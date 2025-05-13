@@ -44,6 +44,8 @@ const product = computed(() => productData.value?.data.product)
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .product-page-info {
   margin-bottom: 100px;
 
@@ -59,7 +61,7 @@ const product = computed(() => productData.value?.data.product)
     display: none;
   }
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     margin-bottom: 50px;
 
     &__tabs {
@@ -80,7 +82,7 @@ const product = computed(() => productData.value?.data.product)
       padding: 0 20px;
     }
   }
-  @include adaptive(phone-big) {
+  @include mixins.adaptive(phone-big) {
     &__info {
       padding: 0;
     }

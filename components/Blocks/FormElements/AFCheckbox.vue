@@ -40,7 +40,7 @@ const _value = computed({
   gap: 0.625rem;
 
   &__label {
-    @include fontSize(16);
+    font: var(--text-16);
   }
 
   input {

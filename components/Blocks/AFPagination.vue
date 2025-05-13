@@ -163,7 +163,7 @@ function checkIfCorrectPage() {
     display: inline-block;
     padding: 0.625rem;
     color: var(--text-color);
-    @include fontSize(16);
+    font: var(--text-16);
     border: 1px solid var(--text-color);
     border-radius: 7px;
     transition: var(--general-transition);

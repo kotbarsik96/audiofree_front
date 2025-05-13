@@ -125,6 +125,8 @@ async function changeQuantity() {
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .cart-item {
   --border-radius: 9px;
 
@@ -194,16 +196,16 @@ async function changeQuantity() {
   }
 
   &__title {
-    font-weight: 500;
     color: var(--text-color);
-    @include fontSize(16);
+    font: var(--text-16);
+    font-weight: 500;
   }
 
   &__price,
   &__total-price {
-    font-weight: 700;
     color: var(--text-color);
-    @include fontSize(18);
+    font: var(--text-18);
+    font-weight: 700;
   }
   &__delete-button {
     svg {
@@ -219,20 +221,20 @@ async function changeQuantity() {
     max-width: 600px;
     text-align: center;
     padding: 0;
+    font: var(--text-18);
     font-weight: 500;
-    @include fontSize(18);
   }
 
   &__warning-dialog-body {
     padding: 1.25rem 0;
   }
 
-  @include adaptive(desktop-small) {
+  @include mixins.adaptive(desktop-small) {
     > * {
       padding: 0 0.75rem;
     }
   }
-  @include adaptive(tablet-small) {
+  @include mixins.adaptive(tablet-small) {
     grid-template-columns: 6rem auto 1fr 24px;
     grid-template-rows: repeat(3, auto);
     padding: 0.8rem;
@@ -247,7 +249,7 @@ async function changeQuantity() {
     &__subtitle {
       display: block;
       color: var(--breadcrumbs-color);
-      @include fontSize(14);
+      font: var(--text-14);
     }
 
     &__img-wrapper {
@@ -280,7 +282,7 @@ async function changeQuantity() {
       grid-row: 1 / -1;
     }
   }
-  @include adaptive(phone) {
+  @include mixins.adaptive(phone) {
     grid-template-columns: 5rem repeat(2, auto) 24px;
 
     &__img-wrapper {

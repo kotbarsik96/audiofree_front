@@ -51,8 +51,8 @@ function setTitle(title: string) {
 
   &__title {
     color: var(--tab-inactive-text);
+    font: var(--text-24);
     font-weight: 300;
-    @include fontSize(24);
     background-color: rgba(255, 255, 255, .5);
     text-align: center;
     padding: 20px 30px;

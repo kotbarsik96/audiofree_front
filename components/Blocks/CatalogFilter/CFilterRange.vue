@@ -119,7 +119,7 @@ function reset() {
 
   &__inputs-delimeter {
     color: var(--black);
-    @include fontSize(16);
+    font: var(--text-16);
   }
 
   &__range {
@@ -127,8 +127,8 @@ function reset() {
   }
 
   &__unavailable {
+    font: var(--text-16);
     font-weight: 500;
-    @include fontSize(16);
   }
 }
 </style>

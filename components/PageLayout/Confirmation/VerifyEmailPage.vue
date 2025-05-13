@@ -49,13 +49,13 @@ await $afFetch('/profile/verify-email', {
 <style lang="scss" scoped>
 .verified {
   padding: 3rem 0;
-  font-weight: 700;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.25rem;
   color: var(--primary);
-  @include fontSize(21);
+  font: var(--text-20);
+  font-weight: 700;
 
   &__buttons {
     display: flex;

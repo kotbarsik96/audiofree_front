@@ -103,7 +103,7 @@ function toggle() {
   border-radius: var(--border-radius);
   background-color: var(--white);
   border: var(--border-width) solid var(--input-border-color);
-  @include fontSize(16);
+  font: var(--text-16);
   transition: var(--general-transition);
 
   &.shown {
@@ -138,7 +138,7 @@ function toggle() {
     display: flex;
     align-items: center;
     gap: 0.625rem;
-    @include fontSize(16);
+    font: var(--text-16);
   }
 
   &__value-icon {

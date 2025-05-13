@@ -126,6 +126,8 @@ function updateWritingReview(value: boolean) {
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .product-reviews {
   margin-bottom: 100px;
   display: flex;
@@ -134,7 +136,7 @@ function updateWritingReview(value: boolean) {
   position: relative;
 
   &__count {
-    @include fontSize(21);
+    font: var(--text-20);
     font-weight: 400;
 
     span {
@@ -155,7 +157,7 @@ function updateWritingReview(value: boolean) {
     gap: 0.625rem;
   }
 
-  @include adaptive(tablet-big) {
+  @include mixins.adaptive(tablet-big) {
     margin-bottom: 50px;
   }
 }

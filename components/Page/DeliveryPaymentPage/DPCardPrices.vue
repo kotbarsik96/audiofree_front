@@ -31,13 +31,15 @@ const props = defineProps<{
 
   &__title {
     color: var(--primary);
+    font: var(--text-24);
+    line-height: 1.875rem;
     font-weight: 500;
-    @include fontSize(24, 1.875rem);
   }
 
   &__detail {
+    font: var(--text-14);
+    line-height: 1.875rem;
     font-weight: 500;
-    @include fontSize(14, 1.875rem);
   }
 }
 </style>

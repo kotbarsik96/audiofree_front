@@ -191,5 +191,5 @@ function onPointerdown(event: PointerEvent) {
 </script>
 
 <style lang="scss" scoped>
-@import '~/scss/components/_InputRange';
+@use '~/scss/components/InputRange.scss';
 </style>

@@ -18,7 +18,7 @@ import socials from '@/enums/socials'
   gap: 9px;
 
   &__icon {
-    @include fontSize(26);
+    font: var(--text-24);
     color: var(--white);
     opacity: 0.5;
   }

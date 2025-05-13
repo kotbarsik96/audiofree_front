@@ -28,7 +28,7 @@ function authWatcher() {
 </script>
 
 <style lang="scss" scoped>
-@import '@/scss/components/_AuthForm';
+@use '~/scss/components/AuthForm.scss';
 
 .auth-page {
   padding: 40px 0;

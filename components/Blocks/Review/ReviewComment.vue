@@ -104,6 +104,8 @@ function editReview() {
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .review-comment {
   --comment-padding: 15px 20px;
 
@@ -139,7 +141,7 @@ function editReview() {
 
   &__username {
     grid-column: 2 / 3;
-    @include fontSize(16);
+    font: var(--text-16);
     font-weight: 500;
   }
 
@@ -168,14 +170,14 @@ function editReview() {
   }
 
   &__body-title {
-    @include fontSize(21);
+    font: var(--text-20);
     font-weight: 700;
     color: var(--black);
   }
 
   &__body-text {
     color: var(--text-color);
-    @include fontSize(18);
+    font: var(--text-18);
   }
 
   &__edit-buttons {
@@ -186,7 +188,7 @@ function editReview() {
     gap: 0.625rem;
   }
 
-  @include adaptive(phone) {
+  @include mixins.adaptive(phone) {
     &__edit-buttons {
       .btn {
         width: 100%;

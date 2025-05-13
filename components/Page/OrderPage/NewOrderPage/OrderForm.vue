@@ -338,6 +338,8 @@ async function makeNewOrder() {
 </script>
 
 <style lang="scss" scoped>
+@use '/scss/mixins.scss';
+
 .oform {
   padding: 3rem 0;
 }
@@ -367,13 +369,13 @@ async function makeNewOrder() {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  @include fontSize(20);
+  font: var(--text-20);
 
   &::before {
     content: '0' counter(order-form);
     color: var(--primary);
     letter-spacing: 2px;
-    @include fontSize(30);
+    font: var(--text-30);;
   }
 }
 .inputs {
@@ -410,9 +412,9 @@ async function makeNewOrder() {
 
   table {
     width: 100%;
-    font-weight: 600;
     color: var(--text-color);
-    @include fontSize(18);
+    font: var(--text-18);
+    font-weight: 600;
 
     td:first-child {
       padding-right: 1rem;
@@ -428,7 +430,7 @@ async function makeNewOrder() {
   margin-left: auto;
 }
 
-@include adaptive(tablet-big) {
+@include mixins.adaptive(tablet-big) {
   .oform {
     max-width: 500px;
     margin: 0 auto;

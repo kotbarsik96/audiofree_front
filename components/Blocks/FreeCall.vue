@@ -26,12 +26,12 @@ import PhoneIcon from "@/assets/images/icons/phone.svg"
 
   &__title {
     color: #aeaeae;
-    @include fontSize(16);
+    font: var(--text-16);
   }
 
   &__number {
     color: var(--text-color);
-    @include fontSize(24);
+    font: var(--text-24);
     font-weight: 700;
   }
 }
