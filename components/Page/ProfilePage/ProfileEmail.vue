@@ -21,7 +21,11 @@
         Вы запросили подтверждение адреса эл. почты. Вам было выслано письмо с
         ссылкой для подтверждения
       </span>
-      <AFButton v-else-if="!emailVerified" label="Подтвердить адрес" @click="verifyEmail" />
+      <AFButton
+        v-else-if="!emailVerified"
+        label="Подтвердить адрес"
+        @click="verifyEmail"
+      />
     </div>
     <form @submit.prevent="onSubmit">
       <div class="section-form__inputs">
@@ -42,6 +46,12 @@ import EmailIcon from '~/assets/images/icons/email.svg'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
+import {
+  useValidationField,
+  useValidationForm,
+} from '~/domain/validaiton/useValidation'
+import { emailValidation } from '~/domain/validaiton/validators/emailValidation'
+import { mustPresentValidation } from '~/domain/validaiton/validators/mustPresentValidation'
 
 const { addNotification } = useNotifications()
 const { $afFetch } = useNuxtApp()
@@ -51,20 +61,22 @@ const { user } = storeToRefs(userStore)
 
 const emailVerified = computed(() => !!user.value?.email_verified_at)
 
-const newEmail = ref('')
-const newEmailError = ref('')
-
 const isLoading = ref(false)
 const isVerifying = computed(() => user.value?.confirmations.verify_email)
 
 const isButtonDisabled = computed(() => isLoading.value)
 
-const { validate } = useAllValidation([
-  useValidation(newEmail, newEmailError, [emailValidation()]),
-])
+const form = useValidationForm({
+  newEmail: useValidationField('', [
+    mustPresentValidation(),
+    emailValidation(),
+  ]),
+})
+const { newEmail } = form.getFieldRefs()
+const { newEmail: newEmailError } = form.getErrorRefs()
 
 async function onSubmit() {
-  if (!validate()) return
+  if (!form.validateAll()) return
 
   isLoading.value = true
 

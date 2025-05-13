@@ -52,6 +52,11 @@ import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import MaskInput from '~/components/Blocks/FormElements/MaskInput.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
 import phoneMask from '~/domain/mask-input/phoneMask'
+import {
+  useValidationField,
+  useValidationForm,
+} from '~/domain/validaiton/useValidation'
+import { phoneNumberValidation } from '~/domain/validaiton/validators/phoneNumberValidation'
 import { mapErrorsFromResponse } from '~/utils/general'
 
 const userStore = useUserStore()
@@ -60,13 +65,11 @@ const { user } = storeToRefs(userStore)
 const userInfo = computed(() => user.value)
 
 const username = ref(user.value?.name || '')
-const phoneNumber = ref(user.value?.phone_number || '')
 const location = ref(user.value?.location || '')
 const street = ref(user.value?.street || '')
 const house = ref(user.value?.house || '')
 
 const usernameError = ref('')
-const phoneNumberError = ref('')
 const locationError = ref('')
 const streetError = ref('')
 const houseError = ref('')
@@ -75,9 +78,14 @@ const { $afFetch } = useNuxtApp()
 const { getUser } = useUserStore()
 const { addNotification } = useNotifications()
 
-const { validate } = useAllValidation([
-  useValidation(phoneNumber, phoneNumberError, [phoneNumberValidation(null)]),
-])
+const form = useValidationForm({
+  phoneNumber: useValidationField(user.value?.phone_number || '', [
+    phoneNumberValidation(),
+  ]),
+})
+
+const { phoneNumber } = form.getFieldRefs()
+const { phoneNumber: phoneNumberError } = form.getErrorRefs()
 
 const isLoading = ref(true)
 
@@ -100,7 +108,7 @@ function compareValues(value1: string, value2: string | null | undefined) {
 onMounted(() => (isLoading.value = false))
 
 async function onSubmit() {
-  if (!validate()) return
+  if (!form.validateAll()) return
 
   isLoading.value = true
   try {

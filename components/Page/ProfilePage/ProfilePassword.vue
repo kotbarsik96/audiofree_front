@@ -13,7 +13,11 @@
         </template>
       </InputWrapper>
       <InputWrapper label="Новый пароль" inputId="new-password">
-        <PasswordInput v-model="newPassword" autocomplete="new-password" id="new-password" />
+        <PasswordInput
+          v-model="newPassword"
+          autocomplete="new-password"
+          id="new-password"
+        />
         <template v-if="newPasswordError" #error>
           {{ newPasswordError }}
         </template>
@@ -28,6 +32,9 @@
           autocomplete="new-password"
           id="new-password-repeat"
         />
+        <template v-if="newPasswordRepeatError" #error>
+          {{ newPasswordRepeatError }}
+        </template>
       </InputWrapper>
     </div>
     <AFButton label="Сохранить" type="submit" :disabled="isButtonDisabled" />
@@ -38,31 +45,42 @@
 import AFButton from '~/components/Blocks/AFButton.vue'
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import PasswordInput from '~/components/Blocks/FormElements/PasswordInput.vue'
+import {
+  useValidationField,
+  useValidationForm,
+} from '~/domain/validaiton/useValidation'
+import { mustPresentValidation } from '~/domain/validaiton/validators/mustPresentValidation'
+import { passwordsMatchValidation } from '~/domain/validaiton/validators/passwordsMatchValidation'
+import { passwordValidation } from '~/domain/validaiton/validators/passwordValidation'
 import { ServerStatuses } from '~/enums/ServerStatuses'
 
 const { addNotification } = useNotifications()
 const { $afFetch } = useNuxtApp()
 
 const oldPassword = ref('')
-const newPassword = ref('')
-const newPasswordRepeat = ref('')
 
 const oldPasswordError = ref('')
-const newPasswordError = ref('')
 
 const isLoading = ref(false)
 
 const isButtonDisabled = computed(() => isLoading.value)
 
-const { validate } = useAllValidation([
-  useValidation(newPassword, newPasswordError, [
-    passwordValidation(),
-    passwordsMatchValidation(newPassword),
-  ]),
-])
+const form = useValidationForm({
+  newPassword: useValidationField('', [mustPresentValidation(), passwordValidation()]),
+  newPasswordRepeat: useValidationField('', []),
+})
+
+const { newPassword, newPasswordRepeat } = form.getFieldRefs()
+const {
+  newPassword: newPasswordError,
+  newPasswordRepeat: newPasswordRepeatError,
+} = form.getErrorRefs()
+
+form.linkFields('newPassword', 'newPasswordRepeat')
+form.fields.newPasswordRepeat.addValidator(passwordsMatchValidation(newPassword))
 
 async function onSubmit() {
-  if (!validate()) return
+  if (!form.validateAll()) return
 
   isLoading.value = true
 

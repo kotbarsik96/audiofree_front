@@ -1,6 +1,7 @@
 import type { WatchHandle } from 'vue'
 import type { ValidatorCallback } from './interfaces/ValidatorCallback'
 import type { TFormValidationField } from './interfaces/TFormValidationField'
+import type { IValidationFormOptions } from './interfaces/IValidationFormOptions'
 
 export function useValidationField<T>(
   initialValue: T,
@@ -43,21 +44,25 @@ export function useValidationField<T>(
     validate,
     validated,
     addValidator,
-    hasError: computed(() => !!error.value),
   }
 }
 
-export function useFormValidation<
+export function useValidationForm<
   T extends TFormValidationField,
   Key extends keyof T
->(validationFields: T) {
+>(validationFields: T, options: IValidationFormOptions = {}) {
   function validateAll() {
     let isAllValid = true
 
     for (let field of Object.values(validationFields)) {
-      if (!field.validate()) {
+      const v = field.validate()
+      if (!v) {
         isAllValid = false
       }
+    }
+
+    if (!isAllValid) {
+      options.scrollToWhenFailed?.value?.scrollIntoView()
     }
 
     return isAllValid
@@ -67,9 +72,7 @@ export function useFormValidation<
     const errors: Record<Key, Ref> = {} as Record<Key, Ref>
 
     for (let [fieldName, fieldData] of Object.entries(validationFields)) {
-      if (fieldData.hasError) {
-        errors[fieldName as Key] = fieldData.error
-      }
+      errors[fieldName as Key] = fieldData.error
     }
 
     return errors

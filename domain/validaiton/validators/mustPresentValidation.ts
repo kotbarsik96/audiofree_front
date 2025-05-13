@@ -5,8 +5,8 @@ export function mustPresentValidation(
 ): ValidatorCallback<string> {
   return function (value: string) {
     if (!value) {
-      if (fieldName) return { error: `Не указано поле: ${fieldName}` }
-      else return { error: 'Не указано поле' }
+      if (fieldName) return `Не указано поле: ${fieldName}`
+      else return 'Не указано поле'
     }
 
     return false

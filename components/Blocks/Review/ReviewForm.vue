@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="element">
     <div v-if="!isAuth" class="review-form review-form--empty _section-box">
       <button class="_link" type="button" @click="openLoginDialog">
         Войдите
@@ -19,7 +19,9 @@
           interactive
         />
         <Transition name="drop-down">
-          <div v-if="ratingError" class="_error">{{ ratingError }}</div>
+          <div v-if="ratingError" class="_error">
+            {{ ratingError }}
+          </div>
         </Transition>
       </div>
       <div class="review-form__inputs">
@@ -87,14 +89,20 @@ import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import TextareaField from '~/components/Blocks/FormElements/TextareaField.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import AFRating from '~/components/Blocks/AFRating.vue'
-import {
-  type IReviewInjection,
-} from '~/domain/reviews/types/IReviewInjection'
+import { type IReviewInjection } from '~/domain/reviews/types/IReviewInjection'
 import { ReviewInjection } from '~/enums/injections'
+import {
+  useValidationForm,
+  useValidationField,
+} from '~/domain/validaiton/useValidation'
+import { minLengthValidation } from '~/domain/validaiton/validators/minLengthValidation'
+import { minNumberValidation } from '~/domain/validaiton/validators/minNumberValidation'
 
 const emit = defineEmits<{
   (e: 'update:isWriting', v: boolean): void
 }>()
+
+const element = ref<HTMLElement>()
 
 const { $afFetch } = useNuxtApp()
 
@@ -119,26 +127,37 @@ const { addConfirm } = useConfirmation()
 
 const minSymbols = 20
 const maxSymbols = 400
-const pros = ref(currentUserReview.value?.pros || '')
-const cons = ref(currentUserReview.value?.cons || '')
-const description = ref(currentUserReview.value?.description || '')
-const rating = ref(currentUserReview.value?.value || 0)
 
-const prosError = ref('')
-const consError = ref('')
-const descriptionError = ref('')
-const ratingError = ref('')
-const validation = useAllValidation([
-  useValidation(pros, prosError, [minLengthValidation(minSymbols)]),
-  useValidation(cons, consError, [minLengthValidation(minSymbols)]),
-  useValidation(description, descriptionError, [
-    minLengthValidation(minSymbols),
-  ]),
-  useValidation<number>(rating, ratingError, [minNumberValidation(1)]),
-])
+const form = useValidationForm(
+  {
+    pros: useValidationField(currentUserReview.value?.pros || '', [
+      minLengthValidation(minSymbols),
+    ]),
+    cons: useValidationField(currentUserReview.value?.cons || '', [
+      minLengthValidation(minSymbols),
+    ]),
+    description: useValidationField(
+      currentUserReview.value?.description || '',
+      [minLengthValidation(minSymbols)]
+    ),
+    rating: useValidationField(currentUserReview.value?.value || 0, [
+      minNumberValidation(1),
+    ]),
+  },
+  { scrollToWhenFailed: element }
+)
+
+const { pros, cons, description, rating } = form.getFieldRefs()
+
+const {
+  pros: prosError,
+  cons: consError,
+  description: descriptionError,
+  rating: ratingError,
+} = form.getErrorRefs()
 
 async function onSubmit() {
-  if (!validation.validate()) return
+  if (!form.validateAll()) return
 
   isLoading.value = true
 
@@ -167,6 +186,8 @@ async function onSubmit() {
           if (errors.cons) consError.value = errors.cons[0]
           if (errors.rating_value) ratingError.value = errors.rating_value[0]
         }
+
+        if (errors.rating_value && element.value) element.value.scrollIntoView()
       },
     })
   } catch (err) {

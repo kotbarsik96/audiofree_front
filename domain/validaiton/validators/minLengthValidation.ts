@@ -4,8 +4,7 @@ export function minLengthValidation(
   minLength: number
 ): ValidatorCallback<string> {
   return function (value: string) {
-    if (value.length < minLength)
-      return { error: `Не менее ${minLength} символов` }
+    if (value.length < minLength) return `Не менее ${minLength} символов`
 
     return false
   }

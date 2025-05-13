@@ -20,7 +20,7 @@ export function mustPresentWithout(
       : !!value
 
     if (!hasValue && !otherFieldIsPresented) {
-      return { error: msg }
+      return msg
     }
 
     return false

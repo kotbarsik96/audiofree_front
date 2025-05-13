@@ -43,12 +43,16 @@ import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import { possibleLogins } from '~/domain/auth/loginTypes'
 
-const { previousTab, tab, login } = storeToRefs(useAuthStore())
+const { previousTab, tab, savedLogin } = storeToRefs(useAuthStore())
+
+const login = ref(savedLogin.value)
 
 const messageSentText = ref()
 const isLoading = ref(false)
 
 const { $afFetch } = useNuxtApp()
+
+watch(login, () => (savedLogin.value = login.value))
 
 async function send() {
   isLoading.value = true
@@ -56,7 +60,7 @@ async function send() {
   try {
     await $afFetch('/profile/reset-password/request', {
       method: 'POST',
-      body: { login: login.value },
+      body: { login: savedLogin.value },
       onResponse({ response }) {
         if (response.ok && response._data.message) {
           messageSentText.value = response._data.message

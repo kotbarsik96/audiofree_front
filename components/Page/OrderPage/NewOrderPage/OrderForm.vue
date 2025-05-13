@@ -111,6 +111,13 @@ import {
   paymentTypesMap,
   type TPaymentTypes,
 } from '~/domain/order/types/TPaymentTypes'
+import {
+  useValidationField,
+  useValidationForm,
+} from '~/domain/validaiton/useValidation'
+import { mustPresentValidation } from '~/domain/validaiton/validators/mustPresentValidation'
+import { minLengthValidation } from '~/domain/validaiton/validators/minLengthValidation'
+import { mustPresentWithout } from '~/domain/validaiton/validators/mustPresentWithoutValidation'
 
 const emit = defineEmits<{
   (e: 'orderCreated'): void
@@ -147,40 +154,56 @@ const { $afFetch } = useNuxtApp()
 
 const summary = computed(() => creationData.value?.data.summary)
 
-const name = ref(savedData.value.name || user?.name || '')
-const email = ref(savedData.value.email || user?.email || '')
-const telegram = ref(savedData.value.telegram || user?.telegram || '')
-const phone = ref(savedData.value.phone || user?.phone_number || '')
-const phoneUnmasked = ref('')
-const comment = ref(savedData.value.comment || '')
-const address = ref(savedData.value.address || '')
-
-const nameError = ref()
-const emailError = ref()
-const telegramError = ref()
-const phoneError = ref()
-const commentError = ref()
-const addressError = ref()
-
 const isLoading = ref(false)
 
-const validateAll = useAllValidation([
-  useValidation(name, nameError, [mustPresentValidation()]),
-  useValidation(email, emailError, [
-    mustPresentWithout([telegram, phoneUnmasked]),
-    emailValidation(),
+const phoneUnmasked = ref('')
+
+// валидация: start
+const form = useValidationForm({
+  name: useValidationField(savedData.value.name || user?.name || '', [
+    mustPresentValidation(),
   ]),
-  useValidation(telegram, telegramError, [
-    mustPresentWithout([email, phoneUnmasked]),
+  email: useValidationField(savedData.value.email || user?.email || '', [
+    /* валидаторы добавляютя ниже */
   ]),
-  useValidation(phone, phoneError, [
-    mustPresentWithout([email, telegram], {
-      unmaskedValue: phoneUnmasked,
-    }),
-    phoneNumberValidation(phoneUnmasked),
+  telegram: useValidationField(
+    savedData.value.telegram || user?.telegram || '',
+    [
+      /* валидаторы добавляютя ниже */
+    ]
+  ),
+  phone: useValidationField(savedData.value.phone || user?.phone_number || '', [
+    /* валидаторы добавляютя ниже */
   ]),
-  useValidation(address, addressError, [minLengthValidation(3)]),
-])
+  comment: useValidationField(savedData.value.comment || '', []),
+  address: useValidationField(savedData.value.address || '', [
+    minLengthValidation(3),
+  ]),
+})
+
+const { name, email, telegram, address, comment, phone } = form.getFieldRefs()
+const {
+  name: nameError,
+  email: emailError,
+  telegram: telegramError,
+  phone: phoneError,
+  comment: commentError,
+  address: addressError,
+} = form.getErrorRefs()
+
+form.fields.email.addValidator(mustPresentWithout([telegram, phoneUnmasked]))
+form.fields.telegram.addValidator(mustPresentWithout([email, phoneUnmasked]))
+form.fields.phone.addValidator(
+  mustPresentWithout([email, telegram], { unmaskedValue: phoneUnmasked })
+)
+
+watch(() => [email.value, telegram.value, phone.value], () => {
+  form.fields.email.validate()
+  form.fields.telegram.validate()
+  form.fields.phone.validate()
+})
+
+// валидация: end
 
 const availableDeliveryPlaces = computed(
   () => creationData.value?.data.variants.delivery_places ?? []
@@ -240,7 +263,7 @@ function onPhoneMaskChange(unmaskedValue: string) {
 
 async function onSubmit() {
   isLoading.value = true
-  if (validateAll.validate()) {
+  if (form.validateAll()) {
     try {
       await orderAttempt()
     } catch (err) {

@@ -24,15 +24,18 @@ import PasswordInput from '~/components/Blocks/FormElements/PasswordInput.vue'
 import { Auth } from '~/domain/auth/Auth'
 import { LoginSteps } from '~/domain/auth/LoginSteps'
 
-const { login, loginStep } = storeToRefs(useAuthStore())
+const { savedLogin, loginStep } = storeToRefs(useAuthStore())
 const { $afFetch } = useNuxtApp()
 const { addNotification } = useNotifications()
 
+const login = ref(savedLogin.value)
 const isLoading = ref(false)
 const password = ref('')
 const passwordError = ref('')
 
 const buttonDisabled = computed(() => !password.value || isLoading.value)
+
+watch(login, () => (savedLogin.value = login.value))
 
 async function onSubmit() {
   isLoading.value = true

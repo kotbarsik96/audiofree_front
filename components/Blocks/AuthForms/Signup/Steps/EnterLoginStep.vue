@@ -2,7 +2,7 @@
   <form @submit.prevent="onSubmit">
     <InputWrapper label="Ваше имя" inputId="name">
       <TextInput v-model="name" placeholder="Имя" id="name" />
-      <template v-if="form.fields.name.hasError.value" #error>
+      <template v-if="nameError" #error>
         {{ nameError }}
       </template>
     </InputWrapper>
@@ -12,7 +12,7 @@
         id="login"
         :placeholder="`${signupLoginType}`"
       />
-      <template v-if="form.fields.login.hasError.value" #error>
+      <template v-if="loginError" #error>
         {{ loginError }}
       </template>
     </InputWrapper>
@@ -26,7 +26,7 @@
       autocomplete="new-password"
       placeholder="Пароль"
     >
-      <template v-if="form.fields.password.hasError.value" #error>
+      <template v-if="passwordError" #error>
         {{ passwordError }}
       </template>
     </PasswordInput>
@@ -36,7 +36,7 @@
       placeholder="Пароль еще раз"
       autocomplete="new-password"
     >
-      <template v-if="form.fields.passwordConfirmation.hasError.value" #error>
+      <template v-if="passwordConfirmationError" #error>
         {{ passwordConfirmationError }}
       </template>
     </PasswordInput>
@@ -61,7 +61,7 @@ import { isResponseOk } from '~/utils/general'
 import { SignupSteps } from '~/domain/auth/SignupSteps'
 import { LoginSteps } from '~/domain/auth/LoginSteps'
 import {
-  useFormValidation,
+  useValidationForm,
   useValidationField,
 } from '~/domain/validaiton/useValidation'
 import { passwordValidation } from '~/domain/validaiton/validators/passwordValidation'
@@ -80,7 +80,7 @@ const userStore = useUserStore()
 const { getUser } = userStore
 const { jwt } = storeToRefs(userStore)
 
-const form = useFormValidation({
+const form = useValidationForm({
   name: useValidationField<string>('', [mustPresentValidation()]),
   login: getLoginValidation(),
   password: useValidationField<string>('', [passwordValidation()]),

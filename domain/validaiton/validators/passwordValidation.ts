@@ -10,18 +10,13 @@ export function passwordValidation(): ValidatorCallback<string> {
 
     if (value) {
       if (!hasNumbers && (!hasUpperCase || !hasLowerCase))
-        return {
-          error:
-            'Пароль должен иметь цифры и строчные и заглавные латинские буквы',
-        }
+        return 'Пароль должен иметь цифры и строчные и заглавные латинские буквы'
       else if (hasNumbers && (!hasUpperCase || !hasLowerCase))
-        return {
-          error: 'Пароль должен иметь ещё строчные и заглавные латинские буквы',
-        }
+        return 'Пароль должен иметь ещё строчные и заглавные латинские буквы'
       else if (!hasNumbers && hasUpperCase && hasLowerCase)
-        return { error: 'Пароль должен иметь ещё хотя бы одну цифру' }
+        return 'Пароль должен иметь ещё хотя бы одну цифру'
       else if (value.length < minLength)
-        return { error: `Пароль должен быть от ${minLength} символов` }
+        return `Пароль должен быть от ${minLength} символов`
     }
 
     return false
