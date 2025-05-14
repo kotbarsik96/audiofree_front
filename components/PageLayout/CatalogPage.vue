@@ -14,6 +14,7 @@
           <CatalogSorts
             class="catalog__sorts"
             :isFetchingProducts="isFetchingProducts"
+            @sort-change="refetchProducts"
           />
         </div>
         <div class="catalog__main">

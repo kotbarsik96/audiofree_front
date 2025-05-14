@@ -14,11 +14,22 @@ const props = defineProps<{
   isFetchingProducts?: boolean
 }>()
 
+const emit = defineEmits<{
+  (e: 'sortChange'): void
+}>()
+
 const { data } = await useAPI<{ data: ISelectOption[] }>(
   '/products/catalog/sorts'
 )
 
 const { options, orderOptions, sort, sortOrder } = useSorts(data)
+
+watch(
+  () => [sort.value, sortOrder.value],
+  () => {
+    emit('sortChange')
+  }
+)
 </script>
 
 <style lang="scss" scoped>
@@ -31,7 +42,7 @@ const { options, orderOptions, sort, sortOrder } = useSorts(data)
   justify-content: flex-end;
   gap: 0.625rem;
 
-  @include mixins.adaptive(tablet-big){
+  @include mixins.adaptive(tablet-big) {
     justify-content: center;
   }
 }
