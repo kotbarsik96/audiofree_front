@@ -370,12 +370,14 @@ async function makeNewOrder() {
   align-items: center;
   gap: 0.625rem;
   font: var(--text-20);
+  font-weight: 500;
 
   &::before {
     content: '0' counter(order-form);
     color: var(--primary);
     letter-spacing: 2px;
-    font: var(--text-30);;
+    font: var(--text-30);
+    font-weight: 700;
   }
 }
 .inputs {
