@@ -9,6 +9,7 @@
           :max="stateMax"
           v-model="stateMin"
           lazy
+          @change="updateLastChangedFilter"
         />
         <div class="cf-range__inputs-delimeter">–</div>
         <NumberInput
@@ -18,6 +19,7 @@
           :max="max"
           v-model="stateMax"
           lazy
+          @change="updateLastChangedFilter"
         />
       </div>
       <div class="cf-range__range">
@@ -26,12 +28,14 @@
           v-model:valueMax="stateMax"
           :min="min"
           :max="max"
+          @change="updateLastChangedFilter"
         />
       </div>
     </template>
     <div class="cf-range__unavailable" v-else>
       Выбор недоступен для данных фильтров
     </div>
+    <CFilterApplyButton v-if="lastChangedFilter === slug" @apply="apply" />
   </div>
 </template>
 
@@ -40,11 +44,18 @@ import { useRouteQuery } from '@vueuse/router'
 import NumberInput from '~/components/Blocks/FormElements/NumberInput.vue'
 import InputRangeDouble from '~/components/Blocks/InputRangeDouble.vue'
 import { FilterRangePrefixes } from '~/domain/product/types/FilterRangePrefixes'
+import CFilterApplyButton from '~/components/Blocks/CatalogFilter/CFilterApplyButton.vue'
 
 const props = defineProps<{
   slug: string
   min: number
   max: number
+  lastChangedFilter: string
+}>()
+
+const emit = defineEmits<{
+  (e: 'apply'): void
+  (e: 'update:lastChangedFilter', value: string): void
 }>()
 
 defineExpose({
@@ -102,6 +113,13 @@ function reset() {
   stateMin.value = props.min
   stateMax.value = props.max
 }
+
+function apply() {
+  emit('apply')
+}
+function updateLastChangedFilter() {
+  emit('update:lastChangedFilter', props.slug)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -129,6 +147,10 @@ function reset() {
   &__unavailable {
     font: var(--text-16);
     font-weight: 500;
+  }
+
+  .apply-btn {
+    margin-top: 1.5rem;
   }
 }
 </style>

@@ -38,6 +38,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (emit: 'update:valueMin', value: number): void
   (emit: 'update:valueMax', value: number): void
+  (emit: 'change'): void
 }>()
 
 const scale = ref<HTMLElement>()
@@ -107,10 +108,14 @@ const barStyle = computed(() => ({
 watch(_valueMin, () => {
   if (_valueMin.value < props.min) _valueMin.value = props.min
   if (_valueMin.value > _valueMax.value) _valueMin.value = _valueMax.value
+
+  emit('change')
 })
 watch(_valueMax, () => {
   if (_valueMax.value > props.max) _valueMax.value = props.max
   if (_valueMax.value < _valueMin.value) _valueMax.value = _valueMin.value
+
+  emit('change')
 })
 
 onMounted(() => {

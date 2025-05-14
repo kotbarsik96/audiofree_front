@@ -30,13 +30,17 @@
                   :type="section.type"
                   :slug="section.slug"
                   :values="section.values"
+                  v-model:lastChangedFilter="lastChangedFilter"
                   ref="filterSectionEl"
+                  @apply="apply"
                 />
                 <CFilterRadios
                   v-else-if="section.type === 'radio' && section.values"
                   :slug="section.slug"
                   :values="section.values"
+                  v-model:lastChangedFilter="lastChangedFilter"
                   ref="filterSectionEl"
+                  @apply="apply"
                 />
                 <CFilterRange
                   v-else-if="section.type === 'range'"
@@ -44,6 +48,8 @@
                   :min="Math.floor(section.min ?? 0)"
                   :max="Math.floor(section.max ?? 0)"
                   ref="filterSectionEl"
+                  v-model:lastChangedFilter="lastChangedFilter"
+                  @apply="apply"
                 />
               </div>
             </div>
@@ -112,6 +118,8 @@ const bodyEl = ref<HTMLElement>()
 const mobileShown = ref(false)
 const bodyMobileHeight = ref('0px')
 
+const lastChangedFilter = ref('')
+
 const className = computed(() => ({
   shown: mobileShown.value,
 }))
@@ -131,9 +139,14 @@ function refetchProducts() {
 function refetchFilters() {
   emit('refetchFilters')
 }
+function apply() {
+  refetchProducts()
+  lastChangedFilter.value = ''
+}
 async function clearFilter() {
   if (isResettingFilters.value) return
   isResettingFilters.value = true
+  lastChangedFilter.value = ''
 
   try {
     await clearRouteQuery()
@@ -194,9 +207,6 @@ async function clearRouteQuery() {
     padding: 0;
   }
 
-  &__body {
-    overflow: hidden;
-  }
   &__body-inner {
     padding-bottom: 1.25rem;
   }

@@ -1,6 +1,6 @@
 <template>
   <label class="checkbox">
-    <input type="checkbox" :value="value" v-model="_value" />
+    <input type="checkbox" :value="value" v-model="_value" @change="onChange" />
     <span class="checkbox__box">
       <AFIcon :icon="CheckmarkIcon" />
     </span>
@@ -20,6 +20,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: typeof props.modelValue): void
+  (e: 'change'): void
 }>()
 
 const _value = computed({
@@ -30,6 +31,10 @@ const _value = computed({
     emit('update:modelValue', val)
   },
 })
+
+function onChange() {
+  emit('change')
+}
 </script>
 
 <style lang="scss" scoped>

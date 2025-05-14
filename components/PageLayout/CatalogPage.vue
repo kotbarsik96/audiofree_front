@@ -122,6 +122,7 @@ watch(
 
   &__sidebar {
     grid-row: 1 / -1;
+    z-index: 20;
   }
 
   &__page-header {
@@ -139,11 +140,13 @@ watch(
   }
 
   &__main {
+    position: relative;
     grid-column: 2 / 3;
     grid-row: 2 / 3;
     display: flex;
     flex-direction: column;
     gap: 2.75rem;
+    z-index: 10;
   }
 
   @include mixins.adaptive(tablet-big) {
