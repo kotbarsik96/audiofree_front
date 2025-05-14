@@ -36,6 +36,8 @@ const catalogBodyComponent = useTemplateRef('catalogBodyComponent')
 
 const isFetchingProducts = ref(false)
 
+const route = useRoute()
+
 const { setBreadcrumbs } = useBreadcrumbs()
 setBreadcrumbs([
   {
@@ -44,6 +46,8 @@ setBreadcrumbs([
     link: { name: 'CatalogPage' },
   },
 ])
+
+watch(() => route.query, refetchProducts)
 
 function onLoadingStateUpdate(value: boolean) {
   isFetchingProducts.value = value

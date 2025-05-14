@@ -1,7 +1,11 @@
 <template>
   <div v-if="options.length > 0" class="catalog-sorts">
-    <AFSelect :options="options" v-model="sort" />
-    <AFSelect :options="orderOptions" v-model="sortOrder" />
+    <AFSelect :options="options" :disabled="disabled" v-model="sort" />
+    <AFSelect
+      :options="orderOptions"
+      :disabled="disabled"
+      v-model="sortOrder"
+    />
   </div>
 </template>
 
@@ -12,6 +16,7 @@ import type ISelectOption from '~/interfaces/components/ISelectOption'
 
 const props = defineProps<{
   isFetchingProducts?: boolean
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -24,12 +29,7 @@ const { data } = await useAPI<{ data: ISelectOption[] }>(
 
 const { options, orderOptions, sort, sortOrder } = useSorts(data)
 
-watch(
-  () => [sort.value, sortOrder.value],
-  () => {
-    emit('sortChange')
-  }
-)
+const disabled = computed(() => props.isFetchingProducts)
 </script>
 
 <style lang="scss" scoped>
