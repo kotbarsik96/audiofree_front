@@ -2,7 +2,11 @@ import { useRouteQuery } from '@vueuse/router'
 import ArrowUpIcon from '~/assets/images/icons/arrow-up.svg'
 import type ISelectOption from '~/interfaces/components/ISelectOption'
 
-export function useSorts(sortData: Ref<{ data: ISelectOption[] } | null>) {
+export function useSorts(
+  sortData:
+    | Ref<{ data: ISelectOption[] } | null>
+    | ComputedRef<{ data: ISelectOption[] } | null>
+) {
   const options = computed(() => {
     const arr: ISelectOption[] = []
     sortData.value?.data.forEach((item) => {

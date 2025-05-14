@@ -3,8 +3,8 @@
     <div class="catalog-body__pagination">
       <AFPagination
         v-if="productsData"
-        :total="productsData.total"
-        :perPage="productsData.per_page"
+        :total="productsData?.total"
+        :perPage="productsData?.per_page"
         :disabled="disabledPagination"
       />
     </div>
@@ -42,39 +42,26 @@
 import AFPagination from '~/components/Blocks/AFPagination.vue'
 import ProductCard from '~/components/Blocks/Cards/ProductCard.vue'
 import EmptyList from '~/components/Blocks/EmptyList.vue'
-import type IPagination from '~/dataAccess/api/IPagination'
-import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 import { useRouteQuery } from '@vueuse/router'
+import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
+import type IPagination from '~/dataAccess/api/IPagination'
 
-const emit = defineEmits<{
-  (e: 'updateLoadingState', value: boolean): void
+const props = defineProps<{
+  productsData: IPagination<ICatalogProduct> | null
+  isFetchingProducts?: boolean;
 }>()
 
-const route = useRoute()
+const emit = defineEmits<{
+  (e: 'refetchProducts'): void
+}>()
 
-const urlQuery = computed(() => route.query)
-
-defineExpose({
-  refetchProducts
-})
-
-const {
-  data: productsData,
-  execute: fetchProducts,
-  status,
-} = await useAPI<IPagination<ICatalogProduct>>('/products/catalog', {
-  query: urlQuery,
-  watch: false,
-})
-
-const isFetchingProducts = computed(() => status.value === 'pending')
-const products = computed(() => productsData.value?.data)
+const products = computed(() => props.productsData?.data)
 const productsKey = computed(() =>
   (products.value || []).map((el) => el.id).join('')
 )
 
 const disabledPagination = computed(
-  () => isFetchingProducts.value && typeof window !== 'undefined'
+  () => props.isFetchingProducts && typeof window !== 'undefined'
 )
 
 const currentPage = useRouteQuery('page', '1', { transform: Number })
@@ -82,16 +69,14 @@ const currentPage = useRouteQuery('page', '1', { transform: Number })
 const el = ref<HTMLElement>()
 
 watch(currentPage, onPageChange)
-watch(isFetchingProducts, (value) => {
-  emit('updateLoadingState', value)
-})
+
+function fetchProducts() {
+  emit('refetchProducts')
+}
 
 async function onPageChange() {
   await fetchProducts()
   if (el.value) el.value.scrollIntoView()
-}
-async function refetchProducts(){
-  await fetchProducts();
 }
 </script>
 

@@ -13,7 +13,7 @@
         <div class="ct-filter__body-inner">
           <div class="ct-filter__sections">
             <div
-              v-for="section in filters"
+              v-for="section in filterItems"
               :key="section.name"
               class="ct-filter__section"
             >
@@ -81,10 +81,12 @@ import { FilterRangePrefixes } from '~/domain/product/types/FilterRangePrefixes'
 
 const props = defineProps<{
   isFetchingProducts?: boolean
+  filterItems: IFilterItem[]
 }>()
 
 const emit = defineEmits<{
   (e: 'refetchProducts'): void
+  (e: 'refetchFilters'): void
 }>()
 
 const route = useRoute()
@@ -97,8 +99,6 @@ const filterSectionEl = ref<
     >
   >
 >([])
-
-const urlQuery = computed(() => route.query)
 
 const isResettingFilters = ref(false)
 const areButtonsDisabled = computed(
@@ -116,36 +116,20 @@ const className = computed(() => ({
   shown: mobileShown.value,
 }))
 
-const {
-  data: filtersData,
-  refresh: refetchFilters,
-  status,
-} = await useAPI<{
-  data: IFilterItem[]
-}>('/products/catalog/filters', {
-  method: 'GET',
-  query: urlQuery,
-  watch: false,
-})
-const pending = computed(() => status.value === 'pending')
-const filters = computed(() => filtersData.value?.data || [])
-
-const { refresh: refetchFiltersDelayed } = useDelayedCallback(250, () => {
-  if (!pending.value) refetchFilters()
-})
-
 watch(mobileShown, () => {
   if (mobileShown.value)
     bodyMobileHeight.value = `${bodyEl.value?.scrollHeight || 0}px`
   else bodyMobileHeight.value = '0px'
 })
-watch(urlQuery, () => refetchFiltersDelayed())
 
 function toggleShown() {
   mobileShown.value = !mobileShown.value
 }
 function refetchProducts() {
   emit('refetchProducts')
+}
+function refetchFilters() {
+  emit('refetchFilters')
 }
 async function clearFilter() {
   if (isResettingFilters.value) return
@@ -166,7 +150,7 @@ async function clearFilter() {
 }
 async function clearRouteQuery() {
   const clearedQuery = { ...route.query }
-  const slugs = filters.value.map((section) => section.slug)
+  const slugs = props.filterItems.map((section) => section.slug)
   for (let key in clearedQuery) {
     let _key = key
     const isRangePrefix =

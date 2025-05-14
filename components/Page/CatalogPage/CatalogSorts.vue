@@ -17,13 +17,12 @@ import type ISelectOption from '~/interfaces/components/ISelectOption'
 const props = defineProps<{
   isFetchingProducts?: boolean
   disabled?: boolean
+  sortsData: { data: ISelectOption[] } | null
 }>()
 
-const { data } = await useAPI<{ data: ISelectOption[] }>(
-  '/products/catalog/sorts'
-)
+const _sortsData = computed(() => props.sortsData)
 
-const { options, orderOptions, sort, sortOrder } = useSorts(data)
+const { options, orderOptions, sort, sortOrder } = useSorts(_sortsData)
 
 const disabled = computed(() => props.isFetchingProducts)
 </script>
