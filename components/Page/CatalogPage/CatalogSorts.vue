@@ -19,10 +19,6 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 
-const emit = defineEmits<{
-  (e: 'sortChange'): void
-}>()
-
 const { data } = await useAPI<{ data: ISelectOption[] }>(
   '/products/catalog/sorts'
 )
