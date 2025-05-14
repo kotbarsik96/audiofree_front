@@ -1,5 +1,5 @@
 <template>
-  <div class="select" :class="{ shown }" v-click-away="close">
+  <div class="select" :class="{ shown, disabled }" v-click-away="close">
     <div class="select__value" @click="toggle">
       <div class="select__value-text">
         <AFIcon
@@ -42,6 +42,7 @@ const props = withDefaults(
     options: (string | ISelectOption)[]
     modelValue?: string | number
     placeholder?: string
+    disabled?: boolean
   }>(),
   {
     placeholder: 'Выбрать',
@@ -80,6 +81,8 @@ const currentOption = computed(
 const shown = ref(false)
 
 function updateValue(option: ISelectOption) {
+  if(props.disabled) return;
+
   _value.value = option.value
   close()
 }
@@ -189,6 +192,11 @@ function toggle() {
   }
   &.shown &__options {
     border-color: var(--input-border-color-active);
+  }
+
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.5;
   }
 }
 </style>

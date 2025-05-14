@@ -38,6 +38,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (emit: 'update:valueMin', value: number): void
   (emit: 'update:valueMax', value: number): void
+  (emit: 'change'): void
 }>()
 
 const scale = ref<HTMLElement>()
@@ -186,6 +187,8 @@ function onPointerdown(event: PointerEvent) {
   function onPointerUp() {
     document.removeEventListener('pointerup', onPointerUp)
     document.removeEventListener('pointermove', onPointerMove)
+    
+    emit('change')
   }
 }
 </script>

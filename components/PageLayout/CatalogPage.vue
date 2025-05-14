@@ -3,8 +3,12 @@
     <div class="_container">
       <div class="catalog__inner">
         <aside class="catalog__sidebar">
-          <CatalogFilter :isFetchingProducts="isFetchingProducts" @refetchProducts="refetchProducts" />
-          <!-- карточка ads -->
+          <CatalogFilter
+            :isFetchingProducts="isFetchingProducts"
+            :filterItems="filterItems"
+            @refetchProducts="refetchProducts"
+            @refetchFilters="refetchFilters"
+          />
         </aside>
         <div class="catalog__page-header">
           <div class="_page-header">
@@ -14,11 +18,14 @@
           <CatalogSorts
             class="catalog__sorts"
             :isFetchingProducts="isFetchingProducts"
-            @sort-change="refetchProducts"
+            :sortsData="sortsData"
           />
         </div>
-        <div class="catalog__main">
-          <CatalogBody ref="catalogBodyComponent" @updateLoadingState="onLoadingStateUpdate" />
+        <div class="catalog__main" ref="mainEl">
+          <CatalogBody
+            :productsData="productsData"
+            :isFetchingProducts="isFetchingProducts"
+          />
         </div>
       </div>
     </div>
@@ -30,11 +37,24 @@ import CatalogFilter from '~/components/Blocks/CatalogFilter.vue'
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import CatalogBody from '~/components/Page/CatalogPage/CatalogBody.vue'
 import CatalogSorts from '~/components/Page/CatalogPage/CatalogSorts.vue'
-import { useTemplateRef } from 'vue'
+import type ISelectOption from '~/interfaces/components/ISelectOption'
+import type IFilterItem from '~/domain/product/types/IFilterItem'
+import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
+import type IPagination from '~/dataAccess/api/IPagination'
 
-const catalogBodyComponent = useTemplateRef('catalogBodyComponent')
+const route = useRoute()
+const urlQuery = computed(() => {
+  const obj = { ...route.query }
 
-const isFetchingProducts = ref(false)
+  // преобразовать массивы в строки, объеденив элементы запятой
+  for (let [key, value] of Object.entries(obj)) {
+    if (Array.isArray(value)) obj[key] = value.join(',')
+  }
+
+  return obj
+})
+
+const mainEl = ref<HTMLElement>()
 
 const { setBreadcrumbs } = useBreadcrumbs()
 setBreadcrumbs([
@@ -45,11 +65,52 @@ setBreadcrumbs([
   },
 ])
 
-function onLoadingStateUpdate(value: boolean) {
-  isFetchingProducts.value = value
-}
-function refetchProducts(){
-  catalogBodyComponent.value?.refetchProducts()
+const [
+  { data: sortsData },
+  { data: filtersData, status: filtersStatus, execute: refetchFilters },
+  { data: productsData, execute: _refetchProducts, status: productsStatus },
+] = await Promise.all([
+  useAPI<{ data: ISelectOption[] }>('/products/catalog/sorts', {
+    watch: false,
+  }),
+  useAPI<{
+    data: IFilterItem[]
+  }>('/products/catalog/filters', {
+    method: 'GET',
+    query: urlQuery,
+    watch: false,
+  }),
+  useAPI<IPagination<ICatalogProduct>>('/products/catalog', {
+    query: urlQuery,
+    watch: false,
+  }),
+])
+
+const filterItems = computed(() => filtersData.value?.data || [])
+
+const isFetchingProducts = computed(() => productsStatus.value === 'pending')
+
+const { refresh: refetchFiltersDelayed } = useDelayedCallback(250, () => {
+  if (filtersStatus.value !== 'pending') refetchFilters()
+})
+
+watch(
+  () => route.query,
+  (newQuery, oldQuery) => {
+    refetchFiltersDelayed()
+
+    // перезапрашивать каталог только тогда, когда в route.query изменилось хотя бы одно из представленных полей
+    const checkKeys = ['page', 'sort', 'sort_order']
+    if (checkKeys.some((key) => newQuery[key] !== oldQuery[key])) {
+      refetchProducts()
+    }
+  }
+)
+
+async function refetchProducts() {
+  await _refetchProducts()
+
+  if (mainEl.value) mainEl.value.scrollIntoView()
 }
 </script>
 
@@ -69,6 +130,7 @@ function refetchProducts(){
 
   &__sidebar {
     grid-row: 1 / -1;
+    z-index: 20;
   }
 
   &__page-header {
@@ -86,11 +148,14 @@ function refetchProducts(){
   }
 
   &__main {
+    scroll-margin: 150px;
+    position: relative;
     grid-column: 2 / 3;
     grid-row: 2 / 3;
     display: flex;
     flex-direction: column;
     gap: 2.75rem;
+    z-index: 10;
   }
 
   @include mixins.adaptive(tablet-big) {

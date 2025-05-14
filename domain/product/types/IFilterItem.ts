@@ -1,3 +1,5 @@
+import type { TFilterType } from './TFilterItem'
+
 export interface IFilterItemValue {
   id?: number
   slug?: string
@@ -9,7 +11,7 @@ export default interface IFilterItem {
   id?: number
   name: string
   slug: string
-  type: 'checkbox' | 'checkbox_boolean' | 'radio' | 'range'
+  type: TFilterType
   values?: Array<IFilterItemValue>
   min?: number
   max?: number

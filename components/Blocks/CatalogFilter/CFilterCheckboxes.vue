@@ -6,18 +6,24 @@
         :value="item.value_slug"
         :label="item.value"
         v-model="state"
+        @change="updateLastChangedFilter"
       />
       <AFCheckbox
         v-if="type === 'checkbox_boolean'"
         :label="item.value"
         v-model="state"
+        @change="updateLastChangedFilter"
       />
+    </li>
+    <li v-if="lastChangedFilter === slug">
+      <CFilterApplyButton @apply="apply" />
     </li>
   </ul>
 </template>
 
 <script setup lang="ts">
 import { useRouteQuery } from '@vueuse/router'
+import CFilterApplyButton from '~/components/Blocks/CatalogFilter/CFilterApplyButton.vue'
 import AFCheckbox from '~/components/Blocks/FormElements/AFCheckbox.vue'
 import type { IFilterItemValue } from '~/domain/product/types/IFilterItem'
 
@@ -25,6 +31,12 @@ const props = defineProps<{
   slug: string
   type: 'checkbox' | 'checkbox_boolean'
   values: Array<IFilterItemValue>
+  lastChangedFilter: string
+}>()
+
+const emit = defineEmits<{
+  (e: 'apply'): void
+  (e: 'update:lastChangedFilter', value: string): void
 }>()
 
 defineExpose({
@@ -66,6 +78,12 @@ if (props.type === 'checkbox_boolean') {
 function reset() {
   if (props.type === 'checkbox') state.value = []
   if (props.type === 'checkbox_boolean') state.value = null
+}
+function apply() {
+  emit('apply')
+}
+function updateLastChangedFilter() {
+  emit('update:lastChangedFilter', props.slug)
 }
 </script>
 

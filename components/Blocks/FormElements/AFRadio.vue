@@ -1,6 +1,6 @@
 <template>
   <label class="radio">
-    <input type="radio" :value="value" v-model="_value" />
+    <input type="radio" :value="value" v-model="_value" @change="onChange" />
     <span class="radio__circle"></span>
     <span v-if="label" class="radio__label">{{ label }}</span>
   </label>
@@ -15,6 +15,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: typeof props.modelValue): void
+  (e: 'change'): void
 }>()
 
 const _value = computed({
@@ -25,6 +26,10 @@ const _value = computed({
     emit('update:modelValue', val)
   },
 })
+
+function onChange() {
+  emit('change')
+}
 </script>
 
 <style lang="scss" scoped>
