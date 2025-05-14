@@ -1,11 +1,11 @@
 <template>
-  <div class="catalog-body" ref="el">
+  <div class="catalog-body" :class="{ '--disabled': disabled }" ref="el">
     <div class="catalog-body__pagination">
       <AFPagination
         v-if="productsData"
         :total="productsData?.total"
         :perPage="productsData?.per_page"
-        :disabled="disabledPagination"
+        :disabled="disabled"
       />
     </div>
     <div class="catalog-body__products-wrapper">
@@ -32,7 +32,7 @@
         v-if="productsData"
         :total="productsData.total"
         :perPage="productsData.per_page"
-        :disabled="disabledPagination"
+        :disabled="disabled"
       />
     </div>
   </div>
@@ -48,7 +48,7 @@ import type IPagination from '~/dataAccess/api/IPagination'
 
 const props = defineProps<{
   productsData: IPagination<ICatalogProduct> | null
-  isFetchingProducts?: boolean;
+  isFetchingProducts?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -60,7 +60,7 @@ const productsKey = computed(() =>
   (products.value || []).map((el) => el.id).join('')
 )
 
-const disabledPagination = computed(
+const disabled = computed(
   () => props.isFetchingProducts && typeof window !== 'undefined'
 )
 
@@ -74,9 +74,8 @@ function fetchProducts() {
   emit('refetchProducts')
 }
 
-async function onPageChange() {
-  await fetchProducts()
-  if (el.value) el.value.scrollIntoView()
+function onPageChange() {
+  fetchProducts()
 }
 </script>
 
@@ -87,8 +86,12 @@ async function onPageChange() {
   display: flex;
   flex-direction: column;
   gap: 2.75rem;
-  scroll-margin: 150px;
   position: relative;
+  transition: var(--general-transition);
+
+  &.--disabled {
+    opacity: 0.5;
+  }
 
   &__products-wrapper {
     position: relative;

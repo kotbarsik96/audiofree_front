@@ -21,7 +21,7 @@
             :sortsData="sortsData"
           />
         </div>
-        <div class="catalog__main">
+        <div class="catalog__main" ref="mainEl">
           <CatalogBody
             :productsData="productsData"
             :isFetchingProducts="isFetchingProducts"
@@ -54,6 +54,8 @@ const urlQuery = computed(() => {
   return obj
 })
 
+const mainEl = ref<HTMLElement>()
+
 const { setBreadcrumbs } = useBreadcrumbs()
 setBreadcrumbs([
   {
@@ -66,7 +68,7 @@ setBreadcrumbs([
 const [
   { data: sortsData },
   { data: filtersData, status: filtersStatus, execute: refetchFilters },
-  { data: productsData, execute: refetchProducts, status: productsStatus },
+  { data: productsData, execute: _refetchProducts, status: productsStatus },
 ] = await Promise.all([
   useAPI<{ data: ISelectOption[] }>('/products/catalog/sorts', {
     watch: false,
@@ -104,6 +106,12 @@ watch(
     }
   }
 )
+
+async function refetchProducts() {
+  await _refetchProducts()
+
+  if (mainEl.value) mainEl.value.scrollIntoView()
+}
 </script>
 
 <style lang="scss" scoped>
@@ -140,6 +148,7 @@ watch(
   }
 
   &__main {
+    scroll-margin: 150px;
     position: relative;
     grid-column: 2 / 3;
     grid-row: 2 / 3;
