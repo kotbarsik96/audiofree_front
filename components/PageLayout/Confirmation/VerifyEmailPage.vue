@@ -17,11 +17,12 @@
 
 <script setup lang="ts">
 import AFButton from '~/components/Blocks/AFButton.vue'
+import type IUser from '~/domain/user/types/IUser'
 
 const router = useRouter()
 const route = useRoute()
 
-const { user } = storeToRefs(useUserStore())
+const user = useSanctumUser<IUser>()
 const { $afFetch } = useNuxtApp()
 
 if (!user.value?.confirmations.verify_email) {

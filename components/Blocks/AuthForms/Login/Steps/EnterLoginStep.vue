@@ -19,6 +19,7 @@ import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import { LoginSteps } from '~/domain/auth/LoginSteps'
 import { possibleLogins } from '~/domain/auth/loginTypes'
+import { Auth } from '~/domain/auth/Auth'
 
 const { loginStep, savedLogin } = storeToRefs(useAuthStore())
 const { $afFetch } = useNuxtApp()
@@ -39,11 +40,14 @@ async function onSubmit() {
   isLoading.value = true
 
   try {
+    await Auth.requestCsrfToken()
+
     await $afFetch('/profile/request-login', {
       method: 'POST',
       body: {
         login: login.value,
       },
+      credentials: 'include',
       onResponse({ response }) {
         if (isResponseOk(response.status)) {
           if (response._data.data.has_code)

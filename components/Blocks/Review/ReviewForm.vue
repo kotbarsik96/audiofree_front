@@ -1,6 +1,6 @@
 <template>
   <div ref="element">
-    <div v-if="!isAuth" class="review-form review-form--empty _section-box">
+    <div v-if="!!user" class="review-form review-form--empty _section-box">
       <button class="_link" type="button" @click="openLoginDialog">
         Войдите
       </button>
@@ -97,6 +97,7 @@ import {
 } from '~/domain/validaiton/useValidation'
 import { minLengthValidation } from '~/domain/validaiton/validators/minLengthValidation'
 import { minNumberValidation } from '~/domain/validaiton/validators/minNumberValidation'
+import type IUser from '~/domain/user/types/IUser'
 
 const emit = defineEmits<{
   (e: 'update:isWriting', v: boolean): void
@@ -106,7 +107,7 @@ const element = ref<HTMLElement>()
 
 const { $afFetch } = useNuxtApp()
 
-const { isAuth } = storeToRefs(useUserStore())
+const user = useSanctumUser<IUser>()
 const { openSignupDialog, openLoginDialog } = useAuthStore()
 
 const {

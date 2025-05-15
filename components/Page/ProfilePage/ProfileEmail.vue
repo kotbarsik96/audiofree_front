@@ -46,6 +46,7 @@ import EmailIcon from '~/assets/images/icons/email.svg'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
+import type IUser from '~/domain/user/types/IUser'
 import {
   useValidationField,
   useValidationForm,
@@ -55,9 +56,7 @@ import { mustPresentValidation } from '~/domain/validaiton/validators/mustPresen
 
 const { addNotification } = useNotifications()
 const { $afFetch } = useNuxtApp()
-const userStore = useUserStore()
-const { getUser } = userStore
-const { user } = storeToRefs(userStore)
+const user = useSanctumUser<IUser>()
 
 const emailVerified = computed(() => !!user.value?.email_verified_at)
 
@@ -88,7 +87,6 @@ async function onSubmit() {
       },
       async onResponse({ response }) {
         if (response.ok) {
-          await getUser()
           addNotification('success', response._data.message)
           clearAll()
         }
@@ -110,11 +108,6 @@ function clearAll() {
 async function verifyEmail() {
   await $afFetch('/profile/verify-email/request', {
     method: 'POST',
-    async onResponse({ response }) {
-      if (response.ok) {
-        await getUser()
-      }
-    },
   })
 }
 </script>

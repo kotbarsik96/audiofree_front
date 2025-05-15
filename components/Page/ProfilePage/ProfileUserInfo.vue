@@ -52,6 +52,7 @@ import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import MaskInput from '~/components/Blocks/FormElements/MaskInput.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
 import phoneMask from '~/domain/mask-input/phoneMask'
+import type IUser from '~/domain/user/types/IUser'
 import {
   useValidationField,
   useValidationForm,
@@ -59,10 +60,7 @@ import {
 import { phoneNumberValidation } from '~/domain/validaiton/validators/phoneNumberValidation'
 import { mapErrorsFromResponse } from '~/utils/general'
 
-const userStore = useUserStore()
-const { user } = storeToRefs(userStore)
-
-const userInfo = computed(() => user.value)
+const user = useSanctumUser<IUser>()
 
 const username = ref(user.value?.name || '')
 const location = ref(user.value?.location || '')
@@ -75,7 +73,6 @@ const streetError = ref('')
 const houseError = ref('')
 
 const { $afFetch } = useNuxtApp()
-const { getUser } = useUserStore()
 const { addNotification } = useNotifications()
 
 const form = useValidationForm({
@@ -92,11 +89,11 @@ const isLoading = ref(true)
 const disabledSave = computed(() => {
   return (
     isLoading.value ||
-    (compareValues(username.value, userInfo.value?.name) &&
-      compareValues(phoneNumber.value, userInfo.value?.phone_number) &&
-      compareValues(location.value, userInfo.value?.location) &&
-      compareValues(street.value, userInfo.value?.street) &&
-      compareValues(house.value, userInfo.value?.house))
+    (compareValues(username.value, user.value?.name) &&
+      compareValues(phoneNumber.value, user.value?.phone_number) &&
+      compareValues(location.value, user.value?.location) &&
+      compareValues(street.value, user.value?.street) &&
+      compareValues(house.value, user.value?.house))
   )
 })
 
@@ -123,7 +120,6 @@ async function onSubmit() {
       },
       async onResponse({ response }) {
         if (response.ok) {
-          await getUser()
           addNotification('success', 'Вы успешно обновили профиль')
         }
       },

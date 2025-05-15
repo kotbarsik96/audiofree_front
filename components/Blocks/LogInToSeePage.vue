@@ -1,6 +1,6 @@
 <template>
   <div>
-    <slot v-if="isAuth"></slot>
+    <slot v-if="!!user"></slot>
     <div v-else class="lts _container">
       <button class="_link" type="button" @click="openLoginDialog">
         Войдите
@@ -14,7 +14,9 @@
 </template>
 
 <script setup lang="ts">
-const { isAuth } = storeToRefs(useUserStore())
+import type IUser from '~/domain/user/types/IUser';
+
+const user = useSanctumUser<IUser>()
 const { openSignupDialog, openLoginDialog } = useAuthStore()
 </script>
 

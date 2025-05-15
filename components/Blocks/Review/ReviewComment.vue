@@ -24,7 +24,7 @@
       </div>
     </div>
     <div
-      v-if="user && review.user_id === userId"
+      v-if="user && review.user_id === user.id"
       class="review-comment__edit-buttons"
     >
       <AFButton
@@ -50,6 +50,7 @@ import {
   type IReviewInjection,
 } from '~/domain/reviews/types/IReviewInjection'
 import { ReviewInjection } from '~/enums/injections';
+import type IUser from '~/domain/user/types/IUser';
 
 const props = defineProps<{
   review: IReview
@@ -59,7 +60,7 @@ const props = defineProps<{
 
 const { $afFetch } = useNuxtApp()
 
-const { user, userId } = storeToRefs(useUserStore())
+const user = useSanctumUser<IUser>()
 const isLoading = ref(false)
 
 const { updateAllReviews, updateWritingReview } =

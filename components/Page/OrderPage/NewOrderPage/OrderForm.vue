@@ -118,12 +118,13 @@ import {
 import { mustPresentValidation } from '~/domain/validaiton/validators/mustPresentValidation'
 import { minLengthValidation } from '~/domain/validaiton/validators/minLengthValidation'
 import { mustPresentWithout } from '~/domain/validaiton/validators/mustPresentWithoutValidation'
+import type IUser from '~/domain/user/types/IUser'
 
 const emit = defineEmits<{
   (e: 'orderCreated'): void
 }>()
 
-const { user } = useUserStore()
+const user = useSanctumUser<IUser>()
 const route = useRoute()
 const router = useRouter()
 
@@ -160,19 +161,19 @@ const phoneUnmasked = ref('')
 
 // валидация: start
 const form = useValidationForm({
-  name: useValidationField(savedData.value.name || user?.name || '', [
+  name: useValidationField(savedData.value.name || user.value?.name || '', [
     mustPresentValidation(),
   ]),
-  email: useValidationField(savedData.value.email || user?.email || '', [
+  email: useValidationField(savedData.value.email || user.value?.email || '', [
     /* валидаторы добавляютя ниже */
   ]),
   telegram: useValidationField(
-    savedData.value.telegram || user?.telegram || '',
+    savedData.value.telegram || user.value?.telegram || '',
     [
       /* валидаторы добавляютя ниже */
     ]
   ),
-  phone: useValidationField(savedData.value.phone || user?.phone_number || '', [
+  phone: useValidationField(savedData.value.phone || user.value?.phone_number || '', [
     /* валидаторы добавляютя ниже */
   ]),
   comment: useValidationField(savedData.value.comment || '', []),

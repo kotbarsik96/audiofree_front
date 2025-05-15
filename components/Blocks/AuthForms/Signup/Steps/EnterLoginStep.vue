@@ -68,6 +68,7 @@ import { passwordValidation } from '~/domain/validaiton/validators/passwordValid
 import { passwordsMatchValidation } from '~/domain/validaiton/validators/passwordsMatchValidation'
 import { emailValidation } from '~/domain/validaiton/validators/emailValidation'
 import { mustPresentValidation } from '~/domain/validaiton/validators/mustPresentValidation'
+import { Auth } from '~/domain/auth/Auth'
 
 const { $afFetch } = useNuxtApp()
 const { savedLogin, signupLoginType, dialogShown, signupStep, tab, loginStep } =
@@ -75,10 +76,6 @@ const { savedLogin, signupLoginType, dialogShown, signupStep, tab, loginStep } =
 const { addNotification } = useNotifications()
 
 const isLoading = ref(false)
-
-const userStore = useUserStore()
-const { getUser } = userStore
-const { jwt } = storeToRefs(userStore)
 
 const form = useValidationForm({
   name: useValidationField<string>('', [mustPresentValidation()]),
@@ -125,6 +122,8 @@ async function onSubmit() {
   isLoading.value = true
 
   try {
+    await Auth.requestCsrfToken()
+
     if (password.value) await submitWithPassword()
     else await submitWithoutPassword()
   } catch (e) {
@@ -145,14 +144,12 @@ async function submitWithPassword() {
   await $afFetch('/signup', {
     method: 'POST',
     body,
+    credentials: 'include',
     async onResponse({ response }) {
       if (response._data.data) {
-        jwt.value = response._data.data.token
         dialogShown.value = false
         if (response._data.message)
           addNotification('info', response._data.message)
-        await nextTick()
-        await getUser()
       }
     },
     onResponseError({ response }) {
@@ -170,6 +167,7 @@ async function submitWithoutPassword() {
   await $afFetch('/signup', {
     method: 'POST',
     body,
+    credentials: 'include',
     async onResponse({ response }) {
       if (isResponseOk(response.status)) {
         if (response._data.message)

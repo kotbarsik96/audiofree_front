@@ -3,7 +3,7 @@
     <AFIcon class="h-auth-block__icon" :icon="UserIcon" />
     <div class="h-auth-block__links">
       <ClientOnly>
-        <div v-if="isAuth" class="h-auth-block__links-inner">
+        <div v-if="!!user" class="h-auth-block__links-inner">
           <NuxtLink
             class="h-auth-block__btn _link _link--text-color"
             :to="{ name: 'ProfilePage' }"
@@ -45,13 +45,11 @@
 import UserIcon from '@/assets/images/icons/user.svg'
 import AFIcon from '~/components/Blocks/AFIcon.vue'
 import { useAuthStore } from '@/stores/authStore'
-import { storeToRefs } from 'pinia'
-import { useUserStore } from '@/stores/userStore'
 import { Auth } from '~/domain/auth/Auth'
+import type IUser from '~/domain/user/types/IUser'
 
 const { openLoginDialog, openSignupDialog } = useAuthStore()
-const userStore = useUserStore()
-const { isAuth } = storeToRefs(userStore)
+const user = useSanctumUser<IUser>()
 </script>
 
 <style lang="scss">

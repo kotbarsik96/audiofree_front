@@ -1,55 +1,64 @@
+import type { FetchResult } from '#app'
+
 export class Auth {
+  public static async requestCsrfToken() {
+    await $fetch('/sanctum/csrf-cookie', {
+      baseURL: import.meta.env.VITE_API_URL,
+      credentials: 'include',
+    })
+  }
   public static async login(
-    login: string,
+    loginString: string,
     authType: 'password' | 'code',
     passwordOrCode: string,
-    errorRef: Ref<string>
+    errorRef?: Ref<string>
   ) {
     const { closeDialogAndReset } = useAuthStore()
     const { addNotification } = useNotifications()
-    const { updateJwt } = useUserStore()
     const { initApp } = useGlobalStore()
+    const { login } = useSanctumAuth()
 
-    await useNuxtApp().$afFetch('/login', {
-      method: 'POST',
-      body: {
-        login: login,
+    let response: FetchResult<any, any> | { status: number }
+
+    try {
+      response = (await login({
+        login: loginString,
         [authType]: passwordOrCode,
-      },
-      async onResponse({ response }) {
-        if (isResponseOk(response.status)) {
-          updateJwt(response._data.data.token)
-          closeDialogAndReset()
-          await nextTick()
-          await initApp()
-          if (response._data.message)
-            addNotification('success', response._data.message)
-        }
-      },
-      onResponseError({ response }) {
-        if (response._data.message) errorRef.value = response._data.message
-      },
-    })
+      })) as FetchResult<any, any>
+
+      if (isResponseOk(response.status) || response.ok) {
+        closeDialogAndReset()
+        if (response.message) addNotification('success', response.message)
+        await initApp()
+      }
+    } catch (e: any) {
+      if (e.response?._data?.message && errorRef)
+        errorRef.value = e.response._data.message
+
+      response = e.response
+    }
+
+    return response ? response : { status: 0 }
   }
   public static async logout() {
-    const userStore = useUserStore()
-    const { resetUser, checkPageMetaAuth } = userStore
-    const { jwt } = storeToRefs(userStore)
     const { addNotification } = useNotifications()
-    const { $afFetch } = useNuxtApp()
     const { initApp } = useGlobalStore()
+    const { logout } = useSanctumAuth()
 
-    jwt.value = null
+    let response: FetchResult<any, any> | { status: number }
 
-    await $afFetch('/logout', {
-      method: 'POST',
-      onResponse({ response }) {
-        addNotification('info', response._data.message)
-        resetUser()
+    try {
+      await this.requestCsrfToken()
+      response = await logout()
+
+      if (isResponseOk(response.status)) {
         initApp()
-      },
-    })
+        if (response.message) addNotification('info', response.message)
+      }
+    } catch (e: any) {
+      response = e.response
+    }
 
-    checkPageMetaAuth()
+    return response
   }
 }

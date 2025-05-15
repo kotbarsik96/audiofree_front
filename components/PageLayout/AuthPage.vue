@@ -10,20 +10,19 @@
 
 <script setup lang="ts">
 import AuthWindow from '~/components/Blocks/AuthForms/AuthWindow.vue'
-import { useUserStore } from '@/stores/userStore'
-import { storeToRefs } from 'pinia'
 import { watch } from 'vue'
 import { useRouter } from 'vue-router'
+import type IUser from '~/domain/user/types/IUser'
 
 const router = useRouter()
-const { isAuth } = storeToRefs(useUserStore())
+const user = useSanctumUser<IUser>()
 
 authWatcher()
 
-watch(isAuth, authWatcher)
+watch(user, authWatcher)
 
 function authWatcher() {
-  if (isAuth.value) router.push({ name: 'HomePage' })
+  if (!!user.value) router.push({ name: 'HomePage' })
 }
 </script>
 
