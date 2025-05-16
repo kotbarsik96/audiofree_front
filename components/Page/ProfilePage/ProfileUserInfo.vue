@@ -118,6 +118,7 @@ async function onSubmit() {
         street: street.value,
         house: house.value,
       },
+      credentials: 'include',
       async onResponse({ response }) {
         if (response.ok) {
           addNotification('success', 'Вы успешно обновили профиль')

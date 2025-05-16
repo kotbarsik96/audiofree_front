@@ -10,6 +10,7 @@ export function useFavorites() {
     try {
       await $afFetch('product/favorites', {
         method: 'POST',
+        credentials: 'include',
         body: {
           variation_id: variationId,
         },
@@ -42,6 +43,7 @@ export function useFavorites() {
     try {
       await $afFetch('product/favorites', {
         method: 'DELETE',
+        credentials: 'include',
         body,
         onResponse({ response }) {
           _response = response

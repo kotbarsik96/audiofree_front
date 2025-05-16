@@ -82,6 +82,7 @@ async function removeReview() {
   try {
     await $afFetch('product/rating', {
       method: 'DELETE',
+      credentials: 'include',
       params: {
         product_slug: props.productSlug,
       },

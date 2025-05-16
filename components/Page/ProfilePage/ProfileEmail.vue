@@ -85,6 +85,7 @@ async function onSubmit() {
       body: {
         email: newEmail.value,
       },
+      credentials: 'include',
       async onResponse({ response }) {
         if (response.ok) {
           addNotification('success', response._data.message)

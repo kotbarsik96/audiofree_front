@@ -12,6 +12,9 @@
           inputId="login"
         >
           <TextInput v-model="login" placeholder="Логин" id="login" />
+          <template v-if="loginError" #error>
+            {{ loginError }}
+          </template>
         </InputWrapper>
         <div class="auth-form__buttons">
           <AFButton
@@ -46,6 +49,7 @@ import { possibleLogins } from '~/domain/auth/loginTypes'
 const { previousTab, tab, savedLogin } = storeToRefs(useAuthStore())
 
 const login = ref(savedLogin.value)
+const loginError = ref('')
 
 const messageSentText = ref()
 const isLoading = ref(false)
@@ -60,11 +64,15 @@ async function send() {
   try {
     await $afFetch('/profile/reset-password/request', {
       method: 'POST',
+      credentials: 'include',
       body: { login: savedLogin.value },
       onResponse({ response }) {
         if (response.ok && response._data.message) {
           messageSentText.value = response._data.message
         }
+      },
+      onResponseError({ response }) {
+        if (response._data.message) loginError.value = response._data.message
       },
     })
   } catch (e) {

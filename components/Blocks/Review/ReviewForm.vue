@@ -1,6 +1,6 @@
 <template>
   <div ref="element">
-    <div v-if="!!user" class="review-form review-form--empty _section-box">
+    <div v-if="!user" class="review-form review-form--empty _section-box">
       <button class="_link" type="button" @click="openLoginDialog">
         Войдите
       </button>
@@ -172,6 +172,7 @@ async function onSubmit() {
         cons: cons.value,
         description: description.value,
       },
+      credentials: 'include',
       async onResponse({ response }) {
         if (response.ok) {
           await updateAllReviews()

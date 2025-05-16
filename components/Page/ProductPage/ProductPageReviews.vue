@@ -67,6 +67,7 @@ const isEditingReview = computed(
 const { data: currentUserReviewData, execute: loadUserReview } = useAPI<{
   data: IProductReview | null
 }>(`/product/${productSlug.value}/user-review`, {
+  credentials: 'include',
   watch: false,
   immediate: false,
 })

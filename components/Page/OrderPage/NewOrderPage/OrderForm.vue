@@ -142,6 +142,7 @@ const { data: creationData } = await useAPI<{ data: ICreationOrderData }>(
   '/order/creation-data',
   {
     params: { is_oneclick: isOneclick },
+    credentials: 'include',
     onResponseError({ response }) {
       if (response._data.message) {
         addNotification('info', response._data.message)
@@ -279,6 +280,7 @@ async function orderAttempt() {
   await $afFetch('/order/new-attempt', {
     method: 'POST',
     body: requestBody.value,
+    credentials: 'include',
     onResponse({ response }) {
       if (isResponseOk(response.status)) {
         emit('orderCreated')
@@ -323,6 +325,7 @@ async function makeNewOrder() {
   await $afFetch('/order/new', {
     method: 'POST',
     body: requestBody.value,
+    credentials: 'include',
     onResponse({ response }) {
       if (isResponseOk(response.status)) {
         emit('orderCreated')

@@ -79,7 +79,10 @@ setBreadcrumbs([
 ])
 
 const { data: order } = await useAPI<{ data: IOrder }>(
-  `/order/single/${route.params.id}`
+  `/order/single/${route.params.id}`,
+  {
+    credentials: 'include',
+  }
 )
 
 const orderData = computed(() => order.value?.data)
