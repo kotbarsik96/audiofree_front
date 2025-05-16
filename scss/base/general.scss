@@ -149,7 +149,7 @@ button {
 
 @each $h in 1, 2, 3, 4 {
   ._h#{$h} {
-    font: var(--text-#{$h});
+    font: var(--text-h#{$h});
   }
 }
 
