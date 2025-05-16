@@ -1,18 +1,20 @@
 <template>
   <div class="notifications-container">
-    <TransitionGroup name="notification-anim">
-      <NotificationItem
-        v-for="item in notifications"
-        :key="item.id"
-        :data="item"
-      />
-    </TransitionGroup>
+    <ClientOnly>
+      <TransitionGroup name="notification-anim">
+        <NotificationItem
+          v-for="item in notifications"
+          :key="item.id"
+          :data="item"
+        />
+      </TransitionGroup>
+    </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
-import NotificationItem from "~/components/Blocks/Notifications/NotificationItem.vue"
-import { useNotifications } from "@/composables/useNotifications"
+import NotificationItem from '~/components/Blocks/Notifications/NotificationItem.vue'
+import { useNotifications } from '@/composables/useNotifications'
 
 const { getNotificationsList } = useNotifications()
 

@@ -11,6 +11,7 @@ export function useAPI<T>(
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
+    // credentials: 'include' внимание: при запросах, взаимодействующих с sanctum, необходимо указывать этот параметр
     $fetch: useNuxtApp().$afFetch,
   })
 }

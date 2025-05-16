@@ -69,6 +69,7 @@ import { passwordsMatchValidation } from '~/domain/validaiton/validators/passwor
 import { emailValidation } from '~/domain/validaiton/validators/emailValidation'
 import { mustPresentValidation } from '~/domain/validaiton/validators/mustPresentValidation'
 import { Auth } from '~/domain/auth/Auth'
+import type IUser from '~/domain/user/types/IUser'
 
 const { $afFetch } = useNuxtApp()
 const { savedLogin, signupLoginType, dialogShown, signupStep, tab, loginStep } =
@@ -141,6 +142,8 @@ async function submitWithPassword() {
     password_confirmation: passwordConfirmation.value,
   }
 
+  const user = useSanctumUser<IUser>()
+
   await $afFetch('/signup', {
     method: 'POST',
     body,
@@ -150,6 +153,15 @@ async function submitWithPassword() {
         dialogShown.value = false
         if (response._data.message)
           addNotification('info', response._data.message)
+
+        await $afFetch('/profile/user', {
+          onResponse({ response }) {
+            if (isResponseOk(response.status)) {
+              user.value = response._data
+            }
+          },
+          credentials: 'include',
+        })
       }
     },
     onResponseError({ response }) {

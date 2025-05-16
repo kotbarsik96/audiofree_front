@@ -18,10 +18,8 @@ export class Auth {
     const { initApp } = useGlobalStore()
     const { login } = useSanctumAuth()
 
-    let response: FetchResult<any, any> | { status: number }
-
     try {
-      response = (await login({
+      const response = (await login({
         login: loginString,
         [authType]: passwordOrCode,
       })) as FetchResult<any, any>
@@ -34,11 +32,34 @@ export class Auth {
     } catch (e: any) {
       if (e.response?._data?.message && errorRef)
         errorRef.value = e.response._data.message
-
-      response = e.response
     }
+  }
+  public static async loginIfHasQuery() {
+    const user = useSanctumUser()
+    const error = ref('')
+    const { addNotification } = useNotifications()
 
-    return response ? response : { status: 0 }
+    if (!user.value) {
+      const route = useRoute()
+      const router = useRouter()
+      const { auth_code, auth_login } = route.query
+
+      if (auth_code && auth_login && typeof window !== 'undefined') {
+        const newQuery = { ...route.query }
+        delete newQuery.auth_code
+        delete newQuery.auth_login
+        router.replace({ name: route.name })
+
+        await this.login(
+          auth_login as string,
+          'code',
+          auth_code as string,
+          error
+        )
+
+        if (error.value) addNotification('error', error.value)
+      }
+    }
   }
   public static async logout() {
     const { addNotification } = useNotifications()
