@@ -154,14 +154,7 @@ async function submitWithPassword() {
         if (response._data.message)
           addNotification('info', response._data.message)
 
-        await $afFetch('/profile/user', {
-          onResponse({ response }) {
-            if (isResponseOk(response.status)) {
-              user.value = response._data
-            }
-          },
-          credentials: 'include',
-        })
+        await Auth.refetchUser()
       }
     },
     onResponseError({ response }) {

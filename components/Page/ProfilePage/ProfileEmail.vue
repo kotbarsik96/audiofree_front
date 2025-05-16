@@ -61,7 +61,7 @@ const user = useSanctumUser<IUser>()
 const emailVerified = computed(() => !!user.value?.email_verified_at)
 
 const isLoading = ref(false)
-const isVerifying = computed(() => user.value?.confirmations.verify_email)
+const isVerifying = ref(user.value?.confirmations.verify_email)
 
 const isButtonDisabled = computed(() => isLoading.value)
 
@@ -106,9 +106,14 @@ function clearAll() {
   newEmailError.value = ''
 }
 async function verifyEmail() {
-  await $afFetch('/profile/verify-email/request', {
+  await $afFetch('/profile/verification/request', {
     method: 'POST',
+    credentials: 'include',
+    body: {
+      entity: 'email',
+    },
   })
+  isVerifying.value = true
 }
 </script>
 

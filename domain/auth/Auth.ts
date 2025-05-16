@@ -82,4 +82,17 @@ export class Auth {
 
     return response
   }
+  public static async refetchUser() {
+    const { $afFetch } = useNuxtApp()
+    const user = useSanctumUser()
+
+    await $afFetch('/profile/user', {
+      onResponse({ response }) {
+        if (isResponseOk(response.status)) {
+          user.value = response._data
+        }
+      },
+      credentials: 'include',
+    })
+  }
 }

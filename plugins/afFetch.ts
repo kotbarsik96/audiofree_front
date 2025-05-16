@@ -13,7 +13,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       debugError(data, 'error from onResponseError')
     },
     headers: {
-      Accept: 'application'
+      Accept: 'application/json'
     },
     // credentials: 'include' внимание: при запросах, взаимодействующих с sanctum, необходимо указывать этот параметр
   })
