@@ -142,7 +142,7 @@ async function submitWithPassword() {
     password_confirmation: passwordConfirmation.value,
   }
 
-  const user = useSanctumUser<IUser>()
+  const { refreshIdentity } = useSanctumAuth()
 
   await $afFetch('/signup', {
     method: 'POST',
@@ -154,7 +154,8 @@ async function submitWithPassword() {
         if (response._data.message)
           addNotification('info', response._data.message)
 
-        await Auth.refetchUser()
+        await Auth.requestCsrfToken()
+        await refreshIdentity()
       }
     },
     onResponseError({ response }) {

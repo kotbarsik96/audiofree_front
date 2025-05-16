@@ -66,33 +66,12 @@ export class Auth {
     const { initApp } = useGlobalStore()
     const { logout } = useSanctumAuth()
 
-    let response: FetchResult<any, any> | { status: number }
-
     try {
-      await this.requestCsrfToken()
-      response = await logout()
-
-      if (isResponseOk(response.status)) {
-        initApp()
-        if (response.message) addNotification('info', response.message)
-      }
+      await logout()
+      addNotification('info', 'Выполнен выход из профиля')
+      await initApp()
     } catch (e: any) {
-      response = e.response
+      console.error(e)
     }
-
-    return response
-  }
-  public static async refetchUser() {
-    const { $afFetch } = useNuxtApp()
-    const user = useSanctumUser()
-
-    await $afFetch('/profile/user', {
-      onResponse({ response }) {
-        if (isResponseOk(response.status)) {
-          user.value = response._data
-        }
-      },
-      credentials: 'include',
-    })
   }
 }

@@ -43,6 +43,8 @@ if (!route.query.code) {
   router.push({ name: 'HomePage' })
 }
 
+const { refreshIdentity } = useSanctumAuth()
+
 const isVerified = ref(false)
 const isLoading = ref(true)
 
@@ -58,13 +60,13 @@ onMounted(() => {
       if (response.ok) {
         isLoading.value = false
         isVerified.value = true
-        await Auth.refetchUser()
+        await refreshIdentity()
       }
     },
     onResponseError({ response }) {
       isLoading.value = false
       router.replace({ name: 'HomePage' })
-      
+
       let text = 'Не удалось подтвердить адрес email'
       if (response.status === ServerStatuses.SERVER_ERROR)
         text += ' (ошибка сервера)'
