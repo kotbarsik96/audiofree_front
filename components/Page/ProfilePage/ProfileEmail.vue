@@ -57,6 +57,7 @@ import { mustPresentValidation } from '~/domain/validaiton/validators/mustPresen
 const { addNotification } = useNotifications()
 const { $afFetch } = useNuxtApp()
 const user = useSanctumUser<IUser>()
+const { refreshIdentity } = useSanctumAuth()
 
 const emailVerified = computed(() => !!user.value?.email_verified_at)
 
@@ -89,6 +90,7 @@ async function onSubmit() {
       async onResponse({ response }) {
         if (response.ok) {
           addNotification('success', response._data.message)
+          isVerifying.value = true
           clearAll()
         }
       },
@@ -99,6 +101,8 @@ async function onSubmit() {
   } catch (err) {
     console.error(err)
   }
+
+  await refreshIdentity()
 
   isLoading.value = false
 }
