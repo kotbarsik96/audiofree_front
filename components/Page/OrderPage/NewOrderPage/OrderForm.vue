@@ -225,7 +225,7 @@ const requestBody = computed(() => ({
   orderer_name: name.value,
   email: email.value,
   telegram: telegram.value,
-  phone_number: phone.value,
+  phone_number: phoneUnmasked.value ? phone.value : undefined,
   delivery_place: deliveryPlace.value,
   delivery_address: address.value,
   desired_payment_type: paymentType.value,
