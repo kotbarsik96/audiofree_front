@@ -53,7 +53,10 @@ const intersectionEl = ref<HTMLElement>()
 const searchString = ref('')
 
 const { data: sortData } = await useAPI<{ data: ISelectOption[] }>(
-  '/order/sorts'
+  '/order/sorts',
+  {
+    credentials: 'include',
+  }
 )
 
 const { options, orderOptions, sort, sortOrder } = useSorts(sortData)
@@ -66,6 +69,7 @@ const {
   intersectionEl,
   '/order/list',
   {
+    credentials: 'include',
     watch: false,
     query: {
       sort: sort,

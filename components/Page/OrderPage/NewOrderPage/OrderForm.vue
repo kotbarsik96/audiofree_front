@@ -118,12 +118,13 @@ import {
 import { mustPresentValidation } from '~/domain/validaiton/validators/mustPresentValidation'
 import { minLengthValidation } from '~/domain/validaiton/validators/minLengthValidation'
 import { mustPresentWithout } from '~/domain/validaiton/validators/mustPresentWithoutValidation'
+import type IUser from '~/domain/user/types/IUser'
 
 const emit = defineEmits<{
   (e: 'orderCreated'): void
 }>()
 
-const { user } = useUserStore()
+const user = useSanctumUser<IUser>()
 const route = useRoute()
 const router = useRouter()
 
@@ -141,6 +142,7 @@ const { data: creationData } = await useAPI<{ data: ICreationOrderData }>(
   '/order/creation-data',
   {
     params: { is_oneclick: isOneclick },
+    credentials: 'include',
     onResponseError({ response }) {
       if (response._data.message) {
         addNotification('info', response._data.message)
@@ -160,19 +162,19 @@ const phoneUnmasked = ref('')
 
 // валидация: start
 const form = useValidationForm({
-  name: useValidationField(savedData.value.name || user?.name || '', [
+  name: useValidationField(savedData.value.name || user.value?.name || '', [
     mustPresentValidation(),
   ]),
-  email: useValidationField(savedData.value.email || user?.email || '', [
+  email: useValidationField(savedData.value.email || user.value?.email || '', [
     /* валидаторы добавляютя ниже */
   ]),
   telegram: useValidationField(
-    savedData.value.telegram || user?.telegram || '',
+    savedData.value.telegram || user.value?.telegram || '',
     [
       /* валидаторы добавляютя ниже */
     ]
   ),
-  phone: useValidationField(savedData.value.phone || user?.phone_number || '', [
+  phone: useValidationField(savedData.value.phone || user.value?.phone_number || '', [
     /* валидаторы добавляютя ниже */
   ]),
   comment: useValidationField(savedData.value.comment || '', []),
@@ -223,7 +225,7 @@ const requestBody = computed(() => ({
   orderer_name: name.value,
   email: email.value,
   telegram: telegram.value,
-  phone_number: phone.value,
+  phone_number: phoneUnmasked.value ? phone.value : undefined,
   delivery_place: deliveryPlace.value,
   delivery_address: address.value,
   desired_payment_type: paymentType.value,
@@ -278,6 +280,7 @@ async function orderAttempt() {
   await $afFetch('/order/new-attempt', {
     method: 'POST',
     body: requestBody.value,
+    credentials: 'include',
     onResponse({ response }) {
       if (isResponseOk(response.status)) {
         emit('orderCreated')
@@ -322,6 +325,7 @@ async function makeNewOrder() {
   await $afFetch('/order/new', {
     method: 'POST',
     body: requestBody.value,
+    credentials: 'include',
     onResponse({ response }) {
       if (isResponseOk(response.status)) {
         emit('orderCreated')

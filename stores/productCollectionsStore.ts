@@ -1,9 +1,10 @@
 import type { IProductCollections } from '~/domain/product/types/IProductCollections'
+import type IUser from '~/domain/user/types/IUser'
 
 export const useProductCollectionsStore = defineStore(
   'productCollectionsStore',
   () => {
-    const { jwt } = useUserStore()
+    const user = useSanctumUser<IUser>()
 
     const {
       data: collection,
@@ -12,6 +13,7 @@ export const useProductCollectionsStore = defineStore(
     } = useAPI<{ data: IProductCollections }>('/profile/products/collections', {
       method: 'GET',
       watch: false,
+      credentials: 'include',
       immediate: false,
     })
 
@@ -26,7 +28,7 @@ export const useProductCollectionsStore = defineStore(
     )
 
     function updateCollection() {
-      if (jwt) _updateCollection()
+      if (!!user.value) _updateCollection()
     }
 
     return {

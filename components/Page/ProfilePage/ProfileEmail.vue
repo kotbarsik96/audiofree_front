@@ -46,6 +46,7 @@ import EmailIcon from '~/assets/images/icons/email.svg'
 import AFButton from '~/components/Blocks/AFButton.vue'
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
+import type IUser from '~/domain/user/types/IUser'
 import {
   useValidationField,
   useValidationForm,
@@ -55,14 +56,13 @@ import { mustPresentValidation } from '~/domain/validaiton/validators/mustPresen
 
 const { addNotification } = useNotifications()
 const { $afFetch } = useNuxtApp()
-const userStore = useUserStore()
-const { getUser } = userStore
-const { user } = storeToRefs(userStore)
+const user = useSanctumUser<IUser>()
+const { refreshIdentity } = useSanctumAuth()
 
 const emailVerified = computed(() => !!user.value?.email_verified_at)
 
 const isLoading = ref(false)
-const isVerifying = computed(() => user.value?.confirmations.verify_email)
+const isVerifying = ref(user.value?.confirmations.verify_email)
 
 const isButtonDisabled = computed(() => isLoading.value)
 
@@ -86,10 +86,11 @@ async function onSubmit() {
       body: {
         email: newEmail.value,
       },
+      credentials: 'include',
       async onResponse({ response }) {
         if (response.ok) {
-          await getUser()
           addNotification('success', response._data.message)
+          isVerifying.value = true
           clearAll()
         }
       },
@@ -101,6 +102,8 @@ async function onSubmit() {
     console.error(err)
   }
 
+  await refreshIdentity()
+
   isLoading.value = false
 }
 function clearAll() {
@@ -108,14 +111,14 @@ function clearAll() {
   newEmailError.value = ''
 }
 async function verifyEmail() {
-  await $afFetch('/profile/verify-email/request', {
+  await $afFetch('/profile/verification/request', {
     method: 'POST',
-    async onResponse({ response }) {
-      if (response.ok) {
-        await getUser()
-      }
+    credentials: 'include',
+    body: {
+      entity: 'email',
     },
   })
+  isVerifying.value = true
 }
 </script>
 

@@ -14,6 +14,7 @@ export function useCart() {
     try {
       await $afFetch('/product/cart', {
         method: 'POST',
+        credentials: 'include',
         body: {
           variation_id: variation.id,
           quantity: quantity,
@@ -42,6 +43,7 @@ export function useCart() {
     try {
       await $afFetch('/product/cart', {
         method: 'POST',
+        credentials: 'include',
         body: {
           variation_id: variation.id,
           quantity: quantity,
@@ -73,6 +75,7 @@ export function useCart() {
     try {
       await $afFetch('product/cart/item', {
         method: 'DELETE',
+        credentials: 'include',
         params: {
           variation_id: variation.id,
           is_oneclick: isOneclick ? '1' : '',

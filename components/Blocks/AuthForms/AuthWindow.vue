@@ -30,12 +30,12 @@
 </template>
 
 <script setup lang="ts">
-import LoginForm from "~/components/Blocks/AuthForms/Login/LoginForm.vue"
-import ResetPasswordForm from "~/components/Blocks/AuthForms/ResetPasswordForm.vue"
-import SignupForm from "~/components/Blocks/AuthForms/Signup/SignupForm.vue"
-import { useAuthStore } from "@/stores/authStore"
-import { storeToRefs } from "pinia"
-import { computed } from "vue"
+import LoginForm from '~/components/Blocks/AuthForms/Login/LoginForm.vue'
+import ResetPasswordForm from '~/components/Blocks/AuthForms/ResetPasswordForm.vue'
+import SignupForm from '~/components/Blocks/AuthForms/Signup/SignupForm.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
 
 const { tab } = storeToRefs(useAuthStore())
 
@@ -46,13 +46,13 @@ const component = computed(() => {
     | typeof ResetPasswordForm
 
   switch (tab.value) {
-    case "login":
+    case 'login':
       _component = LoginForm
       break
-    case "signup":
+    case 'signup':
       _component = SignupForm
       break
-    case "reset":
+    case 'reset':
       _component = ResetPasswordForm
       break
   }

@@ -92,6 +92,7 @@ async function onSubmit() {
         password: newPassword.value,
         password_confirmation: newPasswordRepeat.value,
       },
+      credentials: 'include',
       onResponse({ response }) {
         if (response.ok) {
           addNotification('success', response._data.message)

@@ -63,6 +63,7 @@ async function toConfirmationStep() {
         login: login.value,
         code_required: true,
       },
+      credentials: 'include',
       onResponse({ response }) {
         if (isResponseOk(response.status)) {
           loginStep.value = LoginSteps.ConfirmationCodeStep

@@ -44,7 +44,10 @@ import { useRouteQuery } from '@vueuse/router'
 const intersectionEl = ref<HTMLElement>()
 
 const { data: sortData } = await useAPI<{ data: ISelectOption[] }>(
-  '/product/favorites/sorts'
+  '/product/favorites/sorts',
+  {
+    credentials: 'include',
+  }
 )
 const { options, orderOptions, sort, sortOrder } = useSorts(sortData)
 
@@ -58,6 +61,7 @@ const {
   intersectionEl,
   '/product/favorites',
   {
+    credentials: 'include',
     watch: false,
     query: {
       sort: sort,

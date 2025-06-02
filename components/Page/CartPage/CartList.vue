@@ -78,6 +78,7 @@ const {
   refresh,
 } = await useAPI<{ data: ICartItem[] }>('/product/cart', {
   method: 'GET',
+  credentials: 'include',
   params: {
     is_oneclick: route.query.oneclick,
   },

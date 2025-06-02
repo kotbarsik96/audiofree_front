@@ -47,8 +47,9 @@ import {
   type IReviewInjection,
 } from '~/domain/reviews/types/IReviewInjection'
 import { ReviewInjection } from '~/enums/injections'
+import type IUser from '~/domain/user/types/IUser'
 
-const { userId } = storeToRefs(useUserStore())
+const user = useSanctumUser<IUser>()
 const route = useRoute()
 
 const intersectionEl = ref<HTMLElement>()
@@ -66,6 +67,7 @@ const isEditingReview = computed(
 const { data: currentUserReviewData, execute: loadUserReview } = useAPI<{
   data: IProductReview | null
 }>(`/product/${productSlug.value}/user-review`, {
+  credentials: 'include',
   watch: false,
   immediate: false,
 })
@@ -96,10 +98,10 @@ const [
   loadUserReview(),
 ])
 const otherUsersReviews = computed(() =>
-  reviews.value.filter((review) => review.user_id !== userId.value)
+  reviews.value.filter((review) => review.user_id !== user.value?.id)
 )
 
-watch(userId, async () => {
+watch(user, async () => {
   await loadUserReview()
 })
 

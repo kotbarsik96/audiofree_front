@@ -81,6 +81,7 @@ async function checkLink() {
     await $afFetch('/profile/reset-password/verify-link', {
       method: 'POST',
       body: { login, code },
+      credentials: 'include',
       onResponse({ response }) {
         if (!response.ok) {
           router.push({ name: 'HomePage' })
@@ -102,6 +103,7 @@ async function onSubmit() {
   try {
     await $afFetch('/profile/reset-password/new-password', {
       method: 'POST',
+      credentials: 'include',
       body: {
         code: code as string,
         login: login as string,

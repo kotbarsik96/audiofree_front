@@ -1,9 +1,14 @@
 <template>
-  <div v-show="isVerified" class="_container">
-    <div class="verified">
+  <div class="_container">
+    <GlobalPreloader v-if="isLoading" />
+    <div v-else-if="isVerified" class="verified">
       Вы успешно подтвердили адрес электронной почты
       <div class="verified__buttons">
-        <AFButton type="nuxt-link" :to="{ name: 'ProfilePage' }" label="В профиль" />
+        <AFButton
+          type="nuxt-link"
+          :to="{ name: 'ProfilePage' }"
+          label="В профиль"
+        />
         <AFButton
           type="nuxt-link"
           styleType="secondary"
@@ -16,12 +21,18 @@
 </template>
 
 <script setup lang="ts">
+import GlobalPreloader from '~/components/Blocks/GlobalPreloader.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
+import { Auth } from '~/domain/auth/Auth'
+import type IUser from '~/domain/user/types/IUser'
+import { ServerStatuses } from '~/enums/ServerStatuses'
 
 const router = useRouter()
 const route = useRoute()
 
-const { user } = storeToRefs(useUserStore())
+const { addNotification } = useNotifications()
+
+const user = useSanctumUser<IUser>()
 const { $afFetch } = useNuxtApp()
 
 if (!user.value?.confirmations.verify_email) {
@@ -32,17 +43,37 @@ if (!route.query.code) {
   router.push({ name: 'HomePage' })
 }
 
+const { refreshIdentity } = useSanctumAuth()
+
 const isVerified = ref(false)
-await $afFetch('/profile/verify-email', {
-  method: 'POST',
-  body: {
-    code: route.query.code,
-  },
-  onResponse({ response }) {
-    if (response.ok) {
-      isVerified.value = true
-    }
-  },
+const isLoading = ref(true)
+
+onMounted(() => {
+  $afFetch('/profile/verification/confirm', {
+    method: 'POST',
+    body: {
+      entity: 'email',
+      code: route.query.code,
+    },
+    credentials: 'include',
+    async onResponse({ response }) {
+      if (response.ok) {
+        isLoading.value = false
+        isVerified.value = true
+        await refreshIdentity()
+      }
+    },
+    onResponseError({ response }) {
+      isLoading.value = false
+      router.replace({ name: 'HomePage' })
+
+      let text = 'Не удалось подтвердить адрес email'
+      if (response.status === ServerStatuses.SERVER_ERROR)
+        text += ' (ошибка сервера)'
+      else text += ' (' + response._data.message + ')'
+      addNotification('error', text)
+    },
+  })
 })
 </script>
 
