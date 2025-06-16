@@ -25,12 +25,13 @@
 import { useRouteQuery } from '@vueuse/router'
 import CFilterApplyButton from '~/components/Blocks/CatalogFilter/CFilterApplyButton.vue'
 import AFCheckbox from '~/components/Blocks/FormElements/AFCheckbox.vue'
-import type { IFilterItemValue } from '~/domain/product/types/IFilterItem'
+import type {
+  ICheckboxBooleanItem,
+  IFilterOption,
+} from '~/domain/product/types/IFilterItem'
 
 const props = defineProps<{
-  slug: string
-  type: 'checkbox' | 'checkbox_boolean'
-  values: Array<IFilterItemValue>
+  section: IFilterOption | ICheckboxBooleanItem
   lastChangedFilter: string
 }>()
 
@@ -43,9 +44,13 @@ defineExpose({
   reset,
 })
 
+const slug = computed(() => props.section.slug)
+const type = computed(() => props.section.type)
+const values = computed(() => props.section.values)
+
 let state: Ref<any>
-if (props.type === 'checkbox') {
-  state = useRouteQuery(props.slug, [], {
+if (type.value === 'checkbox') {
+  state = useRouteQuery(slug.value, [], {
     transform: {
       get(val) {
         if (typeof val === 'string') return [val]
@@ -60,8 +65,8 @@ if (props.type === 'checkbox') {
     },
   })
 }
-if (props.type === 'checkbox_boolean') {
-  state = useRouteQuery<any>(props.slug, null, {
+if (type.value === 'checkbox_boolean') {
+  state = useRouteQuery<any>(slug.value, null, {
     transform: {
       get(value) {
         if (value === 'false' || !value) return null
@@ -76,14 +81,14 @@ if (props.type === 'checkbox_boolean') {
 }
 
 function reset() {
-  if (props.type === 'checkbox') state.value = []
-  if (props.type === 'checkbox_boolean') state.value = null
+  if (type.value === 'checkbox') state.value = []
+  if (type.value === 'checkbox_boolean') state.value = null
 }
 function apply() {
   emit('apply')
 }
 function updateLastChangedFilter() {
-  emit('update:lastChangedFilter', props.slug)
+  emit('update:lastChangedFilter', slug.value)
 }
 </script>
 

@@ -25,28 +25,25 @@
                   v-if="
                     (section.type === 'checkbox' ||
                       section.type === 'checkbox_boolean') &&
-                    section.values
+                    (section as IFilterOption).values
                   "
-                  :type="section.type"
-                  :slug="section.slug"
-                  :values="section.values"
+                  :section="(section as IFilterOption)"
                   v-model:lastChangedFilter="lastChangedFilter"
                   ref="filterSectionEl"
                   @apply="apply"
                 />
                 <CFilterRadios
-                  v-else-if="section.type === 'radio' && section.values"
-                  :slug="section.slug"
-                  :values="section.values"
+                  v-else-if="section.type === 'radio' && (section as IFilterOption).values"
+                  :section="(section as IFilterOption)"
                   v-model:lastChangedFilter="lastChangedFilter"
                   ref="filterSectionEl"
                   @apply="apply"
                 />
                 <CFilterRange
                   v-else-if="section.type === 'range'"
-                  :slug="section.slug"
-                  :min="Math.floor(section.min ?? 0)"
-                  :max="Math.floor(section.max ?? 0)"
+                  :section="(section as IFilterRangeItem)"
+                  :min="Math.floor((section as IFilterRangeItem).min ?? 0)"
+                  :max="Math.floor((section as IFilterRangeItem).max ?? 0)"
                   ref="filterSectionEl"
                   v-model:lastChangedFilter="lastChangedFilter"
                   @apply="apply"
@@ -82,8 +79,12 @@ import CFilterCheckboxes from '~/components/Blocks/CatalogFilter/CFilterCheckbox
 import CFilterRadios from '~/components/Blocks/CatalogFilter/CFilterRadios.vue'
 import FilterIcon from '~/assets/images/icons/filter.svg'
 import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
-import type IFilterItem from '~/domain/product/types/IFilterItem'
+import type {
+  IFilterItem,
+  IFilterRangeItem,
+} from '~/domain/product/types/IFilterItem'
 import { FilterRangePrefixes } from '~/domain/product/types/FilterRangePrefixes'
+import type { IFilterOption } from '~/domain/product/types/IFilterItem'
 
 const props = defineProps<{
   isFetchingProducts?: boolean

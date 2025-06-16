@@ -38,7 +38,7 @@ import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import CatalogBody from '~/components/Page/CatalogPage/CatalogBody.vue'
 import CatalogSorts from '~/components/Page/CatalogPage/CatalogSorts.vue'
 import type ISelectOption from '~/interfaces/components/ISelectOption'
-import type IFilterItem from '~/domain/product/types/IFilterItem'
+import type { IFilterItem } from '~/domain/product/types/IFilterItem'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 import type IPagination from '~/dataAccess/api/IPagination'
 

@@ -45,9 +45,10 @@ import NumberInput from '~/components/Blocks/FormElements/NumberInput.vue'
 import InputRangeDouble from '~/components/Blocks/InputRangeDouble.vue'
 import { FilterRangePrefixes } from '~/domain/product/types/FilterRangePrefixes'
 import CFilterApplyButton from '~/components/Blocks/CatalogFilter/CFilterApplyButton.vue'
+import type { IFilterRangeItem } from '~/domain/product/types/IFilterItem'
 
 const props = defineProps<{
-  slug: string
+  section: IFilterRangeItem
   min: number
   max: number
   lastChangedFilter: string
@@ -62,8 +63,10 @@ defineExpose({
   reset,
 })
 
+const slug = computed(() => props.section.slug)
+
 const stateMin = useRouteQuery(
-  `${FilterRangePrefixes.MIN}${props.slug}`,
+  `${FilterRangePrefixes.MIN}${slug.value}`,
   Math.floor(props.min),
   {
     transform: {
@@ -81,7 +84,7 @@ const stateMin = useRouteQuery(
   }
 )
 const stateMax = useRouteQuery(
-  `${FilterRangePrefixes.MAX}${props.slug}`,
+  `${FilterRangePrefixes.MAX}${slug.value}`,
   Math.floor(props.max),
   {
     transform: {
@@ -118,7 +121,7 @@ function apply() {
   emit('apply')
 }
 function updateLastChangedFilter() {
-  emit('update:lastChangedFilter', props.slug)
+  emit('update:lastChangedFilter', slug.value)
 }
 </script>
 

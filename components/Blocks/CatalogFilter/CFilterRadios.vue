@@ -18,11 +18,10 @@
 import { useRouteQuery } from '@vueuse/router'
 import CFilterApplyButton from '~/components/Blocks/CatalogFilter/CFilterApplyButton.vue'
 import AFRadio from '~/components/Blocks/FormElements/AFRadio.vue'
-import type { IFilterItemValue } from '~/domain/product/types/IFilterItem'
+import type { IFilterOption } from '~/domain/product/types/IFilterItem'
 
 const props = defineProps<{
-  slug: string
-  values: Array<IFilterItemValue>
+  section: IFilterOption
   lastChangedFilter: string
 }>()
 
@@ -35,13 +34,16 @@ defineExpose({
   reset,
 })
 
-const state = useRouteQuery(props.slug, props.values[0]?.value_slug)
+const slug = computed(() => props.section.slug)
+const values = computed(() => props.section.values)
+
+const state = useRouteQuery(slug.value, values.value[0]?.value_slug)
 
 function reset() {
-  state.value = props.values[0]?.value_slug
+  state.value = values.value[0]?.value_slug
 }
 function updateLastChangedFilter() {
-  emit('update:lastChangedFilter', props.slug)
+  emit('update:lastChangedFilter', slug.value)
 }
 function apply() {
   emit('apply')
