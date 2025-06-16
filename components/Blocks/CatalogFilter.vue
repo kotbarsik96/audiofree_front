@@ -1,15 +1,11 @@
 <template>
-  <div class="ct-filter _card" :class="className">
+  <div class="ct-filter _card" :class="classes">
     <div class="ct-filter__inner _card__inner">
       <div class="ct-filter__header" @click="toggleShown">
         <div>Фильтр товаров</div>
         <AFIcon class="ct-filter__icon" :icon="FilterIcon" />
       </div>
-      <div
-        class="ct-filter__body"
-        ref="bodyEl"
-        :style="{ '--body-mobile-height': bodyMobileHeight }"
-      >
+      <div class="ct-filter__body">
         <div class="ct-filter__body-inner">
           <div class="ct-filter__sections">
             <CFilterSection
@@ -72,22 +68,13 @@ const areButtonsDisabled = computed(
     typeof window !== 'undefined'
 )
 
-const bodyEl = ref<HTMLElement>()
-
 const mobileShown = ref(false)
-const bodyMobileHeight = ref('0px')
 
 const lastChangedFilter = ref('')
 
-const className = computed(() => ({
-  shown: mobileShown.value,
+const classes = computed(() => ({
+  '--shown': mobileShown.value,
 }))
-
-watch(mobileShown, () => {
-  if (mobileShown.value)
-    bodyMobileHeight.value = `${bodyEl.value?.scrollHeight || 0}px`
-  else bodyMobileHeight.value = '0px'
-})
 
 function toggleShown() {
   mobileShown.value = !mobileShown.value
@@ -136,6 +123,18 @@ async function clearRouteQuery() {
 
 <style lang="scss" scoped>
 @use '/scss/mixins.scss';
+
+@mixin hiddenBodyStyles {
+  display: none;
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+@mixin shownBodyStyles {
+  display: block;
+  opacity: 1;
+  transform: translateY(0px);
+}
 
 .ct-filter {
   --padding-x: 1.25rem;
@@ -187,14 +186,36 @@ async function clearRouteQuery() {
     max-width: 25rem;
     margin: 0 auto;
 
-    &__body {
-      overflow: hidden;
-      max-height: var(--body-mobile-height);
-      padding-bottom: 0;
-      transition-property: var(--spoiler-body-transition-property);
-      transition-duration: var(--spoiler-body-transition-duration);
-      transition-timing-function: var(--spoiler-body-transition-tfunc);
+    &__header {
+      cursor: pointer;
     }
+
+    &__body {
+      @include mixins.hiddenElementStyles;
+      animation: hideElement 0.25s ease-in-out;
+    }
+
+    &.--shown &__body {
+      @include mixins.shownElementStyles;
+      animation-name: showElement;
+    }
+  }
+}
+
+@keyframes hideElement {
+  0% {
+    @include mixins.shownElementStyles;
+  }
+  100% {
+    @include mixins.hiddenElementStyles;
+  }
+}
+@keyframes showElement {
+  0% {
+    @include mixins.hiddenElementStyles;
+  }
+  100% {
+    @include mixins.shownElementStyles;
   }
 }
 </style>

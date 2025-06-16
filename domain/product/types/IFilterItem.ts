@@ -17,7 +17,7 @@ export interface IFilterOption {
   id: number
   name: string
   slug: string
-  type: TFilterType
+  type: 'checkbox' | 'checkbox_boolean' | 'radio'
   values: Array<{
     id: number
     slug: string
@@ -27,7 +27,7 @@ export interface IFilterOption {
 }
 
 export interface IFilterRangeItem {
-  type: string
+  type: 'range'
   slug: string
   name: string
   min: number
@@ -35,7 +35,7 @@ export interface IFilterRangeItem {
 }
 
 export interface IFilterInfoItem {
-  type: string
+  type: 'info'
   slug: string
   name: string
   values: Array<{
@@ -46,7 +46,7 @@ export interface IFilterInfoItem {
 }
 
 export interface ICheckboxBooleanItem {
-  type: string
+  type: 'checkbox_boolean'
   slug: string
   name: string
   values: Array<{

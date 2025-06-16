@@ -1,6 +1,6 @@
 <template>
   <ul class="cf-checkboxes">
-    <li v-for="item in values" class="cf-checkboxes__item">
+    <li v-for="item in values" class="cf-option">
       <AFCheckbox
         v-if="type === 'checkbox'"
         :value="item.value_slug"

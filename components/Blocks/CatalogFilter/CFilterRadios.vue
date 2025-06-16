@@ -1,6 +1,6 @@
 <template>
   <ul class="cf-radios">
-    <li v-for="item in values" class="cf-radios__item">
+    <li v-for="item in values" class="cf-option">
       <AFRadio
         :label="item.value"
         :value="item.value_slug"

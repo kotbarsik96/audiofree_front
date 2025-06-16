@@ -147,6 +147,33 @@ button {
   min-width: 200px;
 }
 
+._hideable-element {
+  @include mixins.hiddenElementStyles;
+  animation: hideElement 0.25s ease-in-out;
+
+  &.--shown-element {
+    @include mixins.shownElementStyles;
+    animation-name: showElement;
+  }
+}
+
+@keyframes hideElement {
+  0% {
+    @include mixins.shownElementStyles;
+  }
+  100% {
+    @include mixins.hiddenElementStyles;
+  }
+}
+@keyframes showElement {
+  0% {
+    @include mixins.hiddenElementStyles;
+  }
+  100% {
+    @include mixins.shownElementStyles;
+  }
+}
+
 @each $h in 1, 2, 3, 4 {
   ._h#{$h} {
     font: var(--text-h#{$h});
