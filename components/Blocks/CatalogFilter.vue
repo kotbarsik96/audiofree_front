@@ -12,44 +12,14 @@
       >
         <div class="ct-filter__body-inner">
           <div class="ct-filter__sections">
-            <div
+            <CFilterSection
               v-for="section in filterItems"
               :key="section.name"
-              class="ct-filter__section"
-            >
-              <div class="ct-filter__section-name">
-                {{ section.name }}
-              </div>
-              <div class="ct-filter__section-body">
-                <CFilterCheckboxes
-                  v-if="
-                    (section.type === 'checkbox' ||
-                      section.type === 'checkbox_boolean') &&
-                    (section as IFilterOption).values
-                  "
-                  :section="(section as IFilterOption)"
-                  v-model:lastChangedFilter="lastChangedFilter"
-                  ref="filterSectionEl"
-                  @apply="apply"
-                />
-                <CFilterRadios
-                  v-else-if="section.type === 'radio' && (section as IFilterOption).values"
-                  :section="(section as IFilterOption)"
-                  v-model:lastChangedFilter="lastChangedFilter"
-                  ref="filterSectionEl"
-                  @apply="apply"
-                />
-                <CFilterRange
-                  v-else-if="section.type === 'range'"
-                  :section="(section as IFilterRangeItem)"
-                  :min="Math.floor((section as IFilterRangeItem).min ?? 0)"
-                  :max="Math.floor((section as IFilterRangeItem).max ?? 0)"
-                  ref="filterSectionEl"
-                  v-model:lastChangedFilter="lastChangedFilter"
-                  @apply="apply"
-                />
-              </div>
-            </div>
+              :section="section"
+              v-model:lastChangedFilter="lastChangedFilter"
+              ref="filterSections"
+              @apply="apply"
+            />
           </div>
           <div class="ct-filter__buttons">
             <AFButton
@@ -75,16 +45,10 @@
 <script setup lang="ts">
 import AFButton from '~/components/Blocks/AFButton.vue'
 import AFIcon from '~/components/Blocks/AFIcon.vue'
-import CFilterCheckboxes from '~/components/Blocks/CatalogFilter/CFilterCheckboxes.vue'
-import CFilterRadios from '~/components/Blocks/CatalogFilter/CFilterRadios.vue'
 import FilterIcon from '~/assets/images/icons/filter.svg'
-import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
-import type {
-  IFilterItem,
-  IFilterRangeItem,
-} from '~/domain/product/types/IFilterItem'
+import CFilterSection from '~/components/Blocks/CatalogFilter/CFilterSection.vue'
+import type { IFilterItem } from '~/domain/product/types/IFilterItem'
 import { FilterRangePrefixes } from '~/domain/product/types/FilterRangePrefixes'
-import type { IFilterOption } from '~/domain/product/types/IFilterItem'
 
 const props = defineProps<{
   isFetchingProducts?: boolean
@@ -99,13 +63,7 @@ const emit = defineEmits<{
 const route = useRoute()
 const router = useRouter()
 
-const filterSectionEl = ref<
-  Array<
-    InstanceType<
-      typeof CFilterCheckboxes | typeof CFilterRadios | typeof CFilterRange
-    >
-  >
->([])
+const filterSections = ref<Array<InstanceType<typeof CFilterSection>>>([])
 
 const isResettingFilters = ref(false)
 const areButtonsDisabled = computed(
@@ -151,10 +109,8 @@ async function clearFilter() {
 
   try {
     await clearRouteQuery()
-    await refetchFilters()
-    filterSectionEl.value.forEach((component) => {
-      if (typeof component.reset === 'function') component.reset()
-    })
+    refetchFilters()
+    filterSections.value.forEach((section) => section.reset())
     refetchProducts()
   } catch (err) {
     console.error(err)
@@ -210,17 +166,6 @@ async function clearRouteQuery() {
 
   &__body-inner {
     padding-bottom: 1.25rem;
-  }
-
-  &__section {
-    border-top: 1px solid var(--stroke);
-    padding: 2rem var(--padding-x);
-  }
-
-  &__section-name {
-    font: var(--text-18);
-    font-weight: 500;
-    margin-bottom: 1.25rem;
   }
 
   &__buttons {
