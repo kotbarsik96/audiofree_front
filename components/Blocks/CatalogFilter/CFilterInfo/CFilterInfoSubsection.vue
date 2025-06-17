@@ -48,7 +48,8 @@ defineExpose({ reset })
 
 const shown = ref(false)
 
-const hideable = computed(() => props.subsection.values.length > 3)
+// const hideable = computed(() => props.subsection.values.length > 3)
+const hideable = computed(() => true)
 
 const state = useRouteQuery(props.subsection.slug, [], {
   transform: {
