@@ -18,16 +18,12 @@
         v-if="(section.type === 'checkbox' ||section.type === 'checkbox_boolean') 
         && (section as IFilterOption).values"
         :section="(section as IFilterOption)"
-        v-model:lastChangedFilter="_lastChangedFilter"
         ref="filterSectionEl"
-        @apply="apply"
       />
       <CFilterRadios
         v-else-if="section.type === 'radio' && (section as IFilterOption).values"
         :section="(section as IFilterOption)"
-        v-model:lastChangedFilter="_lastChangedFilter"
         ref="filterSectionEl"
-        @apply="apply"
       />
       <CFilterRange
         v-else-if="section.type === 'range'"
@@ -35,19 +31,24 @@
         :min="Math.floor((section as IFilterRangeItem).min ?? 0)"
         :max="Math.floor((section as IFilterRangeItem).max ?? 0)"
         ref="filterSectionEl"
-        v-model:lastChangedFilter="_lastChangedFilter"
-        @apply="apply"
+      />
+      <CFilterInfo
+        v-else-if="section.type === 'info'"
+        :section="(section as IFilterInfoItem)"
+        ref="filterSectionEl"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import CFilterInfo from '~/components/Blocks/CatalogFilter/CFilterInfo/CFilterInfo.vue'
 import CFilterCheckboxes from '~/components/Blocks/CatalogFilter/CFilterCheckboxes.vue'
 import CFilterRadios from '~/components/Blocks/CatalogFilter/CFilterRadios.vue'
 import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
 import ChevronRight from '~/assets/images/icons/chevron-right.svg'
 import type {
+  IFilterInfoItem,
   IFilterItem,
   IFilterOption,
   IFilterRangeItem,
@@ -55,12 +56,6 @@ import type {
 
 const props = defineProps<{
   section: IFilterItem
-  lastChangedFilter: string
-}>()
-
-const emit = defineEmits<{
-  (e: 'apply'): void
-  (e: 'update:lastChangedFilter', value: string): void
 }>()
 
 defineExpose({
@@ -76,15 +71,6 @@ const hideable = computed(
     'values' in props.section &&
     props.section.values.length > 3
 )
-
-const _lastChangedFilter = computed({
-  get() {
-    return props.lastChangedFilter
-  },
-  set(value: string) {
-    emit('update:lastChangedFilter', value)
-  },
-})
 
 const filterSectionEl =
   ref<
@@ -104,10 +90,6 @@ const bodyClasses = computed(() => ({
 
 function toggleBody() {
   opened.value = !opened.value
-}
-
-function apply() {
-  emit('apply')
 }
 
 function reset() {

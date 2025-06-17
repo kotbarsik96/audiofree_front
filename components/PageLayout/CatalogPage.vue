@@ -45,7 +45,7 @@ import type IPagination from '~/dataAccess/api/IPagination'
 const route = useRoute()
 const urlQuery = computed(() => {
   const obj = { ...route.query }
-
+  
   // преобразовать массивы в строки, объеденив элементы запятой
   for (let [key, value] of Object.entries(obj)) {
     if (Array.isArray(value)) obj[key] = value.join(',')

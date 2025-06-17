@@ -15,9 +15,6 @@
         @change="updateLastChangedFilter"
       />
     </li>
-    <li v-if="lastChangedFilter === slug">
-      <CFilterApplyButton @apply="apply" />
-    </li>
   </ul>
 </template>
 
@@ -32,12 +29,6 @@ import type {
 
 const props = defineProps<{
   section: IFilterOption | ICheckboxBooleanItem
-  lastChangedFilter: string
-}>()
-
-const emit = defineEmits<{
-  (e: 'apply'): void
-  (e: 'update:lastChangedFilter', value: string): void
 }>()
 
 defineExpose({
@@ -47,6 +38,8 @@ defineExpose({
 const slug = computed(() => props.section.slug)
 const type = computed(() => props.section.type)
 const values = computed(() => props.section.values)
+
+const lastChangedFilter = inject('lastChangedFilter') as Ref<string>
 
 let state: Ref<any>
 if (type.value === 'checkbox') {
@@ -84,11 +77,8 @@ function reset() {
   if (type.value === 'checkbox') state.value = []
   if (type.value === 'checkbox_boolean') state.value = null
 }
-function apply() {
-  emit('apply')
-}
 function updateLastChangedFilter() {
-  emit('update:lastChangedFilter', slug.value)
+  lastChangedFilter.value = slug.value
 }
 </script>
 
@@ -97,5 +87,6 @@ function updateLastChangedFilter() {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  position: relative;
 }
 </style>

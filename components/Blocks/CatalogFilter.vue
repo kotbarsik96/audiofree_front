@@ -12,13 +12,12 @@
               v-for="section in filterItems"
               :key="section.name"
               :section="section"
-              v-model:lastChangedFilter="lastChangedFilter"
               ref="filterSections"
-              @apply="apply"
             />
           </div>
           <div class="ct-filter__buttons">
             <AFButton
+              v-if="lastChangedFilter"
               class="ct-filter__button"
               label="Применить фильтр"
               :disabled="areButtonsDisabled"
@@ -72,6 +71,8 @@ const mobileShown = ref(false)
 
 const lastChangedFilter = ref('')
 
+provide('lastChangedFilter', lastChangedFilter)
+
 const classes = computed(() => ({
   '--shown': mobileShown.value,
 }))
@@ -80,6 +81,7 @@ function toggleShown() {
   mobileShown.value = !mobileShown.value
 }
 function refetchProducts() {
+  lastChangedFilter.value = ''
   emit('refetchProducts')
 }
 function refetchFilters() {
@@ -163,17 +165,29 @@ async function clearRouteQuery() {
     padding: 0;
   }
 
+  &__body {
+    position: relative;
+  }
+
   &__body-inner {
-    padding-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
   }
 
   &__buttons {
     display: flex;
     flex-direction: column;
-    margin: 0 1rem;
     gap: 0.625rem;
-    max-width: 250px;
     margin: 0 auto;
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    background: var(--white);
+    width: 100%;
+    max-width: unset;
+    padding-inline: 0.625rem;
+    padding-block-start: 0.625rem;
+    padding-block-end: 0.625rem;
+    border-top: 1px solid var(--stroke);
   }
 
   &__button {

@@ -8,9 +8,6 @@
         @change="updateLastChangedFilter"
       />
     </li>
-    <li v-if="lastChangedFilter === slug">
-      <CFilterApplyButton @apply="apply" />
-    </li>
   </ul>
 </template>
 
@@ -22,17 +19,13 @@ import type { IFilterOption } from '~/domain/product/types/IFilterItem'
 
 const props = defineProps<{
   section: IFilterOption
-  lastChangedFilter: string
-}>()
-
-const emit = defineEmits<{
-  (e: 'apply'): void
-  (e: 'update:lastChangedFilter', value: string): void
 }>()
 
 defineExpose({
   reset,
 })
+
+const lastChangedFilter = inject('lastChangedFilter') as Ref<string>
 
 const slug = computed(() => props.section.slug)
 const values = computed(() => props.section.values)
@@ -43,10 +36,7 @@ function reset() {
   state.value = values.value[0]?.value_slug
 }
 function updateLastChangedFilter() {
-  emit('update:lastChangedFilter', slug.value)
-}
-function apply() {
-  emit('apply')
+  lastChangedFilter.value = slug.value
 }
 </script>
 

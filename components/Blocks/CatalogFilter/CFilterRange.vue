@@ -35,7 +35,6 @@
     <div class="cf-range__unavailable" v-else>
       Выбор недоступен для данных фильтров
     </div>
-    <CFilterApplyButton v-if="lastChangedFilter === slug" @apply="apply" />
   </div>
 </template>
 
@@ -51,17 +50,13 @@ const props = defineProps<{
   section: IFilterRangeItem
   min: number
   max: number
-  lastChangedFilter: string
-}>()
-
-const emit = defineEmits<{
-  (e: 'apply'): void
-  (e: 'update:lastChangedFilter', value: string): void
 }>()
 
 defineExpose({
   reset,
 })
+
+const lastChangedFilter = inject('lastChangedFilter') as Ref<string>
 
 const slug = computed(() => props.section.slug)
 
@@ -117,11 +112,8 @@ function reset() {
   stateMax.value = props.max
 }
 
-function apply() {
-  emit('apply')
-}
 function updateLastChangedFilter() {
-  emit('update:lastChangedFilter', slug.value)
+  lastChangedFilter.value = slug.value
 }
 </script>
 

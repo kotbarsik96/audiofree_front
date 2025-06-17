@@ -38,11 +38,13 @@ export interface IFilterInfoItem {
   type: 'info'
   slug: string
   name: string
-  values: Array<{
-    name: string
-    slug: string
-    values: Array<string>
-  }>
+  values: Array<IFilterInfoItemSubsection>
+}
+
+export interface IFilterInfoItemSubsection {
+  name: string
+  slug: string
+  values: Array<string>
 }
 
 export interface ICheckboxBooleanItem {
