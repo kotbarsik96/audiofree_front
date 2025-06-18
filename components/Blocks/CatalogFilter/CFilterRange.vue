@@ -98,7 +98,8 @@ const stateMax = useRouteQuery(
   }
 )
 
-if (stateMin.value > stateMax.value) stateMin.value = min.value
+if (stateMin.value < min.value) stateMin.value = min.value
+if (stateMax.value > max.value) stateMax.value = max.value
 
 watch(() => [min.value, max.value], onFilterValuesUpdate)
 
