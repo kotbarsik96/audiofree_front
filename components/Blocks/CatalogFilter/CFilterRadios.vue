@@ -5,7 +5,7 @@
         :label="item.value"
         :value="item.value_slug"
         v-model="state"
-        @change="updateLastChangedFilter"
+        @change="onFilterChange"
       />
     </li>
   </ul>
@@ -13,7 +13,6 @@
 
 <script setup lang="ts">
 import { useRouteQuery } from '@vueuse/router'
-import CFilterApplyButton from '~/components/Blocks/CatalogFilter/CFilterApplyButton.vue'
 import AFRadio from '~/components/Blocks/FormElements/AFRadio.vue'
 import type { IFilterOption } from '~/domain/product/types/IFilterItem'
 
@@ -26,6 +25,7 @@ defineExpose({
 })
 
 const lastChangedFilter = inject('lastChangedFilter') as Ref<string>
+const refetchFilters = inject('refetchFiltersOnChange') as () => void
 
 const slug = computed(() => props.section.slug)
 const values = computed(() => props.section.values)
@@ -35,8 +35,9 @@ const state = useRouteQuery(slug.value, values.value[0]?.value_slug)
 function reset() {
   state.value = values.value[0]?.value_slug
 }
-function updateLastChangedFilter() {
+function onFilterChange() {
   lastChangedFilter.value = slug.value
+  refetchFilters()
 }
 </script>
 

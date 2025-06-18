@@ -7,7 +7,7 @@
     >
       <CFilterInfoSubsection
         :subsection="subsection"
-        @change="updateLastChangedFilter(subsection.slug)"
+        @change="onFilterChange(subsection.slug)"
         ref="subsectionElements"
       />
     </div>
@@ -29,11 +29,13 @@ const subsectionElements = ref<
 >([])
 
 const lastChangedFilter = inject('lastChangedFilter') as Ref<string>
+const refetchFilters = inject('refetchFiltersOnChange') as () => void
 
 const subsections = computed(() => props.section.values)
 
-function updateLastChangedFilter(slug: string) {
+function onFilterChange(slug: string) {
   lastChangedFilter.value = slug
+  refetchFilters()
 }
 
 function reset() {

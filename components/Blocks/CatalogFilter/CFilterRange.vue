@@ -9,7 +9,7 @@
           :max="stateMax"
           v-model="stateMin"
           lazy
-          @change="updateLastChangedFilter"
+          @change="onFilterChange"
         />
         <div class="cf-range__inputs-delimeter">–</div>
         <NumberInput
@@ -19,7 +19,7 @@
           :max="max"
           v-model="stateMax"
           lazy
-          @change="updateLastChangedFilter"
+          @change="onFilterChange"
         />
       </div>
       <div class="cf-range__range">
@@ -28,7 +28,7 @@
           v-model:valueMax="stateMax"
           :min="min"
           :max="max"
-          @change="updateLastChangedFilter"
+          @change="onFilterChange"
         />
       </div>
     </template>
@@ -57,6 +57,7 @@ defineExpose({
 })
 
 const lastChangedFilter = inject('lastChangedFilter') as Ref<string>
+const refetchFilters = inject('refetchFiltersOnChange') as () => void
 
 const slug = computed(() => props.section.slug)
 
@@ -112,8 +113,9 @@ function reset() {
   stateMax.value = props.max
 }
 
-function updateLastChangedFilter() {
+function onFilterChange() {
   lastChangedFilter.value = slug.value
+  refetchFilters()
 }
 </script>
 

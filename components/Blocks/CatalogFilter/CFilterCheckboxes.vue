@@ -6,13 +6,13 @@
         :value="item.value_slug"
         :label="item.value"
         v-model="state"
-        @change="updateLastChangedFilter"
+        @change="onFilterChange"
       />
       <AFCheckbox
         v-if="type === 'checkbox_boolean'"
         :label="item.value"
         v-model="state"
-        @change="updateLastChangedFilter"
+        @change="onFilterChange"
       />
     </li>
   </ul>
@@ -40,6 +40,7 @@ const type = computed(() => props.section.type)
 const values = computed(() => props.section.values)
 
 const lastChangedFilter = inject('lastChangedFilter') as Ref<string>
+const refetchFilters = inject('refetchFiltersOnChange') as () => void
 
 let state: Ref<any>
 if (type.value === 'checkbox') {
@@ -77,8 +78,9 @@ function reset() {
   if (type.value === 'checkbox') state.value = []
   if (type.value === 'checkbox_boolean') state.value = null
 }
-function updateLastChangedFilter() {
+function onFilterChange() {
   lastChangedFilter.value = slug.value
+  refetchFilters()
 }
 </script>
 

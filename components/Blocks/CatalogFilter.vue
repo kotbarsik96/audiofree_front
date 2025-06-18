@@ -72,6 +72,11 @@ const mobileShown = ref(false)
 const lastChangedFilter = ref('')
 
 provide('lastChangedFilter', lastChangedFilter)
+provide('refetchFiltersOnChange', () => {
+  setTimeout(() => {
+    refetchFilters()
+  }, 250)
+})
 
 const classes = computed(() => ({
   '--shown': mobileShown.value,
@@ -98,8 +103,8 @@ async function clearFilter() {
 
   try {
     await clearRouteQuery()
-    refetchFilters()
     filterSections.value.forEach((section) => section.reset())
+    refetchFilters()
     refetchProducts()
   } catch (err) {
     console.error(err)
@@ -109,7 +114,15 @@ async function clearFilter() {
 }
 async function clearRouteQuery() {
   const clearedQuery = { ...route.query }
-  const slugs = props.filterItems.map((section) => section.slug)
+  // сбор слагов фильтров, которые будут удалены из route.query
+  const infoSlugs =
+    props.filterItems
+      .find((section) => section.type === 'info')
+      ?.values?.map((infoItem) => infoItem.slug) || []
+  const slugs: Array<string> = props.filterItems
+    .map((section) => section.slug)
+    .concat(infoSlugs)
+
   for (let key in clearedQuery) {
     let _key = key
     const isRangePrefix =
@@ -119,7 +132,9 @@ async function clearRouteQuery() {
 
     if (slugs.includes(_key)) delete clearedQuery[key]
   }
-  await router.replace({ name: route.name, query: clearedQuery })
+  if (!clearedQuery.page) clearedQuery.page = '1'
+  await router.push({ name: route.name, query: clearedQuery })
+  // await router.replace({ name: route.name, query: clearedQuery })
 }
 </script>
 
