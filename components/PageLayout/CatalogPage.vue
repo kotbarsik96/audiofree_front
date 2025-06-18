@@ -6,8 +6,6 @@
           <CatalogFilter
             :isFetchingProducts="isFetchingProducts"
             :filterItems="filterItems"
-            @refetchProducts="refetchProducts"
-            @refetchFilters="refetchFilters"
           />
         </aside>
         <div class="catalog__page-header">
@@ -38,7 +36,7 @@ import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 import CatalogBody from '~/components/Page/CatalogPage/CatalogBody.vue'
 import CatalogSorts from '~/components/Page/CatalogPage/CatalogSorts.vue'
 import type ISelectOption from '~/interfaces/components/ISelectOption'
-import type IFilterItem from '~/domain/product/types/IFilterItem'
+import type { IFilterItem } from '~/domain/product/types/IFilterItem'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 import type IPagination from '~/dataAccess/api/IPagination'
 
@@ -67,7 +65,7 @@ setBreadcrumbs([
 
 const [
   { data: sortsData },
-  { data: filtersData, status: filtersStatus, execute: refetchFilters },
+  { data: filtersData, execute: refetchFilters },
   { data: productsData, execute: _refetchProducts, status: productsStatus },
 ] = await Promise.all([
   useAPI<{ data: ISelectOption[] }>('/products/catalog/sorts', {
@@ -90,15 +88,12 @@ const filterItems = computed(() => filtersData.value?.data || [])
 
 const isFetchingProducts = computed(() => productsStatus.value === 'pending')
 
-const { refresh: refetchFiltersDelayed } = useDelayedCallback(250, () => {
-  if (filtersStatus.value !== 'pending') refetchFilters()
-})
+provide('refetchFilters', refetchFilters)
+provide('refetchProducts', refetchProducts)
 
 watch(
   () => route.query,
   (newQuery, oldQuery) => {
-    refetchFiltersDelayed()
-
     // перезапрашивать каталог только тогда, когда в route.query изменилось хотя бы одно из представленных полей
     const checkKeys = ['page', 'sort', 'sort_order']
     if (checkKeys.some((key) => newQuery[key] !== oldQuery[key])) {

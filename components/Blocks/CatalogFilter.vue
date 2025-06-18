@@ -1,65 +1,27 @@
 <template>
-  <div class="ct-filter _card" :class="className">
+  <div class="ct-filter _card" :class="classes">
     <div class="ct-filter__inner _card__inner">
       <div class="ct-filter__header" @click="toggleShown">
         <div>Фильтр товаров</div>
         <AFIcon class="ct-filter__icon" :icon="FilterIcon" />
       </div>
-      <div
-        class="ct-filter__body"
-        ref="bodyEl"
-        :style="{ '--body-mobile-height': bodyMobileHeight }"
-      >
+      <div class="ct-filter__body">
         <div class="ct-filter__body-inner">
           <div class="ct-filter__sections">
-            <div
+            <CFilterSection
               v-for="section in filterItems"
               :key="section.name"
-              class="ct-filter__section"
-            >
-              <div class="ct-filter__section-name">
-                {{ section.name }}
-              </div>
-              <div class="ct-filter__section-body">
-                <CFilterCheckboxes
-                  v-if="
-                    (section.type === 'checkbox' ||
-                      section.type === 'checkbox_boolean') &&
-                    section.values
-                  "
-                  :type="section.type"
-                  :slug="section.slug"
-                  :values="section.values"
-                  v-model:lastChangedFilter="lastChangedFilter"
-                  ref="filterSectionEl"
-                  @apply="apply"
-                />
-                <CFilterRadios
-                  v-else-if="section.type === 'radio' && section.values"
-                  :slug="section.slug"
-                  :values="section.values"
-                  v-model:lastChangedFilter="lastChangedFilter"
-                  ref="filterSectionEl"
-                  @apply="apply"
-                />
-                <CFilterRange
-                  v-else-if="section.type === 'range'"
-                  :slug="section.slug"
-                  :min="Math.floor(section.min ?? 0)"
-                  :max="Math.floor(section.max ?? 0)"
-                  ref="filterSectionEl"
-                  v-model:lastChangedFilter="lastChangedFilter"
-                  @apply="apply"
-                />
-              </div>
-            </div>
+              :section="section"
+              ref="filterSections"
+            />
           </div>
           <div class="ct-filter__buttons">
             <AFButton
+              v-if="lastChangedFilter"
               class="ct-filter__button"
               label="Применить фильтр"
               :disabled="areButtonsDisabled"
-              @click="refetchProducts"
+              @click="_refetchProducts"
             />
             <AFButton
               class="ct-filter__button"
@@ -78,11 +40,9 @@
 <script setup lang="ts">
 import AFButton from '~/components/Blocks/AFButton.vue'
 import AFIcon from '~/components/Blocks/AFIcon.vue'
-import CFilterCheckboxes from '~/components/Blocks/CatalogFilter/CFilterCheckboxes.vue'
-import CFilterRadios from '~/components/Blocks/CatalogFilter/CFilterRadios.vue'
 import FilterIcon from '~/assets/images/icons/filter.svg'
-import CFilterRange from '~/components/Blocks/CatalogFilter/CFilterRange.vue'
-import type IFilterItem from '~/domain/product/types/IFilterItem'
+import CFilterSection from '~/components/Blocks/CatalogFilter/CFilterSection.vue'
+import type { IFilterItem } from '~/domain/product/types/IFilterItem'
 import { FilterRangePrefixes } from '~/domain/product/types/FilterRangePrefixes'
 
 const props = defineProps<{
@@ -90,21 +50,10 @@ const props = defineProps<{
   filterItems: IFilterItem[]
 }>()
 
-const emit = defineEmits<{
-  (e: 'refetchProducts'): void
-  (e: 'refetchFilters'): void
-}>()
-
 const route = useRoute()
 const router = useRouter()
 
-const filterSectionEl = ref<
-  Array<
-    InstanceType<
-      typeof CFilterCheckboxes | typeof CFilterRadios | typeof CFilterRange
-    >
-  >
->([])
+const filterSections = ref<Array<InstanceType<typeof CFilterSection>>>([])
 
 const isResettingFilters = ref(false)
 const areButtonsDisabled = computed(
@@ -113,34 +62,36 @@ const areButtonsDisabled = computed(
     typeof window !== 'undefined'
 )
 
-const bodyEl = ref<HTMLElement>()
-
 const mobileShown = ref(false)
-const bodyMobileHeight = ref('0px')
 
 const lastChangedFilter = ref('')
 
-const className = computed(() => ({
-  shown: mobileShown.value,
-}))
+const refetchFilters = inject('refetchFilters') as () => Promise<void>
+const refetchProducts = inject('refetchProducts') as () => Promise<void>
 
-watch(mobileShown, () => {
-  if (mobileShown.value)
-    bodyMobileHeight.value = `${bodyEl.value?.scrollHeight || 0}px`
-  else bodyMobileHeight.value = '0px'
+provide('lastChangedFilter', lastChangedFilter)
+provide('refetchFiltersOnChange', () => {
+  setTimeout(async () => {
+    await _refetchFilters()
+  }, 250)
 })
+
+const classes = computed(() => ({
+  '--shown': mobileShown.value,
+}))
 
 function toggleShown() {
   mobileShown.value = !mobileShown.value
 }
-function refetchProducts() {
-  emit('refetchProducts')
+async function _refetchProducts() {
+  lastChangedFilter.value = ''
+  await refetchProducts()
 }
-function refetchFilters() {
-  emit('refetchFilters')
+async function _refetchFilters() {
+  await refetchFilters()
 }
 function apply() {
-  refetchProducts()
+  _refetchProducts()
   lastChangedFilter.value = ''
 }
 async function clearFilter() {
@@ -150,11 +101,10 @@ async function clearFilter() {
 
   try {
     await clearRouteQuery()
-    await refetchFilters()
-    filterSectionEl.value.forEach((component) => {
-      if (typeof component.reset === 'function') component.reset()
-    })
-    refetchProducts()
+    filterSections.value.forEach((section) => section.resetBeforeFetch())
+    await _refetchFilters()
+    await _refetchProducts()
+    filterSections.value.forEach((section) => section.resetAfterFetch())
   } catch (err) {
     console.error(err)
   }
@@ -163,7 +113,15 @@ async function clearFilter() {
 }
 async function clearRouteQuery() {
   const clearedQuery = { ...route.query }
-  const slugs = props.filterItems.map((section) => section.slug)
+  // сбор слагов фильтров, которые будут удалены из route.query
+  const infoSlugs =
+    props.filterItems
+      .find((section) => section.type === 'info')
+      ?.values?.map((infoItem) => infoItem.slug) || []
+  const slugs: Array<string> = props.filterItems
+    .map((section) => section.slug)
+    .concat(infoSlugs)
+
   for (let key in clearedQuery) {
     let _key = key
     const isRangePrefix =
@@ -173,12 +131,25 @@ async function clearRouteQuery() {
 
     if (slugs.includes(_key)) delete clearedQuery[key]
   }
+  if (!clearedQuery.page) clearedQuery.page = '1'
   await router.replace({ name: route.name, query: clearedQuery })
 }
 </script>
 
 <style lang="scss" scoped>
 @use '/scss/mixins.scss';
+
+@mixin hiddenBodyStyles {
+  display: none;
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+@mixin shownBodyStyles {
+  display: block;
+  opacity: 1;
+  transform: translateY(0px);
+}
 
 .ct-filter {
   --padding-x: 1.25rem;
@@ -207,28 +178,29 @@ async function clearRouteQuery() {
     padding: 0;
   }
 
+  &__body {
+    position: relative;
+  }
+
   &__body-inner {
-    padding-bottom: 1.25rem;
-  }
-
-  &__section {
-    border-top: 1px solid var(--stroke);
-    padding: 2rem var(--padding-x);
-  }
-
-  &__section-name {
-    font: var(--text-18);
-    font-weight: 500;
-    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
   }
 
   &__buttons {
     display: flex;
     flex-direction: column;
-    margin: 0 1rem;
     gap: 0.625rem;
-    max-width: 250px;
     margin: 0 auto;
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    background: var(--white);
+    width: 100%;
+    max-width: unset;
+    padding-inline: 0.625rem;
+    padding-block-start: 0.625rem;
+    padding-block-end: 0.625rem;
+    border-top: 1px solid var(--stroke);
   }
 
   &__button {
@@ -241,14 +213,36 @@ async function clearRouteQuery() {
     max-width: 25rem;
     margin: 0 auto;
 
-    &__body {
-      overflow: hidden;
-      max-height: var(--body-mobile-height);
-      padding-bottom: 0;
-      transition-property: var(--spoiler-body-transition-property);
-      transition-duration: var(--spoiler-body-transition-duration);
-      transition-timing-function: var(--spoiler-body-transition-tfunc);
+    &__header {
+      cursor: pointer;
     }
+
+    &__body {
+      @include mixins.hiddenElementStyles;
+      animation: hideElement 0.25s ease-in-out;
+    }
+
+    &.--shown &__body {
+      @include mixins.shownElementStyles;
+      animation-name: showElement;
+    }
+  }
+}
+
+@keyframes hideElement {
+  0% {
+    @include mixins.shownElementStyles;
+  }
+  100% {
+    @include mixins.hiddenElementStyles;
+  }
+}
+@keyframes showElement {
+  0% {
+    @include mixins.hiddenElementStyles;
+  }
+  100% {
+    @include mixins.shownElementStyles;
   }
 }
 </style>

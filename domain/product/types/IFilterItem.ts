@@ -7,12 +7,52 @@ export interface IFilterItemValue {
   value_slug: string
 }
 
-export default interface IFilterItem {
-  id?: number
+export type IFilterItem =
+  | IFilterOption
+  | IFilterRangeItem
+  | IFilterInfoItem
+  | ICheckboxBooleanItem
+
+export interface IFilterOption {
+  id: number
   name: string
   slug: string
-  type: TFilterType
-  values?: Array<IFilterItemValue>
-  min?: number
-  max?: number
+  type: 'checkbox' | 'checkbox_boolean' | 'radio'
+  values: Array<{
+    id: number
+    slug: string
+    value: string
+    value_slug: string
+  }>
+}
+
+export interface IFilterRangeItem {
+  type: 'range'
+  slug: string
+  name: string
+  min: number
+  max: number
+}
+
+export interface IFilterInfoItem {
+  type: 'info'
+  slug: string
+  name: string
+  values: Array<IFilterInfoItemSubsection>
+}
+
+export interface IFilterInfoItemSubsection {
+  name: string
+  slug: string
+  values: Array<string>
+}
+
+export interface ICheckboxBooleanItem {
+  type: 'checkbox_boolean'
+  slug: string
+  name: string
+  values: Array<{
+    value: string
+    value_slug: string
+  }>
 }

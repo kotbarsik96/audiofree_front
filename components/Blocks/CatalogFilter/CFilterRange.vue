@@ -9,7 +9,7 @@
           :max="stateMax"
           v-model="stateMin"
           lazy
-          @change="updateLastChangedFilter"
+          @change="onFilterChange"
         />
         <div class="cf-range__inputs-delimeter">–</div>
         <NumberInput
@@ -19,7 +19,7 @@
           :max="max"
           v-model="stateMax"
           lazy
-          @change="updateLastChangedFilter"
+          @change="onFilterChange"
         />
       </div>
       <div class="cf-range__range">
@@ -28,14 +28,13 @@
           v-model:valueMax="stateMax"
           :min="min"
           :max="max"
-          @change="updateLastChangedFilter"
+          @change="onFilterChange"
         />
       </div>
     </template>
     <div class="cf-range__unavailable" v-else>
       Выбор недоступен для данных фильтров
     </div>
-    <CFilterApplyButton v-if="lastChangedFilter === slug" @apply="apply" />
   </div>
 </template>
 
@@ -45,26 +44,26 @@ import NumberInput from '~/components/Blocks/FormElements/NumberInput.vue'
 import InputRangeDouble from '~/components/Blocks/InputRangeDouble.vue'
 import { FilterRangePrefixes } from '~/domain/product/types/FilterRangePrefixes'
 import CFilterApplyButton from '~/components/Blocks/CatalogFilter/CFilterApplyButton.vue'
+import type { IFilterRangeItem } from '~/domain/product/types/IFilterItem'
 
 const props = defineProps<{
-  slug: string
-  min: number
-  max: number
-  lastChangedFilter: string
-}>()
-
-const emit = defineEmits<{
-  (e: 'apply'): void
-  (e: 'update:lastChangedFilter', value: string): void
+  section: IFilterRangeItem
 }>()
 
 defineExpose({
-  reset,
+  resetAfterFetch,
 })
 
+const lastChangedFilter = inject('lastChangedFilter') as Ref<string>
+const refetchFilters = inject('refetchFiltersOnChange') as () => void
+
+const slug = computed(() => props.section.slug)
+const min = computed(() => props.section.min ?? 0)
+const max = computed(() => props.section.max ?? 0)
+
 const stateMin = useRouteQuery(
-  `${FilterRangePrefixes.MIN}${props.slug}`,
-  Math.floor(props.min),
+  `${FilterRangePrefixes.MIN}${slug.value}`,
+  Math.floor(min.value),
   {
     transform: {
       get(val) {
@@ -73,7 +72,7 @@ const stateMin = useRouteQuery(
       },
       set(val) {
         if (typeof val === 'string') val = Number(val)
-        if (val < props.min) val = props.min
+        if (val < min.value) val = min.value
         if (val > stateMax.value) val = stateMax.value
         return val
       },
@@ -81,8 +80,8 @@ const stateMin = useRouteQuery(
   }
 )
 const stateMax = useRouteQuery(
-  `${FilterRangePrefixes.MAX}${props.slug}`,
-  Math.floor(props.max),
+  `${FilterRangePrefixes.MAX}${slug.value}`,
+  Math.floor(max.value),
   {
     transform: {
       get(val) {
@@ -92,33 +91,32 @@ const stateMax = useRouteQuery(
       set(val) {
         if (typeof val === 'string') val = Number(val)
         if (val < stateMin.value) val = stateMin.value
-        if (val > props.max) val = props.max
+        if (val > max.value) val = max.value
         return val
       },
     },
   }
 )
 
-if (stateMin.value > stateMax.value) stateMin.value = props.min
+if (stateMin.value < min.value) stateMin.value = min.value
+if (stateMax.value > max.value) stateMax.value = max.value
 
-watch(() => [props.min, props.max], onFilterValuesUpdate)
+watch(() => [min.value, max.value], onFilterValuesUpdate)
 
 function onFilterValuesUpdate() {
-  if (stateMin.value < props.min) stateMin.value = props.min
-  if (stateMax.value > props.max) stateMax.value = props.max
+  if (stateMin.value < min.value) stateMin.value = min.value
+  if (stateMax.value > max.value) stateMax.value = max.value
   if (stateMin.value > stateMax.value) stateMin.value = stateMax.value
 }
 
-function reset() {
-  stateMin.value = props.min
-  stateMax.value = props.max
+function resetAfterFetch() {
+  stateMin.value = min.value
+  stateMax.value = max.value
 }
 
-function apply() {
-  emit('apply')
-}
-function updateLastChangedFilter() {
-  emit('update:lastChangedFilter', props.slug)
+function onFilterChange() {
+  lastChangedFilter.value = slug.value
+  refetchFilters()
 }
 </script>
 

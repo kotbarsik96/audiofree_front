@@ -1,1 +1,1 @@
-export type TFilterType = 'checkbox' | 'checkbox_boolean' | 'radio' | 'range'
+export type TFilterType = 'checkbox' | 'checkbox_boolean' | 'radio' | 'range' | 'info'
