@@ -132,8 +132,7 @@ async function clearRouteQuery() {
     if (slugs.includes(_key)) delete clearedQuery[key]
   }
   if (!clearedQuery.page) clearedQuery.page = '1'
-  await router.push({ name: route.name, query: clearedQuery })
-  // await router.replace({ name: route.name, query: clearedQuery })
+  await router.replace({ name: route.name, query: clearedQuery })
 }
 </script>
 
