@@ -6,8 +6,6 @@
           <CatalogFilter
             :isFetchingProducts="isFetchingProducts"
             :filterItems="filterItems"
-            @refetchProducts="refetchProducts"
-            @refetchFilters="refetchFilters"
           />
         </aside>
         <div class="catalog__page-header">
@@ -67,7 +65,7 @@ setBreadcrumbs([
 
 const [
   { data: sortsData },
-  { data: filtersData, status: filtersStatus, execute: refetchFilters },
+  { data: filtersData, execute: refetchFilters },
   { data: productsData, execute: _refetchProducts, status: productsStatus },
 ] = await Promise.all([
   useAPI<{ data: ISelectOption[] }>('/products/catalog/sorts', {
@@ -90,9 +88,8 @@ const filterItems = computed(() => filtersData.value?.data || [])
 
 const isFetchingProducts = computed(() => productsStatus.value === 'pending')
 
-const { refresh: refetchFiltersDelayed } = useDelayedCallback(250, () => {
-  if (filtersStatus.value !== 'pending') refetchFilters()
-})
+provide('refetchFilters', refetchFilters)
+provide('refetchProducts', refetchProducts)
 
 watch(
   () => route.query,

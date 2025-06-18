@@ -21,7 +21,7 @@
               class="ct-filter__button"
               label="Применить фильтр"
               :disabled="areButtonsDisabled"
-              @click="refetchProducts"
+              @click="_refetchProducts"
             />
             <AFButton
               class="ct-filter__button"
@@ -50,11 +50,6 @@ const props = defineProps<{
   filterItems: IFilterItem[]
 }>()
 
-const emit = defineEmits<{
-  (e: 'refetchProducts'): void
-  (e: 'refetchFilters'): void
-}>()
-
 const route = useRoute()
 const router = useRouter()
 
@@ -71,10 +66,13 @@ const mobileShown = ref(false)
 
 const lastChangedFilter = ref('')
 
+const refetchFilters = inject('refetchFilters') as () => Promise<void>
+const refetchProducts = inject('refetchProducts') as () => Promise<void>
+
 provide('lastChangedFilter', lastChangedFilter)
 provide('refetchFiltersOnChange', () => {
-  setTimeout(() => {
-    refetchFilters()
+  setTimeout(async () => {
+    await _refetchFilters()
   }, 250)
 })
 
@@ -85,15 +83,15 @@ const classes = computed(() => ({
 function toggleShown() {
   mobileShown.value = !mobileShown.value
 }
-function refetchProducts() {
+async function _refetchProducts() {
   lastChangedFilter.value = ''
-  emit('refetchProducts')
+  await refetchProducts()
 }
-function refetchFilters() {
-  emit('refetchFilters')
+async function _refetchFilters() {
+  await refetchFilters()
 }
 function apply() {
-  refetchProducts()
+  _refetchProducts()
   lastChangedFilter.value = ''
 }
 async function clearFilter() {
@@ -103,9 +101,10 @@ async function clearFilter() {
 
   try {
     await clearRouteQuery()
-    filterSections.value.forEach((section) => section.reset())
-    refetchFilters()
-    refetchProducts()
+    filterSections.value.forEach((section) => section.resetBeforeFetch())
+    await _refetchFilters()
+    await _refetchProducts()
+    filterSections.value.forEach((section) => section.resetAfterFetch())
   } catch (err) {
     console.error(err)
   }

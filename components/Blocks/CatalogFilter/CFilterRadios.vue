@@ -21,7 +21,7 @@ const props = defineProps<{
 }>()
 
 defineExpose({
-  reset,
+  resetBeforeFetch,
 })
 
 const lastChangedFilter = inject('lastChangedFilter') as Ref<string>
@@ -32,7 +32,7 @@ const values = computed(() => props.section.values)
 
 const state = useRouteQuery(slug.value, values.value[0]?.value_slug)
 
-function reset() {
+function resetBeforeFetch() {
   state.value = values.value[0]?.value_slug
 }
 function onFilterChange() {

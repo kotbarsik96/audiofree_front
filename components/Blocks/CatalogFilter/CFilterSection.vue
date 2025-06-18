@@ -28,8 +28,6 @@
       <CFilterRange
         v-else-if="section.type === 'range'"
         :section="(section as IFilterRangeItem)"
-        :min="Math.floor((section as IFilterRangeItem).min ?? 0)"
-        :max="Math.floor((section as IFilterRangeItem).max ?? 0)"
         ref="filterSectionEl"
       />
       <CFilterInfo
@@ -59,7 +57,8 @@ const props = defineProps<{
 }>()
 
 defineExpose({
-  reset,
+  resetBeforeFetch,
+  resetAfterFetch,
 })
 
 const opened = ref(
@@ -92,9 +91,24 @@ function toggleBody() {
   opened.value = !opened.value
 }
 
-function reset() {
-  if (typeof filterSectionEl.value?.reset === 'function') {
-    filterSectionEl.value.reset()
+// Сброс фильтров до начала их refetch'а
+function resetBeforeFetch() {
+  if (
+    filterSectionEl.value &&
+    'resetBeforeFetch' in filterSectionEl.value &&
+    typeof filterSectionEl.value?.resetBeforeFetch === 'function'
+  ) {
+    filterSectionEl.value.resetBeforeFetch()
+  }
+}
+// Сброс филтьров после окончания их refetch'а
+function resetAfterFetch() {
+  if (
+    filterSectionEl.value &&
+    'resetAfterFetch' in filterSectionEl.value &&
+    typeof filterSectionEl.value?.resetAfterFetch === 'function'
+  ) {
+    filterSectionEl.value.resetAfterFetch()
   }
 }
 </script>

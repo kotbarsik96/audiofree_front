@@ -22,7 +22,7 @@ const props = defineProps<{
   section: IFilterInfoItem
 }>()
 
-defineExpose({ reset })
+defineExpose({ resetBeforeFetch })
 
 const subsectionElements = ref<
   Array<InstanceType<typeof CFilterInfoSubsection>>
@@ -38,7 +38,7 @@ function onFilterChange(slug: string) {
   refetchFilters()
 }
 
-function reset() {
+function resetBeforeFetch() {
   subsectionElements.value.forEach((component) => component.reset())
 }
 </script>

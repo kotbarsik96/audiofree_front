@@ -32,7 +32,7 @@ const props = defineProps<{
 }>()
 
 defineExpose({
-  reset,
+  resetBeforeFetch,
 })
 
 const slug = computed(() => props.section.slug)
@@ -74,7 +74,7 @@ if (type.value === 'checkbox_boolean') {
   })
 }
 
-function reset() {
+function resetBeforeFetch() {
   if (type.value === 'checkbox') state.value = []
   if (type.value === 'checkbox_boolean') state.value = null
 }

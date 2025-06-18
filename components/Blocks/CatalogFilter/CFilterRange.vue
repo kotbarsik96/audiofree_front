@@ -48,22 +48,22 @@ import type { IFilterRangeItem } from '~/domain/product/types/IFilterItem'
 
 const props = defineProps<{
   section: IFilterRangeItem
-  min: number
-  max: number
 }>()
 
 defineExpose({
-  reset,
+  resetAfterFetch,
 })
 
 const lastChangedFilter = inject('lastChangedFilter') as Ref<string>
 const refetchFilters = inject('refetchFiltersOnChange') as () => void
 
 const slug = computed(() => props.section.slug)
+const min = computed(() => props.section.min ?? 0)
+const max = computed(() => props.section.max ?? 0)
 
 const stateMin = useRouteQuery(
   `${FilterRangePrefixes.MIN}${slug.value}`,
-  Math.floor(props.min),
+  Math.floor(min.value),
   {
     transform: {
       get(val) {
@@ -72,7 +72,7 @@ const stateMin = useRouteQuery(
       },
       set(val) {
         if (typeof val === 'string') val = Number(val)
-        if (val < props.min) val = props.min
+        if (val < min.value) val = min.value
         if (val > stateMax.value) val = stateMax.value
         return val
       },
@@ -81,7 +81,7 @@ const stateMin = useRouteQuery(
 )
 const stateMax = useRouteQuery(
   `${FilterRangePrefixes.MAX}${slug.value}`,
-  Math.floor(props.max),
+  Math.floor(max.value),
   {
     transform: {
       get(val) {
@@ -91,26 +91,26 @@ const stateMax = useRouteQuery(
       set(val) {
         if (typeof val === 'string') val = Number(val)
         if (val < stateMin.value) val = stateMin.value
-        if (val > props.max) val = props.max
+        if (val > max.value) val = max.value
         return val
       },
     },
   }
 )
 
-if (stateMin.value > stateMax.value) stateMin.value = props.min
+if (stateMin.value > stateMax.value) stateMin.value = min.value
 
-watch(() => [props.min, props.max], onFilterValuesUpdate)
+watch(() => [min.value, max.value], onFilterValuesUpdate)
 
 function onFilterValuesUpdate() {
-  if (stateMin.value < props.min) stateMin.value = props.min
-  if (stateMax.value > props.max) stateMax.value = props.max
+  if (stateMin.value < min.value) stateMin.value = min.value
+  if (stateMax.value > max.value) stateMax.value = max.value
   if (stateMin.value > stateMax.value) stateMin.value = stateMax.value
 }
 
-function reset() {
-  stateMin.value = props.min
-  stateMax.value = props.max
+function resetAfterFetch() {
+  stateMin.value = min.value
+  stateMax.value = max.value
 }
 
 function onFilterChange() {
