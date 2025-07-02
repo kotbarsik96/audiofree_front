@@ -25,6 +25,6 @@ export default interface ICatalogProduct {
   brand: {
     id: number
     value: string
-    value_slug: ProductStatuses
+    value_slug: string
   }
 }
