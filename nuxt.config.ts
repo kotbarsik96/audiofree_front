@@ -9,7 +9,6 @@ export default defineNuxtConfig({
 
   sanctum: {
     baseUrl: import.meta.env.VITE_API_URL,
-    origin: import.meta.env.VITE_REQUEST_URL,
     endpoints: {
       login: '/api/login',
       logout: '/api/logout',

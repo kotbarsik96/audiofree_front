@@ -23,6 +23,9 @@ setBreadcrumbs([
     link: { name: 'ProfilePage' },
   },
 ])
+
+const { data } = await useAPI<{ data: IPageSeo }>('page/profile')
+usePageMeta(data)
 </script>
 
 <style lang="scss">

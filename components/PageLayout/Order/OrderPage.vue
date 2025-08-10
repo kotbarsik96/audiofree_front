@@ -78,18 +78,19 @@ setBreadcrumbs([
   },
 ])
 
-const { data: order } = await useAPI<{ data: IOrder }>(
-  `/order/single/${route.params.id}`,
-  {
+const [{ data: order }, { data: pageSeoData }] = await Promise.all([
+  useAPI<{ data: IOrder }>(`/order/single/${route.params.id}`, {
     credentials: 'include',
-  }
-)
+  }),
+  useAPI<{ data: IPageSeo }>('page/order'),
+])
 
 const orderData = computed(() => order.value?.data)
-
 const paidString = computed(() =>
   orderData.value?.is_paid ? 'оплачен' : 'не оплачен'
 )
+
+usePageMeta(pageSeoData)
 </script>
 
 <style lang="scss" scoped>

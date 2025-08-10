@@ -67,6 +67,7 @@ const [
   { data: sortsData },
   { data: filtersData, execute: refetchFilters },
   { data: productsData, execute: _refetchProducts, status: productsStatus },
+  { data: pageSeoData },
 ] = await Promise.all([
   useAPI<{ data: ISelectOption[] }>('/products/catalog/sorts', {
     watch: false,
@@ -82,7 +83,9 @@ const [
     query: urlQuery,
     watch: false,
   }),
+  useAPI<{ data: IPageSeo }>('page/catalog'),
 ])
+usePageMeta(pageSeoData)
 
 const filterItems = computed(() => filtersData.value?.data || [])
 

@@ -6,6 +6,9 @@
 
 <script setup lang="ts">
 import BestsellersSliderSection from '~/components/Page/HomePage/BestsellersSliderSection.vue'
+
+const { data } = await useAPI<{ data: IPageSeo }>('page/home')
+usePageMeta(data)
 </script>
 
 <style lang="scss" scoped></style>

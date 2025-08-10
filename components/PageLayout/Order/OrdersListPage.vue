@@ -61,14 +61,11 @@ const { data: sortData } = await useAPI<{ data: ISelectOption[] }>(
 
 const { options, orderOptions, sort, sortOrder } = useSorts(sortData)
 
-const {
-  list: ordersList,
-  reset: resetList,
-  isLoading: isLoadingOrders,
-} = await usePaginationLazyWrapper<IOrderListItem>(
-  intersectionEl,
-  '/order/list',
-  {
+const [
+  { list: ordersList, reset: resetList, isLoading: isLoadingOrders },
+  { data: pageSeoData },
+] = await Promise.all([
+  usePaginationLazyWrapper<IOrderListItem>(intersectionEl, '/order/list', {
     credentials: 'include',
     watch: false,
     query: {
@@ -76,8 +73,10 @@ const {
       sort_order: sortOrder,
       search: searchString,
     },
-  }
-)
+  }),
+  useAPI<{ data: IPageSeo }>('page/orders'),
+])
+usePageMeta(pageSeoData)
 
 const { refresh: resetListDelayed } = useDelayedCallback(1000, () => {
   resetList()

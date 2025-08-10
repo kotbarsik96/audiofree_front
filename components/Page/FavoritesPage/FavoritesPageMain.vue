@@ -53,25 +53,35 @@ const { options, orderOptions, sort, sortOrder } = useSorts(sortData)
 
 const searchString = useRouteQuery('search') as Ref<string>
 
-const {
-  list,
-  reset: resetList,
-  isLoading: isLoadingProducts,
-} = await usePaginationLazyWrapper<IVariationProduct>(
-  intersectionEl,
-  '/product/favorites',
-  {
-    credentials: 'include',
-    watch: false,
-    query: {
-      sort: sort,
-      sort_order: sortOrder,
-      search: searchString,
-    },
-  }
-)
+const [
+  { list, reset: resetList, isLoading: isLoadingProducts },
+  { data: pageSeoData },
+] = await Promise.all([
+  usePaginationLazyWrapper<IVariationProduct>(
+    intersectionEl,
+    '/product/favorites',
+    {
+      credentials: 'include',
+      watch: false,
+      query: {
+        sort: sort,
+        sort_order: sortOrder,
+        search: searchString,
+      },
+    }
+  ),
+  useAPI<{ data: IPageSeo }>('page/favorites'),
+])
+
 const { refresh: resetListDelayed } = useDelayedCallback(1000, () => {
   resetList()
+})
+
+const { favoritesCount } = storeToRefs(useProductCollectionsStore())
+usePageMeta(pageSeoData, {
+  titleReplace: {
+    '%:count': favoritesCount.value?.toString() || '0',
+  },
 })
 
 watch(

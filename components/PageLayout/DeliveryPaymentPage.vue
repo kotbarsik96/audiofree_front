@@ -29,6 +29,9 @@ setBreadcrumbs([
     link: { name: 'DeliveryPaymentPage' },
   },
 ])
+
+const { data } = await useAPI<{ data: IPageSeo }>('page/delivery-payment')
+usePageMeta(data)
 </script>
 
 <style lang="scss" scoped>

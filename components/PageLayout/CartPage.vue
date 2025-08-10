@@ -5,7 +5,7 @@
         <BreadCrumbs />
         <h1 class="_page-header__title">Корзина</h1>
       </div>
-      <CartList />
+      <CartList is-page />
     </div>
   </div>
 </template>

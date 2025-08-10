@@ -5,8 +5,12 @@
         <div v-show="error" class="error__container _container">
           <div class="error__code">{{ error?.statusCode }}</div>
           <div class="error__text">
-            <p v-if="error?.statusCode === ServerStatuses.SERVER_ERROR">Что-то пошло не так</p>
-            <p v-else-if="error?.statusCode === ServerStatuses.NOT_FOUND">Страница не найдена</p>
+            <p v-if="error?.statusCode === ServerStatuses.SERVER_ERROR">
+              Что-то пошло не так
+            </p>
+            <p v-else-if="error?.statusCode === ServerStatuses.NOT_FOUND">
+              Страница не найдена
+            </p>
             <p>Вы можете перейти на главную страницу</p>
             <AFButton
               class="error__link"
@@ -14,6 +18,13 @@
               to="/"
               type="nuxt-link"
             />
+
+            <div v-if="isDev" class="dev">
+              {{ error.message }}
+              <br />
+              <br />
+              <div v-html="error.stack"></div>
+            </div>
           </div>
         </div>
       </LayoutWrapper>
@@ -24,11 +35,13 @@
 <script setup lang="ts">
 import type { NuxtError } from '#app'
 import AFButton from '~/components/Blocks/AFButton.vue'
-import { ServerStatuses } from '~/enums/ServerStatuses';
+import { ServerStatuses } from '~/enums/ServerStatuses'
 
 const props = defineProps<{
   error: NuxtError
 }>()
+
+const isDev = !!import.meta.env.VITE_DEVELOPMENT
 </script>
 
 <style lang="scss" scoped>
@@ -56,6 +69,12 @@ const props = defineProps<{
 
   &__link {
     margin-top: 2rem;
+  }
+
+  .dev {
+    margin-block-start: 1rem;
+    overflow: auto;
+    background-color: rgba(225, 225, 225, 0.5);
   }
 }
 </style>

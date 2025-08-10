@@ -65,6 +65,10 @@ import EmptyList from '~/components/Blocks/EmptyList.vue'
 import TextPreloader from '~/components/Blocks/TextPreloader.vue'
 import type ICartItem from '~/domain/product/collections/cart/ICartItem'
 
+const props = defineProps<{
+  isPage?: boolean
+}>()
+
 const route = useRoute()
 
 const toOrderPage = computed(() => ({
@@ -85,13 +89,25 @@ const {
   immediate: true,
 })
 
+if (props.isPage) {
+  const { data } = await useAPI<{ data: IPageSeo }>('page/cart')
+
+  const { cartCount } = storeToRefs(useProductCollectionsStore())
+  usePageMeta(data, {
+    titleReplace: {
+      '%:count': cartCount.value?.toString() || '0',
+    },
+  })
+}
+
 const isLoading = computed(() => status.value === 'pending')
 const hasCart = computed(() => !!cart.value?.data?.length)
 
 const totalCost = computed(() =>
   cart.value?.data
     .reduce(
-      (prev, current) => current.variation.current_price * current.quantity + prev,
+      (prev, current) =>
+        current.variation.current_price * current.quantity + prev,
       0
     )
     .toFixed(2)

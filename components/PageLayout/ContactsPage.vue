@@ -33,6 +33,9 @@ setBreadcrumbs([
     link: { name: 'ContactsPage' },
   },
 ])
+
+const { data } = await useAPI<{ data: IPageSeo }>('page/contacts')
+usePageMeta(data)
 </script>
 
 <style lang="scss" scoped>

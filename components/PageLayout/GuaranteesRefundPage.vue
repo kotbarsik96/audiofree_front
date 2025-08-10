@@ -24,6 +24,9 @@ setBreadcrumbs([
     link: { name: 'GuaranteesRefundPage' },
   },
 ])
+
+const { data } = await useAPI<{ data: IPageSeo }>('page/warranty-returns')
+usePageMeta(data)
 </script>
 
 <style lang="scss" scoped>
