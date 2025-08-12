@@ -12,8 +12,8 @@ export default defineNuxtConfig({
     endpoints: {
       login: '/api/login',
       logout: '/api/logout',
-      user: '/api/profile/user'
-    }
+      user: '/api/profile/user',
+    },
   },
 
   devServer: {
