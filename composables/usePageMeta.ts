@@ -10,7 +10,7 @@ export interface IPageMetaOptions {
 }
 
 export function usePageMeta(
-  data: MaybeRefOrGetter<{ data: IPageSeo } | null>,
+  data: MaybeRefOrGetter<{ data: IPageSeo } | IPageSeo | null>,
   options?: IPageMetaOptions
 ) {
   const route = useRoute()
@@ -21,7 +21,11 @@ export function usePageMeta(
     return url
   })
 
-  const pageData = computed(() => toValue(data)?.data)
+  const pageData = computed(() => {
+    let _data = toValue(data)
+    if (_data && 'data' in _data) _data = _data.data
+    return _data
+  })
 
   const title = computed(() => {
     let _title = pageData.value?.title || 'AudioFree'

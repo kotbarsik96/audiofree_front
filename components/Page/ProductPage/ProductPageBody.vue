@@ -119,9 +119,19 @@ setBreadcrumbs(breadCrumbs.value)
 
 const { addToCart, updateQuantity, deleteCartItem } = useCart()
 
-const { data: productData } = await useAPI<{ data: IProductData }>(
-  `/product/${route.params.product}/${route.params.variation}`
-)
+const [{ data: productData }, { data: pageData }] = await Promise.all([
+  useAPI<{ data: IProductData }>(
+    `/product/${route.params.product}/${route.params.variation}`
+  ),
+  useAPI<{ data: IPageSeo }>('page/product', {
+    query: {
+      product: route.params.product,
+      product_variation: route.params.variation,
+    },
+  }),
+])
+
+usePageMeta(pageData)
 
 if (!productData.value) {
   showError({
@@ -182,8 +192,8 @@ const { refresh: quantityRefreshCallback } = useDelayedCallback(
   updateQuantityOnChange
 )
 
-const outOfStock = computed(() =>
-  !variation.value || variation.value.quantity < 1
+const outOfStock = computed(
+  () => !variation.value || variation.value.quantity < 1
 )
 const smallStock = computed(
   () => !variation.value || variation.value.quantity < 5
@@ -284,7 +294,7 @@ async function onFavortieClick() {
   }
 
   &__price-current {
-    font: var(--text-30);;
+    font: var(--text-30);
     font-weight: 700;
   }
 
@@ -356,7 +366,7 @@ async function onFavortieClick() {
     font: var(--text-18);
   }
 
-  &__small-stock{ 
+  &__small-stock {
     color: var(--rating-fill-color);
     font: var(--text-18);
   }
