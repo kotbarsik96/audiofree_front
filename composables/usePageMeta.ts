@@ -5,8 +5,8 @@ export interface IPageSeo {
 
 export interface IPageMetaOptions {
   canonicalPath?: string
-  titleReplace?: Record<string, string>
-  descriptionReplace?: Record<string, string>
+  titleReplace?: MaybeRefOrGetter<Record<string, string>>
+  descriptionReplace?: MaybeRefOrGetter<Record<string, string>>
 }
 
 export function usePageMeta(
@@ -25,28 +25,46 @@ export function usePageMeta(
 
   const title = computed(() => {
     let _title = pageData.value?.title || 'AudioFree'
+    const titleReplace = options?.titleReplace
+      ? toValue(options.titleReplace)
+      : null
 
-    if (options?.titleReplace) {
-      for (let str in options.titleReplace) {
-        _title = _title.replace(str, options.titleReplace[str])
+    if (titleReplace) {
+      for (let str in titleReplace) {
+        _title = _title.replace(str, titleReplace[str])
       }
     }
 
     return _title
   })
 
+  const description = computed(() => {
+    let _description = pageData.value?.description || 'AudioFree'
+    const replace = options?.descriptionReplace
+      ? toValue(options.titleReplace)
+      : null
+
+    if (replace) {
+      for (let str in replace) {
+        _description = _description.replace(str, replace[str])
+      }
+    }
+
+    return _description
+  })
+
   useHead({
-    title: title.value,
+    title,
     meta: [
       {
         name: 'description',
-        content: pageData.value?.description || 'AudioFree',
+        content: description,
       },
     ],
     link: [
       {
         rel: 'canonical',
-        href: canonicalPath.value,
+        href: canonicalPath,
       },
     ],
   })

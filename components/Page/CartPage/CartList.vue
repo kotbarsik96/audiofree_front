@@ -94,9 +94,9 @@ if (props.isPage) {
 
   const { cartCount } = storeToRefs(useProductCollectionsStore())
   usePageMeta(data, {
-    titleReplace: {
-      '%:count': cartCount.value?.toString() || '0',
-    },
+    titleReplace: () => ({
+      '%:count': cartCount.value ? `(${cartCount.value.toString()}) ` : '',
+    }),
   })
 }
 

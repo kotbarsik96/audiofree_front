@@ -79,9 +79,11 @@ const { refresh: resetListDelayed } = useDelayedCallback(1000, () => {
 
 const { favoritesCount } = storeToRefs(useProductCollectionsStore())
 usePageMeta(pageSeoData, {
-  titleReplace: {
-    '%:count': favoritesCount.value?.toString() || '0',
-  },
+  titleReplace: () => ({
+    '%:count': favoritesCount.value
+      ? `(${favoritesCount.value?.toString()}) `
+      : '',
+  }),
 })
 
 watch(
