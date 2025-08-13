@@ -7,6 +7,7 @@
       :placeholder="placeholder"
       :autocomplete="autocomplete"
       :id="id"
+      :disabled="disabled"
     />
     <template v-if="slots.error" #error>
       <slot name="error" />
@@ -39,6 +40,7 @@ const props = withDefaults(
     modelValue: string
     placeholder?: string
     autocomplete?: string
+    disabled?: boolean;
   }>(),
   {
     placeholder: "Пароль",

@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="onSubmit">
     <InputWrapper label="Ваше имя" inputId="name">
-      <TextInput v-model="name" placeholder="Имя" id="name" />
+      <TextInput v-model="name" placeholder="Имя" id="name" :disabled="isLoading" />
       <template v-if="nameError" #error>
         {{ nameError }}
       </template>
@@ -11,6 +11,7 @@
         v-model="login"
         id="login"
         :placeholder="`${signupLoginType}`"
+        :disabled="isLoading"
       />
       <template v-if="loginError" #error>
         {{ loginError }}
@@ -25,6 +26,7 @@
       v-model="password"
       autocomplete="new-password"
       placeholder="Пароль"
+      :disabled="isLoading"
     >
       <template v-if="passwordError" #error>
         {{ passwordError }}
@@ -35,6 +37,7 @@
       v-model="passwordConfirmation"
       placeholder="Пароль еще раз"
       autocomplete="new-password"
+      :disabled="isLoading"
     >
       <template v-if="passwordConfirmationError" #error>
         {{ passwordConfirmationError }}

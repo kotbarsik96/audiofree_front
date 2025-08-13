@@ -4,7 +4,12 @@
       :label="`Логин (${possibleLogins.join(', ')})`"
       inputId="login"
     >
-      <TextInput v-model="login" id="login" placeholder="Логин" />
+      <TextInput
+        v-model="login"
+        id="login"
+        placeholder="Логин"
+        :disabled="isLoading"
+      />
       <template v-if="loginError" #error>{{ loginError }}</template>
     </InputWrapper>
     <div class="_popup-buttons-column">
