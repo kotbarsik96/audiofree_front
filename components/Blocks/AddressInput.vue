@@ -35,6 +35,7 @@
 import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import TextareaField from '~/components/Blocks/FormElements/TextareaField.vue'
 import SpinnerLoader from '~/components/Blocks/Loaders/SpinnerLoader.vue'
+import { ServerStatuses } from '~/enums/ServerStatuses'
 
 const props = defineProps<{
   name?: string
@@ -56,6 +57,15 @@ const { data, execute } = useAPI<{ data: string[] }>('search/address', {
   credentials: 'include',
   immediate: false,
   watch: false,
+  onResponseError({ response }) {
+    if (response.status === ServerStatuses.TOO_MANY_REQUESTS) {
+      error.value =
+        'Превышен лимт запросов. Пожалуйста, попробуйте через минуту'
+    }
+  },
+  onResponse({ response }) {
+    if (response.ok) error.value = undefined
+  },
 })
 
 const suggestions = computed(() => data.value?.data)
