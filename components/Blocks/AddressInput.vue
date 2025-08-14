@@ -7,6 +7,8 @@
       :name="name"
       :id="inputId"
       @input="onAddressInput"
+      @blur="onBlur"
+      @focus="onFocus"
     />
     <Transition name="fade-in">
       <SpinnerLoader v-if="isPreloaderShown" class="iw-preloader" />
@@ -50,6 +52,8 @@ const model = defineModel({ type: String })
 const suggestionsShown = ref(false)
 const isPreloaderShown = ref(false)
 
+let blurTimeout: ReturnType<typeof setTimeout>
+
 const { data, execute } = useAPI<{ data: string[] }>('search/address', {
   query: {
     value: model,
@@ -92,6 +96,16 @@ const { refresh: refetchSuggestions } = useDelayedCallback(1000, async () => {
 function setAddress(address: string) {
   model.value = address
   suggestionsShown.value = false
+}
+
+function onBlur() {
+  if (blurTimeout) clearTimeout(blurTimeout)
+  blurTimeout = setTimeout(() => (suggestionsShown.value = false), 200)
+}
+
+function onFocus() {
+  if (blurTimeout) clearTimeout(blurTimeout)
+  suggestionsShown.value = true
 }
 </script>
 
