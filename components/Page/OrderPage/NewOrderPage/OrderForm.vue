@@ -45,7 +45,7 @@
             v-model="deliveryPlace"
             name="delivery_place"
           />
-          <AddressInput v-model="address" />
+          <AddressInput v-model="address" :validation-error="addressError" />
         </div>
       </div>
       <div class="oform-col">

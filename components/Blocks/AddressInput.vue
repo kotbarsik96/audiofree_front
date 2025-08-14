@@ -30,7 +30,7 @@
         </li>
       </menu>
     </Transition>
-    <template v-if="error" #error>{{ error }}</template>
+    <template v-if="error || validationError" #error>{{ error || validationError }}</template>
   </InputWrapper>
 </template>
 
@@ -44,6 +44,7 @@ const props = defineProps<{
   name?: string
   inputId?: string
   label?: string
+  validationError?: string
 }>()
 
 const error = ref()

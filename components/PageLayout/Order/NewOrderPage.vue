@@ -18,6 +18,8 @@ import SuccessfullyCreatedOrder from '~/components/Page/OrderPage/NewOrderPage/S
 
 const isCreated = ref(false)
 
+const { updateCollection } = useProductCollectionsStore()
+
 const { setBreadcrumbs } = useBreadcrumbs()
 setBreadcrumbs([
   {
@@ -38,6 +40,7 @@ watch(isCreated, () => {
 
 function onCreatedOrder() {
   isCreated.value = true
+  updateCollection()
 }
 </script>
 
