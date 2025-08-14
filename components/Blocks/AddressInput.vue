@@ -65,7 +65,10 @@ const { data, execute } = useAPI<{ data: string[] }>('search/address', {
   onResponseError({ response }) {
     if (response.status === ServerStatuses.TOO_MANY_REQUESTS) {
       error.value =
-        'Превышен лимт запросов. Пожалуйста, попробуйте через минуту'
+        'Превышен лимит запросов. Пожалуйста, попробуйте через минуту'
+    } else if (response.status === ServerStatuses.FORBIDDEN) {
+      error.value =
+        'Превышен общий лимит запросов. Пожалуйста, попробуйте через сутки'
     } else if (response._data.message) {
       error.value = response._data.message
     }
