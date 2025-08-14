@@ -61,6 +61,8 @@ const { data, execute } = useAPI<{ data: string[] }>('search/address', {
     if (response.status === ServerStatuses.TOO_MANY_REQUESTS) {
       error.value =
         'Превышен лимт запросов. Пожалуйста, попробуйте через минуту'
+    } else if (response._data.message) {
+      error.value = response._data.message
     }
   },
   onResponse({ response }) {
