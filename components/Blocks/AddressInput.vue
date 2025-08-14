@@ -6,6 +6,7 @@
       rows="2"
       :name="name"
       :id="inputId"
+      maxlength="290"
       @input="onAddressInput"
       @blur="onBlur"
       @focus="onFocus"
