@@ -42,11 +42,14 @@ function handleInput(value?: string) {
   padding: 0.7rem 1rem;
   color: var(--input-text-color);
   width: 100%;
-  height: 6rem;
   outline: none;
   background-color: var(--white);
   resize: none;
   font: var(--text-16);
+
+  &:not([rows]) {
+    height: 6rem;
+  }
 
   &::placeholder {
     color: var(--input-placeholder-color);

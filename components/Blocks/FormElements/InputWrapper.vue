@@ -53,6 +53,7 @@ const className = computed(() => {
 </script>
 
 <style lang="scss" scoped>
+// инпут и всё основное
 .input-wrapper {
   --input-icon-size: 1.25rem;
   --input-padding-x: 1rem;
@@ -62,6 +63,8 @@ const className = computed(() => {
     var(--input-padding-x) + var(--input-icon-padding) +
       calc(var(--input-icon-size) / 1.5)
   );
+  --input-border-color: #dadada;
+  --input-border-radius: 9px;
 
   position: relative;
   margin-bottom: 0.25rem;
@@ -112,8 +115,8 @@ const className = computed(() => {
 
   :deep(.input),
   :deep(.textarea) {
-    border-radius: 9px;
-    border: 1px solid #dadada;
+    border-radius: var(--input-border-radius);
+    border: 1px solid var(--input-border-color);
     background-color: transparent;
     padding: var(--input-padding-y) var(--input-padding-x);
     outline: none;
@@ -145,6 +148,58 @@ const className = computed(() => {
   }
   &__counter + &__error {
     padding-right: 5rem;
+  }
+}
+
+// дополнительные элементы: селект
+.input-wrapper {
+  &:has(.iw-select) {
+    :deep(.input),
+    :deep(.textarea) {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+
+  :deep(.iw-select) {
+    position: absolute;
+    top: calc(100% - 0.35rem);
+    left: 0;
+    right: 0;
+    padding-inline-start: 0;
+    margin-block-start: 0;
+    max-height: 12.5rem;
+    overflow: auto;
+    border: 1px solid var(--input-border-color);
+    border-top: 0;
+    border-bottom-left-radius: var(--input-border-radius);
+    border-bottom-right-radius: var(--input-border-radius);
+
+    li {
+      cursor: pointer;
+      list-style: none;
+      background-color: var(--white);
+      padding: var(--input-padding-y) var(--input-padding-x);
+      border-bottom: 1px solid #dadada;
+      font: var(--text-16);
+      transition: var(--general-transition);
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      &:hover {
+        background-color: var(--stroke);
+      }
+    }
+  }
+
+  :deep(.iw-preloader) {
+    position: absolute;
+    top: 0.625rem;
+    right: 0.625rem;
+    width: 1rem;
+    height: 1rem;
   }
 }
 </style>
