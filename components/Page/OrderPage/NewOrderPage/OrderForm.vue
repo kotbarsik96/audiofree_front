@@ -45,10 +45,7 @@
             v-model="deliveryPlace"
             name="delivery_place"
           />
-          <InputWrapper>
-            <TextareaField v-model="address" />
-            <template v-if="addressError" #error>{{ addressError }}</template>
-          </InputWrapper>
+          <AddressInput v-model="address" :validation-error="addressError" />
         </div>
       </div>
       <div class="oform-col">
@@ -103,6 +100,7 @@ import phoneMask from '~/domain/mask-input/phoneMask'
 import type { ICreationOrderData } from '~/domain/order/interfaces/ICreationOrderData'
 import AFRadio from '~/components/Blocks/FormElements/AFRadio.vue'
 import AFButton from '~/components/Blocks/AFButton.vue'
+import AddressInput from '~/components/Blocks/AddressInput.vue'
 import {
   deliveryPlacesMap,
   type TDeliveryPlaces,
@@ -174,9 +172,12 @@ const form = useValidationForm({
       /* валидаторы добавляютя ниже */
     ]
   ),
-  phone: useValidationField(savedData.value.phone || user.value?.phone_number || '', [
-    /* валидаторы добавляютя ниже */
-  ]),
+  phone: useValidationField(
+    savedData.value.phone || user.value?.phone_number || '',
+    [
+      /* валидаторы добавляютя ниже */
+    ]
+  ),
   comment: useValidationField(savedData.value.comment || '', []),
   address: useValidationField(savedData.value.address || '', [
     minLengthValidation(3),
@@ -199,11 +200,14 @@ form.fields.phone.addValidator(
   mustPresentWithout([email, telegram], { unmaskedValue: phoneUnmasked })
 )
 
-watch(() => [email.value, telegram.value, phone.value], () => {
-  form.fields.email.validate()
-  form.fields.telegram.validate()
-  form.fields.phone.validate()
-})
+watch(
+  () => [email.value, telegram.value, phone.value],
+  () => {
+    form.fields.email.validate()
+    form.fields.telegram.validate()
+    form.fields.phone.validate()
+  }
+)
 
 // валидация: end
 
