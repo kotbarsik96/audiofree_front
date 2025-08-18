@@ -82,15 +82,18 @@ function setTitle(title: string) {
   }
 
   &__body {
+    --body-block-padding: 80px;
+
     position: relative;
     z-index: 1;
-    padding: 80px 0;
+    padding: var(--body-block-padding) 0;
     background-color: var(--white);
     box-shadow: 0px 0px 19px rgba(0, 0, 0, 0.05);
 
-    :deep(.tab[class*='enter-active']) {
-      top: auto;
-      left: auto;
+    :deep(.tab[class*='leave-active']) {
+      top: var(--body-block-padding);
+      left: 0;
+      right: 0;
     }
   }
 }
