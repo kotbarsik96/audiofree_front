@@ -295,6 +295,10 @@ function closeMenu(e: Event) {
 
   &__search {
     min-width: 19rem;
+
+    :deep(.iw-select-inner) {
+      max-height: 70vh;
+    }
   }
 
   &__bottom &__container {
@@ -458,8 +462,8 @@ function closeMenu(e: Event) {
       padding-bottom: calc(var(--input-padding-y) + 0.25rem);
     }
 
-    :deep(.iw-select) {
-      max-height: 90vh;
+    :deep(.iw-select-inner) {
+      max-height: 80vh;
     }
   }
   &__search:not(.shown) &__search-input-wrapper {

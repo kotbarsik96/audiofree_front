@@ -1,5 +1,5 @@
 <template>
-  <li class="ps-result" role="option">
+  <li class="ps-result --no-padding" role="option">
     <NuxtLink class="link" :to="result.link">
       <AFImage class="img" :data="img" />
       <div class="title">{{ result.title }}</div>
@@ -35,7 +35,10 @@ const matchString = computed(() => {
 @use '/scss/mixins.scss';
 
 .ps-result {
+  padding: 0;
+
   .link {
+    padding: var(--input-padding-y) var(--input-padding-x);
     display: grid;
     grid-template-columns: auto 1fr;
     grid-template-rows: repeat(3, auto);

@@ -8,6 +8,13 @@
     />
     <Transition name="drop-down">
       <menu v-if="showResults" class="iw-select" role="listbox">
+        <li class="all-results" role="option" @click="onResultClick">
+          <NuxtLink
+            :to="{ name: 'SearchPage', query: { search: searchValue } }"
+          >
+            Смотреть все результаты
+          </NuxtLink>
+        </li>
         <ProductSearchResult
           v-for="result in results"
           :key="result.title"
@@ -36,30 +43,15 @@ import SearchIcon from '~/assets/images/icons/search.svg'
 import ProductSearchResult from '~/components/Blocks/ProductSearch/ProductSearchResult.vue'
 import SpinnerLoader from '~/components/Blocks/Loaders/SpinnerLoader.vue'
 import NoSearchResults from '~/components/Blocks/ProductSearch/NoSearchResults.vue'
-import type { IProductSearchResult } from '~/domain/product_search/IProductSearchResult'
 
 const searchValue = ref('')
 const lastSearchedValue = ref(searchValue.value)
 const inputFocused = ref(false)
 
-const {
-  data: resultsData,
-  execute,
-  status,
-} = useAPI<{ data: IProductSearchResult[] }>('/search/products', {
-  params: {
-    value: searchValue,
-    type: 'searchbar',
-  },
-  watch: false,
-  immediate: false,
-})
-const results = computed(() => resultsData.value?.data)
-const { refresh: executeSearch } = useDelayedCallback(500, async () => {
-  await execute()
-  lastSearchedValue.value = searchValue.value
-})
-const isLoading = computed(() => status.value === 'pending')
+const { results, isLoading, executeSearchWithDelay } = useProductsSearch(
+  searchValue,
+  'searchbar'
+)
 
 const showResults = computed(
   () => results.value?.length && searchValue.value && inputFocused.value
@@ -74,7 +66,7 @@ const noResults = computed(
 const isPreloaderShown = computed(() => isLoading.value)
 
 watch(searchValue, () => {
-  if (searchValue.value.trim()) executeSearch()
+  if (searchValue.value.trim()) executeSearchWithDelay()
   else lastSearchedValue.value = ''
 })
 
@@ -95,10 +87,26 @@ function onInputBlur() {
 .psiw {
   .iw-select {
     z-index: 100;
+
+    a {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .no-search-results {
     background-color: var(--white);
+  }
+
+  .all-results {
+    display: flex;
+    justify-content: center;
+
+    a {
+      text-align: center;
+      font: var(--text-16);
+      font-weight: 600;
+    }
   }
 }
 </style>

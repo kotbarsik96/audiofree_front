@@ -179,10 +179,13 @@ const className = computed(() => {
       cursor: pointer;
       list-style: none;
       background-color: var(--white);
-      padding: var(--input-padding-y) var(--input-padding-x);
       border-bottom: 1px solid #dadada;
       font: var(--text-16);
       transition: var(--general-transition);
+
+      &:not(.--no-padding) {
+        padding: var(--input-padding-y) var(--input-padding-x);
+      }
 
       &:last-child {
         border-bottom: 0;
