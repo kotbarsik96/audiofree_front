@@ -1,8 +1,9 @@
 export default interface ISimplePagination<T> {
   data: T[];
   pagination: {
-    page: number;
+    current_page: number;
     total_items: number;
     total_pages: number;
+    per_page: number;
   }
 }

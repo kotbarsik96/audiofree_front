@@ -4,9 +4,14 @@ import type { TProductSearchType } from "~/domain/product_search/TProductSearchT
 
 export const useProductsSearch = (
   searchValue: MaybeRefOrGetter<string>,
-  type: TProductSearchType
+  type: TProductSearchType,
+  page?: MaybeRefOrGetter<number>
 ) => {
   const lastSearchedValue = ref(toValue(searchValue))
+  const _page = computed(() => {
+    if (!page || type === 'searchbar') return 1;
+    return toValue(page);
+  });
 
   const {
     data: resultsData,
@@ -16,8 +21,9 @@ export const useProductsSearch = (
     params: {
       value: searchValue,
       type,
+      page: _page
     },
-    watch: false,
+    watch: [_page],
     immediate: false,
   })
   const results = computed(() => resultsData.value?.data)
@@ -26,6 +32,7 @@ export const useProductsSearch = (
     lastSearchedValue.value = toValue(searchValue)
   })
   const isLoading = computed(() => status.value === 'pending')
+  const pagination = computed(() => resultsData.value?.pagination)
 
   return {
     lastSearchedValue,
@@ -34,5 +41,6 @@ export const useProductsSearch = (
     resultsData,
     executeSearchWithDelay,
     execute,
+    pagination
   }
 }

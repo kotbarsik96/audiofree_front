@@ -36,7 +36,12 @@
               </div>
             </div>
           </Transition>
-          <!-- <AFPagination /> -->
+          <AFPagination
+            v-if="pagination && paginationShown"
+            :disabled="isLoading"
+            :per-page="pagination.per_page"
+            :total="pagination.total_items"
+          />
         </div>
       </div>
     </div>
@@ -66,14 +71,16 @@ setBreadcrumbs([
   },
 ])
 
+const page = computed(() => Number(route.query.page ?? 1))
+
 const {
   executeSearchWithDelay,
   isLoading,
   lastSearchedValue,
   results,
-  resultsData,
   execute,
-} = useProductsSearch(searchValue, 'full')
+  pagination,
+} = useProductsSearch(searchValue, 'full', page)
 
 const resultsNotFound = computed(
   () =>
@@ -85,9 +92,9 @@ const resultsNotFound = computed(
 const searchStringIsEmpty = computed(
   () => !isLoading.value && !searchValue.value
 )
-// const paginationShown = computed(() => {
-//   resultsData.value
-// })
+const paginationShown = computed(
+  () => pagination.value && pagination.value.total_pages > 1
+)
 
 await execute()
 
