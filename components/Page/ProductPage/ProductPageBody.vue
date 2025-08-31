@@ -145,7 +145,10 @@ const gallery = computed(
   () => variation.value?.gallery?.map((obj) => obj.url) || []
 )
 const fullName = computed(
-  () => `${product.value?.name || ''} ${variation.value?.name || ''}`
+  () =>
+    `${product.value?.brand.value + ' ' || ''}${
+      product.value?.name + ' ' || ''
+    }${variation.value?.name || ''}`
 )
 const currentPrice = computed(() => variation.value?.current_price || 0)
 const oldPrice = computed(() =>
@@ -161,7 +164,9 @@ setBreadcrumbs([
   },
   {
     index: 3,
-    label: `${product.value?.name} (${variation.value?.name})`,
+    label: `${product.value?.brand.value + ' ' || ''}${product.value?.name} (${
+      variation.value?.name
+    })`,
     link: {
       name: 'ProductPage',
       params: {
