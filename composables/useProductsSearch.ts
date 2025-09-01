@@ -23,16 +23,19 @@ export const useProductsSearch = (
       type,
       page: _page
     },
-    watch: [_page],
+    watch: false,
     immediate: false,
   })
   const results = computed(() => resultsData.value?.data)
-  const { refresh: executeSearchWithDelay } = useDelayedCallback(500, async () => {
+  const executeSearchWithDelay = debounce(async () => {
     await execute()
     lastSearchedValue.value = toValue(searchValue)
-  })
+  }, 500)
   const isLoading = computed(() => status.value === 'pending')
   const pagination = computed(() => resultsData.value?.pagination)
+
+  /** При указании "watch: [_page]" в useAPI работает некорректно и почему-то отслеживает searchValue */
+  watch(_page, () => execute())
 
   return {
     lastSearchedValue,

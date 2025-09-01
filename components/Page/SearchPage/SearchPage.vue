@@ -12,30 +12,32 @@
         </InputWrapper>
         <div class="results" :class="{ '--loading': isLoading }">
           <h2 class="_h2 results-title">Результаты</h2>
-          <Transition name="blur">
-            <ul v-if="results?.length" class="results-list">
-              <ProductSearchResult
-                class="rl-item"
-                v-for="result in results"
-                :key="result.title"
-                :result="result"
-              />
-            </ul>
-            <div v-else-if="resultsNotFound" class="message-block">
-              <SearchResultIcon class="mb-icon" />
-              <div class="mb-text">
-                Не удалось найти результаты по запросу
-                <span>{{ searchValue }}</span>
+          <div class="results-body">
+            <Transition name="blur">
+              <ul v-if="results?.length" class="results-list">
+                <ProductSearchResult
+                  class="rl-item"
+                  v-for="result in results"
+                  :key="result.title"
+                  :result="result"
+                />
+              </ul>
+              <div v-else-if="resultsNotFound" class="message-block">
+                <SearchResultIcon class="mb-icon" />
+                <div class="mb-text">
+                  Не удалось найти результаты по запросу
+                  <span>{{ searchValue }}</span>
+                </div>
               </div>
-            </div>
-            <div v-else-if="searchStringIsEmpty" class="message-block">
-              <SearchResultIcon class="mb-icon" />
-              <div class="mb-text">
-                Результаты появятся после ввода поискового запроса
-                <span>{{ searchValue }}</span>
+              <div v-else-if="searchStringIsEmpty" class="message-block">
+                <SearchResultIcon class="mb-icon" />
+                <div class="mb-text">
+                  Результаты появятся после ввода поискового запроса
+                  <span>{{ searchValue }}</span>
+                </div>
               </div>
-            </div>
-          </Transition>
+            </Transition>
+          </div>
           <AFPagination
             v-if="pagination && paginationShown"
             :disabled="isLoading"
@@ -57,11 +59,14 @@ import SearchResultIcon from '~/assets/images/icons/search-result.svg'
 import ProductSearchResult from '~/components/Blocks/ProductSearch/ProductSearchResult.vue'
 import SpinnerLoader from '~/components/Blocks/Loaders/SpinnerLoader.vue'
 import AFPagination from '~/components/Blocks/AFPagination.vue'
+import { useRouteQuery } from '@vueuse/router'
 
 const { setBreadcrumbs } = useBreadcrumbs()
-const route = useRoute()
 
-const searchValue = ref((route.query.search as string) || '')
+const searchValue = useRouteQuery<string>('search')
+const page = useRouteQuery<number>('page', 1, {
+  transform: Number,
+})
 
 setBreadcrumbs([
   {
@@ -70,8 +75,6 @@ setBreadcrumbs([
     link: { name: 'SearchPage' },
   },
 ])
-
-const page = computed(() => Number(route.query.page ?? 1))
 
 const {
   executeSearchWithDelay,
@@ -98,9 +101,24 @@ const paginationShown = computed(
 
 await execute()
 
+let initialPage = page.value
+setCorrectPage()
+if (initialPage !== page.value) await execute()
+
 watch(searchValue, () => {
   executeSearchWithDelay()
 })
+
+watch(pagination, setCorrectPage)
+
+function setCorrectPage() {
+  const pages = pagination.value?.total_pages
+  if (pages && page.value > pages) {
+    page.value = pages
+  }
+
+  if (pages && page.value < 1) page.value = 1
+}
 </script>
 
 <style lang="scss" scoped>
@@ -123,18 +141,19 @@ watch(searchValue, () => {
 
   .results {
     position: relative;
+    margin-block-start: 1rem;
+  }
+
+  .results-body {
     min-height: 9rem;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-block-start: 1rem;
   }
 
   .results-title {
-    align-self: flex-start;
-    justify-self: flex-start;
-    margin-block-end: auto;
     padding-block-end: 1rem;
   }
 
@@ -145,7 +164,7 @@ watch(searchValue, () => {
     align-items: center;
     justify-content: center;
     gap: 0.625rem;
-    padding: 0.5rem 1rem;
+    padding: 1rem 0.5rem 0.5rem 0.5rem;
     top: auto;
     left: auto;
 

@@ -5,6 +5,7 @@
       v-model="searchValue"
       @focus="onInputFocus"
       @blur="onInputBlur"
+      @keyup.enter="onKeyupEnter"
     />
     <Transition name="drop-down">
       <menu v-if="showResults" class="iw-select" role="listbox">
@@ -44,9 +45,13 @@ import ProductSearchResult from '~/components/Blocks/ProductSearch/ProductSearch
 import SpinnerLoader from '~/components/Blocks/Loaders/SpinnerLoader.vue'
 import NoSearchResults from '~/components/Blocks/ProductSearch/NoSearchResults.vue'
 
+const router = useRouter()
+
 const searchValue = ref('')
 const lastSearchedValue = ref(searchValue.value)
 const inputFocused = ref(false)
+
+const redirecting = ref(false)
 
 const { results, isLoading, executeSearchWithDelay } = useProductsSearch(
   searchValue,
@@ -78,6 +83,17 @@ function onInputFocus() {
 }
 function onInputBlur() {
   inputFocused.value = false
+}
+async function onKeyupEnter() {
+  if (redirecting.value) return
+
+  redirecting.value = true
+  await router.push({
+    name: 'SearchPage',
+    query: { search: searchValue.value },
+  })
+  searchValue.value = ''
+  redirecting.value = false
 }
 </script>
 

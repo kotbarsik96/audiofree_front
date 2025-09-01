@@ -137,3 +137,15 @@ export function isResponseOk(status: number) {
     ServerStatuses.ACCEPTED,
   ].includes(status)
 }
+
+export function debounce(fn: Function, wait: number) {
+  let timer: ReturnType<typeof setTimeout>;
+  return function (...args: any[]) {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn(...args)
+    }, wait);
+  };
+}
