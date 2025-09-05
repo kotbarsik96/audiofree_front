@@ -20,14 +20,7 @@
       <div class="header__main">
         <div class="header__container _container">
           <FreeCall />
-          <InputWrapper
-            class="header__search"
-            rounded
-            :icon="SearchIcon"
-            iconPos="left"
-          >
-            <TextInput placeholder="Поиск товара" v-model="searchValue" />
-          </InputWrapper>
+          <ProductSearchInputWrapper class="header__search" />
           <ul class="header__main-icon-links">
             <li v-for="item in iconLinks" :key="item.icon">
               <ButtonIcon
@@ -79,11 +72,9 @@
         >
           <AFIcon :icon="SearchIcon" />
         </button>
-        <div class="header-mobile__search-input-wrapper">
-          <InputWrapper class="header-mobile__search-input">
-            <TextInput placeholder="Поиск товара" v-model="searchValue" />
-          </InputWrapper>
-        </div>
+        <ProductSearchInputWrapper
+          class="header-mobile__search-input-wrapper"
+        />
       </div>
       <div class="header-mobile">
         <button
@@ -169,6 +160,7 @@
 </template>
 
 <script setup lang="ts">
+import ProductSearchInputWrapper from '~/components/Blocks/ProductSearch/ProductSearchInputWrapper.vue'
 import MenuIcon from '@/assets/images/icons/menu.svg'
 import SearchIcon from '@/assets/images/icons/search.svg'
 import ChevronRightIcon from '@/assets/images/icons/chevron-right.svg'
@@ -177,13 +169,11 @@ import AFIcon from '~/components/Blocks/AFIcon.vue'
 import LogoText from '~/components/Blocks/LogoText.vue'
 import topLinks from '@/enums/header/top-links'
 import FreeCall from '~/components/Blocks/FreeCall.vue'
-import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
 import bottomLinks from '@/enums/header/bottom-links'
 import { computed, ref } from 'vue'
 import ButtonIcon from '~/components/Blocks/ButtonIcon.vue'
 import HeaderAuthBlock from '~/components/Blocks/Header/HeaderAuthBlock.vue'
 import vClickAway from '@/directives/vClickAway'
-import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
 import HeartIcon from '@/assets/images/icons/heart.svg'
 import CartIcon from '@/assets/images/icons/cart.svg'
 
@@ -305,6 +295,10 @@ function closeMenu(e: Event) {
 
   &__search {
     min-width: 19rem;
+
+    :deep(.iw-select-inner) {
+      max-height: 70vh;
+    }
   }
 
   &__bottom &__container {
@@ -433,7 +427,6 @@ function closeMenu(e: Event) {
     z-index: 100;
     display: flex;
     align-items: center;
-    overflow: hidden;
     min-width: 2rem;
   }
   &__search.shown {
@@ -442,9 +435,10 @@ function closeMenu(e: Event) {
 
   &__search-button {
     position: relative;
-    transform: translate(0.75rem, -0.25rem);
+    transform: translate(0.75rem, -0.15rem);
     z-index: 50;
     font-size: var(--search-btn-size);
+    width: 1.25rem;
     color: var(--primary-dark);
   }
 
@@ -454,15 +448,41 @@ function closeMenu(e: Event) {
     left: 0;
     right: 110%;
     background-color: var(--white);
-    overflow: hidden;
     top: 50%;
     border: none;
     border-radius: 0;
     transform: translateY(-50%);
     transition: var(--general-transition);
+
+    :deep(.input-wrapper__icon) {
+      display: none;
+    }
+
+    :deep(.input) {
+      padding-bottom: calc(var(--input-padding-y) + 0.25rem);
+    }
+
+    :deep(.iw-select-inner) {
+      max-height: 80vh;
+    }
+  }
+  &__search:not(.shown) &__search-input-wrapper {
+    :deep(.input) {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    :deep(.iw-select) {
+      display: none;
+    }
   }
   &__search.shown &__search-input-wrapper {
     right: 15px;
+
+    :deep(input) {
+      opacity: 1;
+      pointer-events: auto;
+    }
   }
   &__search.shown + .header-mobile > .header-mobile {
     &__logo-wrapper,
