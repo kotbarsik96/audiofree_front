@@ -30,9 +30,9 @@
 </template>
 
 <script setup lang="ts">
-import LoginForm from '~/components/Blocks/AuthForms/Login/LoginForm.vue'
-import ResetPasswordForm from '~/components/Blocks/AuthForms/ResetPasswordForm.vue'
-import SignupForm from '~/components/Blocks/AuthForms/Signup/SignupForm.vue'
+import LoginForm from '~/components/Auth/AuthForms/Login/LoginForm.vue'
+import ResetPasswordForm from '~/components/Auth/AuthForms/ResetPasswordForm.vue'
+import SignupForm from '~/components/Auth/AuthForms/Signup/SignupForm.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'

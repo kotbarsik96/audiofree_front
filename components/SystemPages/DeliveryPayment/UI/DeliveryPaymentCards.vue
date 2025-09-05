@@ -18,8 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import DPCardInfo from '~/components/Page/DeliveryPaymentPage/DPCardInfo.vue'
-import DPCardPrices from '~/components/Page/DeliveryPaymentPage/DPCardPrices.vue'
+import DPCardInfo from '~/components/SystemPages/DeliveryPayment/UI/DPCardInfo.vue'
+import DPCardPrices from '~/components/SystemPages/DeliveryPayment/UI/DPCardPrices.vue'
 import deliveryPaymentInfo from '~/enums/delivery-payment/deliveryPaymentInfo'
 import deliveryPaymentPrices from '~/enums/delivery-payment/deliveryPaymentPrices'
 </script>
@@ -33,9 +33,6 @@ import deliveryPaymentPrices from '~/enums/delivery-payment/deliveryPaymentPrice
 
     &.--info {
       margin-bottom: 3.75rem;
-    }
-
-    &.--prices {
     }
   }
 }

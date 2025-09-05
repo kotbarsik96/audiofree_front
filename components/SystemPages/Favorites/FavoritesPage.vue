@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import FavoritesPageMain from '~/components/Page/FavoritesPage/FavoritesPageMain.vue'
+import FavoritesPageMain from '~/components/SystemPages/Favorites/Blocks/FavoritesPageMain.vue'
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
 
 const { setBreadcrumbs } = useBreadcrumbs()

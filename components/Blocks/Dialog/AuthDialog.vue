@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import AFDialog from '~/components/Blocks/Dialog/AFDialog.vue'
-import AuthWindow from '~/components/Blocks/AuthForms/AuthWindow.vue'
+import AuthWindow from '~/components/Auth/AuthForms/AuthWindow.vue'
 import { computed } from 'vue'
 
 const props = defineProps<{

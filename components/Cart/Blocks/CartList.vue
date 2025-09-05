@@ -60,7 +60,7 @@
 
 <script setup lang="ts">
 import AFButton from '~/components/Blocks/AFButton.vue'
-import CartItem from '~/components/Page/CartPage/CartItem.vue'
+import CartItem from '~/components/Cart/UI/CartItem.vue'
 import EmptyList from '~/components/Blocks/EmptyList.vue'
 import TextPreloader from '~/components/Blocks/TextPreloader.vue'
 import type ICartItem from '~/domain/product/collections/cart/ICartItem'

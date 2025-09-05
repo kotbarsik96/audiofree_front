@@ -18,8 +18,8 @@
 
 <script setup lang="ts">
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
-import DeliveryPaymentCards from '~/components/Page/DeliveryPaymentPage/DeliveryPaymentCards.vue'
-import PaymentMethods from '~/components/Page/DeliveryPaymentPage/PaymentMethods.vue'
+import DeliveryPaymentCards from '~/components/SystemPages/DeliveryPayment/UI/DeliveryPaymentCards.vue'
+import PaymentMethods from '~/components/SystemPages/DeliveryPayment/Blocks/PaymentMethods.vue'
 
 const { setBreadcrumbs } = useBreadcrumbs()
 setBreadcrumbs([

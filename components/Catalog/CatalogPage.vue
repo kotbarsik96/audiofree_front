@@ -33,8 +33,8 @@
 <script setup lang="ts">
 import CatalogFilter from '~/components/Blocks/CatalogFilter.vue'
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
-import CatalogBody from '~/components/Page/CatalogPage/CatalogBody.vue'
-import CatalogSorts from '~/components/Page/CatalogPage/CatalogSorts.vue'
+import CatalogBody from '~/components/Catalog/Blocks/CatalogBody.vue'
+import CatalogSorts from '~/components/Catalog/Blocks/CatalogSorts.vue'
 import type ISelectOption from '~/interfaces/components/ISelectOption'
 import type { IFilterItem } from '~/domain/product/types/IFilterItem'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'

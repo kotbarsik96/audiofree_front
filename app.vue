@@ -12,7 +12,7 @@
 
 <script lang="ts" setup>
 import { useGlobalStore } from '~/stores/globalStore'
-import LayoutWrapper from '~/components/Layout/LayoutWrapper.vue'
+import LayoutWrapper from '~/components/_Layout/LayoutWrapper.vue'
 
 const { setBreadcrumbs } = useBreadcrumbs()
 

@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
-import CartList from '~/components/Page/CartPage/CartList.vue'
+import CartList from '~/components/Cart/Blocks/CartList.vue'
 
 const { setBreadcrumbs } = useBreadcrumbs()
 setBreadcrumbs([

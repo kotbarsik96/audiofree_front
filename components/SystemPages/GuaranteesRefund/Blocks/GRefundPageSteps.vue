@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import GRefundStep from '~/components/Page/GuaranteesRefundPage/GRefundStep.vue'
+import GRefundStep from '~/components/SystemPages/GuaranteesRefund/Blocks/GRefundStep.vue'
 import refundSteps from '~/enums/guarantees-refund/refundSteps'
 </script>
 
