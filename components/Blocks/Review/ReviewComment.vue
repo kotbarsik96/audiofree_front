@@ -106,7 +106,7 @@ function editReview() {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .review-comment {
   --comment-padding: 15px 20px;

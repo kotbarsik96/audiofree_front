@@ -251,7 +251,7 @@ async function onFavortieClick() {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .product-body {
   display: grid;

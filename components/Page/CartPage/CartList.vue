@@ -122,7 +122,7 @@ function onQuantityChange() {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .cart-list {
   &__list-body {

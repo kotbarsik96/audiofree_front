@@ -113,7 +113,7 @@ async function refetchProducts() {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .catalog {
   --column-width: 17rem;

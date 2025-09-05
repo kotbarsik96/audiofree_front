@@ -123,7 +123,7 @@ async function verifyEmail() {
 </script>
 
 <style lang="scss" scoped>
-@use '~/scss/components/SectionForm.scss';
+@use '~/css/components/SectionForm.scss';
 
 .profile-email {
   .--verified {

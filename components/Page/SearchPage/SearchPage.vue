@@ -122,7 +122,7 @@ function setCorrectPage() {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .search-page {
   margin-block-end: 3.75rem;

@@ -14,7 +14,7 @@ import guarantees from '~/enums/guarantees-refund/guarantees'
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .grefund-info {
   display: grid;

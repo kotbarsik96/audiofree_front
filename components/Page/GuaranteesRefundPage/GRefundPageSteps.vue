@@ -15,7 +15,7 @@ import refundSteps from '~/enums/guarantees-refund/refundSteps'
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .grefund-steps {
   &__title {

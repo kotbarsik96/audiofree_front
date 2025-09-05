@@ -114,7 +114,7 @@ function resetAfterFetch() {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .cf-section {
   border-top: 1px solid var(--stroke);

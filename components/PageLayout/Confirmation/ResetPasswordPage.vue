@@ -130,7 +130,7 @@ async function onSubmit() {
 </script>
 
 <style lang="scss" scoped>
-@use '~/scss/components/AuthForm.scss';
+@use '~/css/components/AuthForm.scss';
 
 .reset-password {
   padding: 40px 0;

@@ -5,7 +5,7 @@
 <script setup lang="ts"></script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .loader {
   width: 48px;

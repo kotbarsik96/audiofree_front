@@ -21,9 +21,9 @@ const props = defineProps<{
 </script>
 
 <style>
-@import '/scss/plugins/swiper.scss';
-@import '/scss/plugins/swiper-effect-flip.scss';
-@import '/scss/plugins/swiper-pagination.scss';
+@import '/css/plugins/swiper.scss';
+@import '/css/plugins/swiper-effect-flip.scss';
+@import '/css/plugins/swiper-pagination.scss';
 </style>
 
 <style lang="scss" scoped>

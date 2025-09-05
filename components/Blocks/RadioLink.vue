@@ -18,5 +18,5 @@ const props = withDefaults(
 </script>
 
 <style lang="scss" scoped>
-@use '~/scss/components/AFRadio.scss';
+@use '~/css/components/AFRadio.scss';
 </style>

@@ -346,7 +346,7 @@ async function makeNewOrder() {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .oform {
   padding: 3rem 0;

@@ -57,7 +57,7 @@ const costString = computed(
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .order-card {
   --padding-y: 0.75rem;

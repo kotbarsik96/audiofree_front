@@ -115,5 +115,5 @@ function onFocus() {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 </style>

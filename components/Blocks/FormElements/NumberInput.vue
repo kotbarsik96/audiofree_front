@@ -150,5 +150,5 @@ function handleMax(numValue: number) {
 </script>
 
 <style lang="scss" scoped>
-@use '~/scss/components/Input.scss';
+@use '~/css/components/Input.scss';
 </style>

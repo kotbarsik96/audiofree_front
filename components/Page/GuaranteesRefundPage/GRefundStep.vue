@@ -17,7 +17,7 @@ import ChevronRightIcon from '~/assets/images/icons/chevron-right.svg'
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .grefund-step {
   &__inner {

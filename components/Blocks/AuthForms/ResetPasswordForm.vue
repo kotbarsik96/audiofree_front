@@ -84,7 +84,7 @@ async function send() {
 </script>
 
 <style lang="scss" scoped>
-@use '~/scss/components/AuthForm.scss';
+@use '~/css/components/AuthForm.scss';
 
 .email-sent {
   text-align: center;

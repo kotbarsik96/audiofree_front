@@ -32,7 +32,7 @@ const matchString = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .ps-result {
   padding: 0;

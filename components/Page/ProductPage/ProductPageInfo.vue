@@ -44,7 +44,7 @@ const product = computed(() => productData.value?.data.product)
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .product-page-info {
   margin-bottom: 100px;

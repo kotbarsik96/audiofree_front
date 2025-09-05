@@ -91,5 +91,5 @@ function moveBar(moveX: number) {
 </script>
 
 <style lang="scss">
-@use '~/scss/components/InputRange.scss';
+@use '~/css/components/InputRange.scss';
 </style>

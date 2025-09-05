@@ -125,8 +125,8 @@ function clearAll() {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
-@use '~/scss/components/SectionForm.scss';
+@use '/css/mixins/mixins.scss';
+@use '~/css/components/SectionForm.scss';
 
 .section-form {
   &__input.--repeat {

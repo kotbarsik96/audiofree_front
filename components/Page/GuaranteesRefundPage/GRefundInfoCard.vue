@@ -19,7 +19,7 @@ const props = defineProps<{
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .grefund-info-card {
   display: grid;

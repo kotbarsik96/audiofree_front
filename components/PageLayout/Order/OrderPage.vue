@@ -94,7 +94,7 @@ usePageMeta(pageSeoData)
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .order {
   padding: 0 0 3rem 0;

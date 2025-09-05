@@ -97,5 +97,5 @@ async function onFavoritesClick() {
 </script>
 
 <style lang="scss" scoped>
-@use '~/scss/components/ProductCard/ProductCard.scss';
+@use '~/css/components/ProductCard/ProductCard.scss';
 </style>

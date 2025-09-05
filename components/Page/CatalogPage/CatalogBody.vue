@@ -80,7 +80,7 @@ function onPageChange() {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .catalog-body {
   display: flex;

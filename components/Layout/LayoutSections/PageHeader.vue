@@ -233,7 +233,7 @@ function closeMenu(e: Event) {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .header {
   --header-height: 165px;

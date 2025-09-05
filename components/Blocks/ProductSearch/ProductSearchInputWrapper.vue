@@ -98,7 +98,7 @@ async function onKeyupEnter() {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .psiw {
   .iw-select {

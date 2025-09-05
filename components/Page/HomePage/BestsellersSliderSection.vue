@@ -71,14 +71,14 @@ function linkToProduct(product: ICatalogProduct) {
 </script>
 
 <style>
-@import '/scss/plugins/swiper.scss';
-@import '/scss/plugins/swiper-effect-flip.scss';
-@import '/scss/plugins/swiper-pagination.scss';
+@import '/css/plugins/swiper.scss';
+@import '/css/plugins/swiper-effect-flip.scss';
+@import '/css/plugins/swiper-pagination.scss';
 </style>
 
 <style lang="scss" scoped>
-@use '~/scss/plugins/swiper-effect-flip.scss';
-@use '~/scss/plugins/swiper-pagination.scss';
+@use '~/css/plugins/swiper-effect-flip.scss';
+@use '~/css/plugins/swiper-pagination.scss';
 
 .bestsellers-section {
   padding-top: 90px;

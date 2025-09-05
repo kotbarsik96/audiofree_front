@@ -24,7 +24,7 @@ const props = defineProps<{
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .product-info {
   --cell-border-radius: 9px;

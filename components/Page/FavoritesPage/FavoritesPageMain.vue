@@ -95,7 +95,7 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .favorites-main {
   display: flex;

@@ -125,7 +125,7 @@ async function changeQuantity() {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .cart-item {
   --border-radius: 9px;

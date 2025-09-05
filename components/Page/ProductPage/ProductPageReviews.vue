@@ -128,7 +128,7 @@ function updateWritingReview(value: boolean) {
 </script>
 
 <style lang="scss" scoped>
-@use '/scss/mixins.scss';
+@use '/css/mixins/mixins.scss';
 
 .product-reviews {
   margin-bottom: 100px;
