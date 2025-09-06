@@ -4,46 +4,48 @@
       <div class="sp-wrapper _section-box">
         <BreadCrumbs class="sp-breadcrumbs" />
         <h1 class="_h1 sp-title">Поиск</h1>
-        <InputWrapper :icon="SearchIcon">
-          <TextInput v-model="searchValue" placeholder="Поиск товара" />
-          <Transition name="fade-in">
-            <SpinnerLoader v-if="isLoading" class="iw-preloader" />
-          </Transition>
-        </InputWrapper>
-        <div class="results" :class="{ '--loading': isLoading }">
-          <h2 class="_h2 results-title">Результаты</h2>
-          <div class="results-body">
-            <Transition name="blur">
-              <ul v-if="results?.length" class="results-list">
-                <ProductSearchResult
-                  class="rl-item"
-                  v-for="result in results"
-                  :key="result.title"
-                  :result="result"
-                />
-              </ul>
-              <div v-else-if="resultsNotFound" class="message-block">
-                <SearchResultIcon class="mb-icon" />
-                <div class="mb-text">
-                  Не удалось найти результаты по запросу
-                  <span>{{ searchValue }}</span>
-                </div>
-              </div>
-              <div v-else-if="searchStringIsEmpty" class="message-block">
-                <SearchResultIcon class="mb-icon" />
-                <div class="mb-text">
-                  Результаты появятся после ввода поискового запроса
-                  <span>{{ searchValue }}</span>
-                </div>
-              </div>
+        <div class="sp-body" v-arrow-navigation>
+          <InputWrapper :icon="SearchIcon">
+            <TextInput v-model="searchValue" placeholder="Поиск товара" />
+            <Transition name="fade-in">
+              <SpinnerLoader v-if="isLoading" class="iw-preloader" />
             </Transition>
+          </InputWrapper>
+          <div class="results" :class="{ '--loading': isLoading }">
+            <h2 class="_h2 results-title">Результаты</h2>
+            <div class="results-body">
+              <Transition name="blur">
+                <ul v-if="results?.length" class="results-list">
+                  <ProductSearchResult
+                    class="rl-item"
+                    v-for="result in results"
+                    :key="result.title"
+                    :result="result"
+                  />
+                </ul>
+                <div v-else-if="resultsNotFound" class="message-block">
+                  <SearchResultIcon class="mb-icon" />
+                  <div class="mb-text">
+                    Не удалось найти результаты по запросу
+                    <span>{{ searchValue }}</span>
+                  </div>
+                </div>
+                <div v-else-if="searchStringIsEmpty" class="message-block">
+                  <SearchResultIcon class="mb-icon" />
+                  <div class="mb-text">
+                    Результаты появятся после ввода поискового запроса
+                    <span>{{ searchValue }}</span>
+                  </div>
+                </div>
+              </Transition>
+            </div>
+            <AFPagination
+              v-if="pagination && paginationShown"
+              :disabled="isLoading"
+              :per-page="pagination.per_page"
+              :total="pagination.total_items"
+            />
           </div>
-          <AFPagination
-            v-if="pagination && paginationShown"
-            :disabled="isLoading"
-            :per-page="pagination.per_page"
-            :total="pagination.total_items"
-          />
         </div>
       </div>
     </div>
@@ -62,6 +64,7 @@ import AFPagination from '~/components/_UI/AFPagination.vue'
 import { useRouteQuery } from '@vueuse/router'
 import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
 import { searchBreadcrumbs } from '~/domain/breadcrumbs/pages'
+import { vArrowNavigation } from '~/directives/vArrowNavigation'
 
 useBreadcrumbs(searchBreadcrumbs)
 
@@ -210,8 +213,10 @@ function setCorrectPage() {
         font-weight: 500;
       }
 
-      &:hover {
+      &:hover,
+      &:focus {
         background-color: var(--gray-100);
+        outline: none;
       }
     }
   }

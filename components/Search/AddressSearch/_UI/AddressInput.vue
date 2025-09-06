@@ -1,5 +1,10 @@
 <template>
-  <InputWrapper :label="label" :input-id="inputId">
+  <InputWrapper
+    :label="label"
+    :input-id="inputId"
+    v-arrow-navigation="{ focusableTag: 'li' }"
+    v-click-away="onClickAway"
+  >
     <TextareaField
       class="oform-textarea"
       v-model="model"
@@ -8,7 +13,6 @@
       :id="inputId"
       maxlength="290"
       @input="onAddressInput"
-      @blur="onBlur"
       @focus="onFocus"
     />
     <Transition name="fade-in">
@@ -24,13 +28,17 @@
           v-for="addr in suggestions"
           :key="addr"
           role="option"
+          tabindex="0"
           @click="setAddress(addr)"
+          @keyup.enter="setAddress(addr)"
         >
           {{ addr }}
         </li>
       </menu>
     </Transition>
-    <template v-if="error || validationError" #error>{{ error || validationError }}</template>
+    <template v-if="error || validationError" #error>{{
+      error || validationError
+    }}</template>
   </InputWrapper>
 </template>
 
@@ -39,6 +47,8 @@ import InputWrapper from '~/components/_UI/FormElements/InputWrapper.vue'
 import TextareaField from '~/components/_UI/FormElements/TextareaField.vue'
 import SpinnerLoader from '~/components/_UI/Loaders/SpinnerLoader.vue'
 import { ServerStatuses } from '~/enums/ServerStatuses'
+import { vArrowNavigation } from '~/directives/vArrowNavigation'
+import vClickAway from '~/directives/vClickAway'
 
 const props = defineProps<{
   name?: string
@@ -53,8 +63,6 @@ const model = defineModel({ type: String })
 
 const suggestionsShown = ref(false)
 const isPreloaderShown = ref(false)
-
-let blurTimeout: ReturnType<typeof setTimeout>
 
 const { data, execute } = useAPI<{ data: string[] }>('search/address', {
   query: {
@@ -103,14 +111,12 @@ function setAddress(address: string) {
   suggestionsShown.value = false
 }
 
-function onBlur() {
-  if (blurTimeout) clearTimeout(blurTimeout)
-  blurTimeout = setTimeout(() => (suggestionsShown.value = false), 200)
+function onFocus() {
+  suggestionsShown.value = true
 }
 
-function onFocus() {
-  if (blurTimeout) clearTimeout(blurTimeout)
-  suggestionsShown.value = true
+function onClickAway() {
+  suggestionsShown.value = false
 }
 </script>
 
