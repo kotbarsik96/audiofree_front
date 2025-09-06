@@ -65,11 +65,14 @@ export class Auth {
     const { addNotification } = useNotifications()
     const { initApp } = useGlobalStore()
     const { logout } = useSanctumAuth()
+    const { updateCollection } = useProductCollectionsStore()
 
     try {
       await logout()
+
       addNotification('info', 'Выполнен выход из профиля')
       await initApp()
+      await updateCollection(true)
     } catch (e: any) {
       console.error(e)
     }
