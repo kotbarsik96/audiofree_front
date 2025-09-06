@@ -83,6 +83,7 @@ const [
     paginationData: reviewsData,
     isLoading: isLoadingReviews,
     refresh: loadReviews,
+    reset: resetAndLoadReviews
   },
 ] = await Promise.all([
   usePaginationLazyWrapper<IProductReview>(
@@ -118,7 +119,7 @@ provide<IReviewInjection>(ReviewInjection, {
 
 async function updateAllReviews() {
   isUpdatingReviews.value = true
-  await loadReviews()
+  await resetAndLoadReviews()
   await loadUserReview()
   isUpdatingReviews.value = false
 }
