@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
+import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import GRefundPageInfo from '~/components/SystemPages/GuaranteesRefund/Blocks/GRefundPageInfo.vue'
 import GRefundPageSteps from '~/components/SystemPages/GuaranteesRefund/Blocks/GRefundPageSteps.vue'
 

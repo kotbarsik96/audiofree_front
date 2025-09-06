@@ -55,9 +55,9 @@
 </template>
 
 <script setup lang="ts">
-import SocialsList from '~/components/Blocks/SocialsList.vue'
-import LogoText from '~/components/Blocks/LogoText.vue'
-import ContactsList from '~/components/Blocks/ContactsList.vue'
+import SocialsList from '~/components/_UI/SocialsList.vue'
+import LogoText from '~/components/_UI/LogoText.vue'
+import ContactsList from '~/components/SystemPages/Contacts/Blocks/ContactsList.vue'
 import { useAuthStore } from '@/stores/authStore'
 import type { RouteLocationRaw } from 'vue-router'
 

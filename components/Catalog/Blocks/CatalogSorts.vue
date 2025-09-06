@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import AFSelect from '~/components/Blocks/AFSelect.vue'
+import AFSelect from '~/components/_UI/AFSelect.vue'
 import { useSorts } from '~/domain/product/useSorts'
 import type ISelectOption from '~/interfaces/components/ISelectOption'
 

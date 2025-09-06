@@ -42,9 +42,9 @@
 
 <script setup lang="ts">
 import CrossIcon from '~/assets/images/icons/cross.svg'
-import AFImage from '~/components/Blocks/AFImage.vue'
-import QuantityInput from '~/components/Blocks/FormElements/QuantityInput.vue'
-import AFDialog from '~/components/Blocks/Dialog/AFDialog.vue'
+import AFImage from '~/components/_UI/AFImage.vue'
+import QuantityInput from '~/components/_UI/FormElements/QuantityInput.vue'
+import AFDialog from '~/components/_UI/Dialog/AFDialog.vue'
 import { useCart } from '~/domain/product/collections/cart/useCart'
 import type ICartItem from '~/domain/product/collections/cart/ICartItem'
 

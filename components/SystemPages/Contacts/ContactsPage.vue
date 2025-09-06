@@ -21,9 +21,9 @@
 </template>
 
 <script setup lang="ts">
-import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
-import ContactsList from '~/components/Blocks/ContactsList.vue'
-import SupportChatUser from '~/components/Blocks/SupportChat/SupportChatUser.vue'
+import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
+import ContactsList from '~/components/SystemPages/Contacts/Blocks/ContactsList.vue'
+import SupportChatUser from '~/components/Support/SupportChat/Blocks/SupportChatUser.vue'
 
 const { setBreadcrumbs } = useBreadcrumbs()
 setBreadcrumbs([

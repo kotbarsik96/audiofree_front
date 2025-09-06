@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import SearchPage from '~/components/Page/SearchPage/SearchPage.vue'
+import SearchPage from '~/components/Search/SearchPage.vue'
 
 definePageMeta({
   name: 'SearchPage',

@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import OrderPage from '~/components/PageLayout/Order/OrderPage.vue';
+import OrderPage from '~/components/Orders/Order/OrderPage.vue';
 
 definePageMeta({
   name: 'OrderPage',

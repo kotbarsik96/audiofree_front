@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import AuthWindow from '~/components/Auth/AuthForms/AuthWindow.vue'
+import AuthWindow from '~/components/Auth/_UI/AuthWindow.vue'
 import { watch } from 'vue'
 import { useRouter } from 'vue-router'
 import type IUser from '~/domain/user/types/IUser'

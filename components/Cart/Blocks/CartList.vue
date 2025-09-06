@@ -59,10 +59,10 @@
 </template>
 
 <script setup lang="ts">
-import AFButton from '~/components/Blocks/AFButton.vue'
+import AFButton from '~/components/_UI/AFButton.vue'
 import CartItem from '~/components/Cart/UI/CartItem.vue'
-import EmptyList from '~/components/Blocks/EmptyList.vue'
-import TextPreloader from '~/components/Blocks/TextPreloader.vue'
+import EmptyList from '~/components/_UI/EmptyList.vue'
+import TextPreloader from '~/components/_UI/TextPreloader.vue'
 import type ICartItem from '~/domain/product/collections/cart/ICartItem'
 
 const props = defineProps<{

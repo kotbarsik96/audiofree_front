@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
+import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import CartList from '~/components/Cart/Blocks/CartList.vue'
 
 const { setBreadcrumbs } = useBreadcrumbs()

@@ -30,12 +30,12 @@
 </template>
 
 <script setup lang="ts">
-import EmptyList from '~/components/Blocks/EmptyList.vue'
+import EmptyList from '~/components/_UI/EmptyList.vue'
 import SearchIcon from '~/assets/images/icons/search.svg'
-import InputWrapper from '~/components/Blocks/FormElements/InputWrapper.vue'
-import TextInput from '~/components/Blocks/FormElements/TextInput.vue'
-import AFSelect from '~/components/Blocks/AFSelect.vue'
-import ProductVariationCard from '~/components/Blocks/Cards/ProductVariationCard.vue'
+import InputWrapper from '~/components/_UI/FormElements/InputWrapper.vue'
+import TextInput from '~/components/_UI/FormElements/TextInput.vue'
+import AFSelect from '~/components/_UI/AFSelect.vue'
+import ProductVariationCard from '~/components/Product/UI/ProductCard/ProductVariationCard.vue'
 import { useSorts } from '~/domain/product/useSorts'
 import type ISelectOption from '~/interfaces/components/ISelectOption'
 import type IVariationProduct from '~/domain/product/types/IVariationProduct'

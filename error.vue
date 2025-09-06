@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import type { NuxtError } from '#app'
-import AFButton from '~/components/Blocks/AFButton.vue'
+import AFButton from '~/components/_UI/AFButton.vue'
 import { ServerStatuses } from '~/enums/ServerStatuses'
 
 const props = defineProps<{

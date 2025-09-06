@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import BreadCrumbs from '~/components/Blocks/BreadCrumbs.vue'
+import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import DeliveryPaymentCards from '~/components/SystemPages/DeliveryPayment/UI/DeliveryPaymentCards.vue'
 import PaymentMethods from '~/components/SystemPages/DeliveryPayment/Blocks/PaymentMethods.vue'
 

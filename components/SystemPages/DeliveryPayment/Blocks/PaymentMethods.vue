@@ -8,9 +8,9 @@
 </template>
 
 <script setup lang="ts">
-import PaymentCard from '~/components/Blocks/PaymentCard.vue'
+import PaymentCard from '~/components/SystemPages/DeliveryPayment/UI/PaymentCard.vue'
 import paymentMethods from '~/enums/delivery-payment/paymentMethods'
-import AFImage from '~/components/Blocks/AFImage.vue'
+import AFImage from '~/components/_UI/AFImage.vue'
 </script>
 
 <style lang="scss" scoped>

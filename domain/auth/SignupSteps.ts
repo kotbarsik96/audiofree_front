@@ -7,13 +7,13 @@ export enum SignupSteps {
 export const signupFormComponents = {
   [SignupSteps.ChooseLoginStep]: defineAsyncComponent(
     () =>
-      import('~/components/Auth/AuthForms/Signup/Steps/ChooseLoginStep.vue')
+      import('~/components/Auth/Signup/_UI/Steps/ChooseLoginStep.vue')
   ),
   [SignupSteps.TelegramStep]: defineAsyncComponent(
-    () => import('~/components/Auth/AuthForms/Signup/Steps/TelegramStep.vue')
+    () => import('~/components/Auth/Signup/_UI/Steps/TelegramStep.vue')
   ),
   [SignupSteps.EnterLoginStep]: defineAsyncComponent(
     () =>
-      import('~/components/Auth/AuthForms/Signup/Steps/EnterLoginStep.vue')
+      import('~/components/Auth/Signup/_UI/Steps/EnterLoginStep.vue')
   ),
 }
