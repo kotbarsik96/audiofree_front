@@ -1,7 +1,7 @@
-import { computed, ref } from "vue"
-import type INotification from "@/interfaces/notification/INotification"
-import type { NotificationSeverity } from "@/enums/notification/NotificationSeverety"
-import { useTimer } from "@/composables/useTimer"
+import { computed, ref } from 'vue'
+import type INotification from '@/interfaces/notification/INotification'
+import type { NotificationSeverity } from '@/enums/notification/NotificationSeverety'
+import { useTimer } from '@/composables/useTimer'
 
 const notifications = ref<INotification[]>([])
 const _default_notification_hold_time = 7500
@@ -20,6 +20,11 @@ export function useNotifications() {
       createdAt: new Date(),
       holdTime: holdTime || _default_notification_hold_time,
     })
+    if (notifications.value.length > _max_notifications) {
+      notifications.value = notifications.value.slice(
+        notifications.value.length - _max_notifications
+      )
+    }
   }
   function getNotificationsList() {
     const { timeSource } = useTimer()
