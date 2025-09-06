@@ -27,8 +27,8 @@ export const useProductCollectionsStore = defineStore(
       () => collection.value?.data.favorites.length || null
     )
 
-    function updateCollection() {
-      if (!!user.value) _updateCollection()
+    function updateCollection(forced?: boolean) {
+      if (!!user.value || forced) _updateCollection()
     }
 
     return {
