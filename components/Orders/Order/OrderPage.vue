@@ -58,7 +58,7 @@
 
 <script setup lang="ts">
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
-import OrderProduct from '~/components/Orders/UI/OrderProduct.vue'
+import OrderProduct from '~/components/Orders/_UI/OrderProduct.vue'
 import type { IOrder } from '~/domain/order/interfaces/IOrder'
 import { deliveryPlacesMap } from '~/domain/order/types/TDeliveryPlaces'
 

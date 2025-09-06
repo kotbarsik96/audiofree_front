@@ -10,9 +10,9 @@
 </template>
 
 <script setup lang="ts">
-import ProfileUserInfo from '~/components/Profile/Blocks/ProfileUserInfo.vue'
-import ProfilePassword from '~/components/Profile/Blocks/ProfilePassword.vue'
-import ProfileEmail from '~/components/Profile/Blocks/ProfileEmail.vue'
+import ProfileUserInfo from '~/components/Profile/_Blocks/ProfileUserInfo.vue'
+import ProfilePassword from '~/components/Profile/_Blocks/ProfilePassword.vue'
+import ProfileEmail from '~/components/Profile/_Blocks/ProfileEmail.vue'
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 
 const { setBreadcrumbs } = useBreadcrumbs()

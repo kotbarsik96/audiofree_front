@@ -41,7 +41,7 @@
 import AFButton from '~/components/_UI/AFButton.vue'
 import AFIcon from '~/components/_UI/AFIcon.vue'
 import FilterIcon from '~/assets/images/icons/filter.svg'
-import CFilterSection from '~/components/Catalog/UI/Filter/CFilterSection.vue'
+import CFilterSection from '~/components/Catalog/_UI/CFilterSection.vue'
 import type { IFilterItem } from '~/domain/product/types/IFilterItem'
 import { FilterRangePrefixes } from '~/domain/product/types/FilterRangePrefixes'
 

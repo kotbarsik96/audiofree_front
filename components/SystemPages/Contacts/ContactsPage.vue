@@ -22,8 +22,8 @@
 
 <script setup lang="ts">
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
-import ContactsList from '~/components/SystemPages/Contacts/Blocks/ContactsList.vue'
-import SupportChatUser from '~/components/Support/SupportChat/Blocks/SupportChatUser.vue'
+import ContactsList from '~/components/SystemPages/Contacts/_Blocks/ContactsList.vue'
+import SupportChatUser from '~/components/Support/SupportChat/_Blocks/SupportChatUser.vue'
 
 const { setBreadcrumbs } = useBreadcrumbs()
 setBreadcrumbs([

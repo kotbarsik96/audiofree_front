@@ -160,7 +160,7 @@
 </template>
 
 <script setup lang="ts">
-import ProductSearchInputWrapper from '~/components/Search/ProductSearch/UI/ProductSearchInputWrapper.vue'
+import ProductSearchInputWrapper from '~/components/Search/ProductSearch/_UI/ProductSearchInputWrapper.vue'
 import MenuIcon from '@/assets/images/icons/menu.svg'
 import SearchIcon from '@/assets/images/icons/search.svg'
 import ChevronRightIcon from '@/assets/images/icons/chevron-right.svg'

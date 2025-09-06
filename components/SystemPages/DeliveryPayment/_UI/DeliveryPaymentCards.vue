@@ -18,8 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import DPCardInfo from '~/components/SystemPages/DeliveryPayment/UI/DPCardInfo.vue'
-import DPCardPrices from '~/components/SystemPages/DeliveryPayment/UI/DPCardPrices.vue'
+import DPCardInfo from '~/components/SystemPages/DeliveryPayment/_UI/DPCardInfo.vue'
+import DPCardPrices from '~/components/SystemPages/DeliveryPayment/_UI/DPCardPrices.vue'
 import deliveryPaymentInfo from '~/enums/delivery-payment/deliveryPaymentInfo'
 import deliveryPaymentPrices from '~/enums/delivery-payment/deliveryPaymentPrices'
 </script>

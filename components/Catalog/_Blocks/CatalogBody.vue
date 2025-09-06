@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import AFPagination from '~/components/_UI/AFPagination.vue'
-import ProductCard from '~/components/Product/UI/ProductCard/ProductCard.vue'
+import ProductCard from '~/components/Product/_UI/ProductCard/ProductCard.vue'
 import EmptyList from '~/components/_UI/EmptyList.vue'
 import { useRouteQuery } from '@vueuse/router'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'

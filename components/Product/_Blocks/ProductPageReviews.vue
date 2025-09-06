@@ -38,10 +38,10 @@
 
 <script setup lang="ts">
 import EmptyList from '~/components/_UI/EmptyList.vue'
-import ReviewForm from '~/components/Review/UI/ReviewForm.vue'
-import ReviewComment from '~/components/Review/UI/ReviewComment.vue'
+import ReviewForm from '~/components/Review/_UI/ReviewForm.vue'
+import ReviewComment from '~/components/Review/_UI/ReviewComment.vue'
 import SmallPreloader from '~/components/_UI/SmallPreloader.vue'
-import CurrentUserReview from '~/components/Review/UI/CurrentUserReview.vue'
+import CurrentUserReview from '~/components/Review/_UI/CurrentUserReview.vue'
 import type { IProductReview } from '~/domain/product/types/IProductData'
 import {
   type IReviewInjection,

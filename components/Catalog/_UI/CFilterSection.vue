@@ -40,10 +40,10 @@
 </template>
 
 <script setup lang="ts">
-import CFilterInfo from '~/components/Catalog/UI/Filter/CFilterInfo/CFilterInfo.vue'
-import CFilterCheckboxes from '~/components/Catalog/UI/Filter/CFilterCheckboxes.vue'
-import CFilterRadios from '~/components/Catalog/UI/Filter/CFilterRadios.vue'
-import CFilterRange from '~/components/Catalog/UI/Filter/CFilterRange.vue'
+import CFilterInfo from '~/components/Catalog/_UI/Filter/CFilterInfo/CFilterInfo.vue'
+import CFilterCheckboxes from '~/components/Catalog/_UI/CFilterCheckboxes.vue'
+import CFilterRadios from '~/components/Catalog/_UI/CFilterRadios.vue'
+import CFilterRange from '~/components/Catalog/_UI/CFilterRange.vue'
 import ChevronRight from '~/assets/images/icons/chevron-right.svg'
 import type {
   IFilterInfoItem,

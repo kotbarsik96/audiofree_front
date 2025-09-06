@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import GRefundInfoCard from '~/components/SystemPages/GuaranteesRefund/UI/GRefundInfoCard.vue'
+import GRefundInfoCard from '~/components/SystemPages/GuaranteesRefund/_UI/GRefundInfoCard.vue'
 import guarantees from '~/enums/guarantees-refund/guarantees'
 </script>
 

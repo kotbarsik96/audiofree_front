@@ -16,8 +16,8 @@
 </template>
 
 <script setup lang="ts">
-import ReviewForm from '~/components/Review/UI/ReviewForm.vue'
-import ReviewComment from '~/components/Review/UI/ReviewComment.vue'
+import ReviewForm from '~/components/Review/_UI/ReviewForm.vue'
+import ReviewComment from '~/components/Review/_UI/ReviewComment.vue'
 import { type IReviewInjection } from '~/domain/reviews/types/IReviewInjection'
 import { ReviewInjection } from '~/enums/injections'
 

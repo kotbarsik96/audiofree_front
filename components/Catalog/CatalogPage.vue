@@ -31,10 +31,10 @@
 </template>
 
 <script setup lang="ts">
-import CatalogFilter from '~/components/Catalog/Blocks/CatalogFilter.vue'
+import CatalogFilter from '~/components/Catalog/_Blocks/CatalogFilter.vue'
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
-import CatalogBody from '~/components/Catalog/Blocks/CatalogBody.vue'
-import CatalogSorts from '~/components/Catalog/Blocks/CatalogSorts.vue'
+import CatalogBody from '~/components/Catalog/_Blocks/CatalogBody.vue'
+import CatalogSorts from '~/components/Catalog/_Blocks/CatalogSorts.vue'
 import type ISelectOption from '~/interfaces/components/ISelectOption'
 import type { IFilterItem } from '~/domain/product/types/IFilterItem'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'

@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import CFilterInfoSubsection from '~/components/Catalog/UI/Filter/CFilterInfo/CFilterInfoSubsection.vue';
+import CFilterInfoSubsection from '~/components/Catalog/_UI/Filter/CFilterInfo/CFilterInfoSubsection.vue';
 import type { IFilterInfoItem } from '~/domain/product/types/IFilterItem'
 
 const props = defineProps<{

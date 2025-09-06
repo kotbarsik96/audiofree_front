@@ -41,9 +41,9 @@
 import InputWrapper from '~/components/_UI/FormElements/InputWrapper.vue'
 import TextInput from '~/components/_UI/FormElements/TextInput.vue'
 import SearchIcon from '~/assets/images/icons/search.svg'
-import ProductSearchResult from '~/components/Search/ProductSearch/UI/ProductSearchResult.vue'
+import ProductSearchResult from '~/components/Search/ProductSearch/_UI/ProductSearchResult.vue'
 import SpinnerLoader from '~/components/_UI/Loaders/SpinnerLoader.vue'
-import NoSearchResults from '~/components/Search/ProductSearch/UI/NoSearchResults.vue'
+import NoSearchResults from '~/components/Search/ProductSearch/_UI/NoSearchResults.vue'
 
 const router = useRouter()
 

@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { useRouteQuery } from '@vueuse/router'
-import CFilterApplyButton from '~/components/Catalog/UI/Filter/CFilterApplyButton.vue';
+import CFilterApplyButton from '~/components/Catalog/_UI/CFilterApplyButton.vue';
 import AFCheckbox from '~/components/_UI/FormElements/AFCheckbox.vue'
 import type {
   ICheckboxBooleanItem,

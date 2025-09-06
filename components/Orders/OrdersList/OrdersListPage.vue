@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import EmptyList from '~/components/_UI/EmptyList.vue'
-import OrderCard from '~/components/Orders/UI/OrderCard.vue'
+import OrderCard from '~/components/Orders/_UI/OrderCard.vue'
 import AFSelect from '~/components/_UI/AFSelect.vue'
 import InputWrapper from '~/components/_UI/FormElements/InputWrapper.vue'
 import TextInput from '~/components/_UI/FormElements/TextInput.vue'

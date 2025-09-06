@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import AFImage from '~/components/_UI/AFImage.vue'
-import OrderStatus from '~/components/Orders/UI/OrderStatus.vue';
+import OrderStatus from '~/components/Orders/_UI/OrderStatus.vue';
 import type { IOrderListItem } from '~/domain/order/interfaces/IOrderListItem'
 import { deliveryPlacesMap } from '~/domain/order/types/TDeliveryPlaces'
 

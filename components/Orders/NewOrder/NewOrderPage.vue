@@ -12,9 +12,9 @@
 </template>
 
 <script setup lang="ts">
-import OrderForm from '~/components/Orders/NewOrder/Blocks/OrderForm.vue'
+import OrderForm from '~/components/Orders/NewOrder/_Blocks/OrderForm.vue'
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
-import SuccessfullyCreatedOrder from '~/components/Orders/NewOrder/Blocks/SuccessfullyCreatedOrder.vue'
+import SuccessfullyCreatedOrder from '~/components/Orders/NewOrder/_Blocks/SuccessfullyCreatedOrder.vue'
 
 const isCreated = ref(false)
 

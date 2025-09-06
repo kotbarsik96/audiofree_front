@@ -13,9 +13,9 @@
 </template>
 
 <script setup lang="ts">
-import ProductPageBody from '~/components/Product/Blocks/ProductPageBody.vue'
-import ProductPageInfo from '~/components/Product/Blocks/ProductPageInfo.vue'
-import ProductPageReviews from '~/components/Product/Blocks/ProductPageReviews.vue'
+import ProductPageBody from '~/components/Product/_Blocks/ProductPageBody.vue'
+import ProductPageInfo from '~/components/Product/_Blocks/ProductPageInfo.vue'
+import ProductPageReviews from '~/components/Product/_Blocks/ProductPageReviews.vue'
 </script>
 
 <style lang="scss" scoped></style>

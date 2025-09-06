@@ -100,7 +100,7 @@ import phoneMask from '~/domain/mask-input/phoneMask'
 import type { ICreationOrderData } from '~/domain/order/interfaces/ICreationOrderData'
 import AFRadio from '~/components/_UI/FormElements/AFRadio.vue'
 import AFButton from '~/components/_UI/AFButton.vue'
-import AddressInput from '~/components/Search/AddressSearch/AddressInput.vue'
+import AddressInput from '~/components/Search/AddressSearch/_UI/AddressInput.vue'
 import {
   deliveryPlacesMap,
   type TDeliveryPlaces,
