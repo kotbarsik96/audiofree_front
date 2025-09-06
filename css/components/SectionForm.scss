@@ -1,0 +1,23 @@
+@use '/css/mixins/mixins.scss';
+
+.section-form {
+  padding: 1rem;
+  max-width: 47rem;
+
+  ._h2 {
+    margin-bottom: 2rem;
+  }
+
+  &__inputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  @include mixins.adaptive(phone-big) {
+    &__inputs {
+      grid-template-columns: 1fr;
+    }
+  }
+}

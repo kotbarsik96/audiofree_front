@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import ResetPasswordPage from '~/components/PageLayout/Confirmation/ResetPasswordPage.vue'
+import ResetPasswordPage from '~/components/Confirmation/ResetPassword/ResetPasswordPage.vue'
 
 definePageMeta({
   name: 'ResetPasswordPage'

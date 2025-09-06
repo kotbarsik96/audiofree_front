@@ -5,8 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import LogInToSeePage from '~/components/Blocks/LogInToSeePage.vue'
-import NewOrderPage from '~/components/PageLayout/Order/NewOrderPage.vue'
+import LogInToSeePage from '~/components/Auth/_Blocks/LogInToSeePage.vue'
+import NewOrderPage from '~/components/Orders/NewOrder/NewOrderPage.vue'
 
 definePageMeta({
   name: 'NewOrderPage',

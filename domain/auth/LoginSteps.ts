@@ -6,15 +6,15 @@ export enum LoginSteps {
 
 export const loginFormComponents = {
   [LoginSteps.EnterLoginStep]: defineAsyncComponent(
-    () => import('~/components/Blocks/AuthForms/Login/Steps/EnterLoginStep.vue')
+    () => import('~/components/Auth/Login/_UI/Steps/EnterLoginStep.vue')
   ),
   [LoginSteps.ConfirmationCodeStep]: defineAsyncComponent(
     () =>
       import(
-        '~/components/Blocks/AuthForms/Login/Steps/ConfirmationCodeStep.vue'
+        '~/components/Auth/Login/_UI/Steps/ConfirmationCodeStep.vue'
       )
   ),
   [LoginSteps.PasswordStep]: defineAsyncComponent(
-    () => import('~/components/Blocks/AuthForms/Login/Steps/PasswordStep.vue')
+    () => import('~/components/Auth/Login/_UI/Steps/PasswordStep.vue')
   ),
 }

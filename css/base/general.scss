@@ -1,0 +1,192 @@
+@use '/css/mixins/mixins.scss';
+
+html {
+  line-height: 120%;
+  font-weight: 400;
+  font-family: var(--font-roboto-flex);
+  font-size: clamp(0.875em, 0.5svw + 0.6em, 1.15em);
+
+  @include mixins.scrollbar();
+  * {
+    @include mixins.scrollbar();
+  }
+}
+
+:root:has(.firefox) {
+  @include mixins.scrollbarFirefox();
+
+  * {
+    @include mixins.scrollbarFirefox();
+  }
+}
+
+._container {
+  margin: 0 auto;
+  width: 100%;
+  max-width: calc(var(--container-width) + var(--container-padding-x) * 2);
+  padding: 0 var(--container-padding-x);
+}
+
+a,
+button {
+  &:focus-visible {
+    outline: 1px solid var(--black);
+  }
+}
+
+._link {
+  text-decoration: none;
+  font: var(--text-16);
+  color: var(--primary);
+  transition: var(--general-transition);
+
+  &:hover {
+    color: var(--secondary-2);
+  }
+
+  &--white {
+    color: var(--white);
+  }
+
+  &--text-color {
+    color: var(--text-color);
+  }
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+}
+
+._error {
+  color: var(--red);
+  font: var(--text-16);
+}
+
+._bold {
+  font-weight: 700;
+}
+
+._box {
+  padding: 20px;
+  border-radius: 8px;
+  background-color: var(--white);
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+._section {
+  &--primary-color {
+    @extend ._section;
+    color: var(--white);
+    background-color: var(--primary);
+  }
+}
+
+._section-box {
+  border-radius: 8px;
+  background-color: var(--white);
+  box-shadow: 0px 1px 25px rgba(0, 0, 0, 0.06);
+}
+
+._page {
+  margin-top: 3.75rem;
+
+  @include mixins.adaptive(tablet-big) {
+    margin-top: 1.5rem;
+  }
+}
+
+._page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__title {
+    font: var(--text-36);
+    font-weight: 700;
+  }
+}
+
+._card {
+  --border-radius: 9px;
+
+  position: relative;
+  padding-bottom: 0.5rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0.3rem;
+    right: 0.3rem;
+    bottom: 0;
+    top: 0;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.1);
+  }
+
+  &__inner {
+    position: relative;
+    z-index: 5;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+    box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.1);
+    transition: var(--general-transition);
+  }
+
+  &.--clickable:hover &__inner {
+    box-shadow: 0px 1px 18px rgb(165, 165, 165);
+  }
+}
+
+._popup-buttons-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 200px;
+}
+
+._hideable-element {
+  @include mixins.hiddenElementStyles;
+  animation: hideElement 0.25s ease-in-out;
+
+  &.--shown-element {
+    @include mixins.shownElementStyles;
+    animation-name: showElement;
+  }
+}
+
+@keyframes hideElement {
+  0% {
+    @include mixins.shownElementStyles;
+  }
+  100% {
+    @include mixins.hiddenElementStyles;
+  }
+}
+@keyframes showElement {
+  0% {
+    @include mixins.hiddenElementStyles;
+  }
+  100% {
+    @include mixins.shownElementStyles;
+  }
+}
+
+@each $h in 1, 2, 3, 4 {
+  ._h#{$h} {
+    font: var(--text-h#{$h});
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::after,
+  *::before {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

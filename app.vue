@@ -12,17 +12,11 @@
 
 <script lang="ts" setup>
 import { useGlobalStore } from '~/stores/globalStore'
-import LayoutWrapper from '~/components/Layout/LayoutWrapper.vue'
+import LayoutWrapper from '~/components/_Layout/LayoutWrapper.vue'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
+import { homeBreadcrumbs } from '~/domain/breadcrumbs/pages'
 
-const { setBreadcrumbs } = useBreadcrumbs()
-
-setBreadcrumbs([
-  {
-    index: 1,
-    label: 'Главная',
-    link: { name: 'HomePage' },
-  },
-])
+useBreadcrumbs(homeBreadcrumbs)
 
 onMounted(() => {
   defineIfFirefox()
@@ -37,12 +31,12 @@ function defineIfFirefox() {
 </script>
 
 <style>
-@import '/scss/base/reset.scss';
-@import '/scss/base/fonts.scss';
-@import '/scss/base/transition.scss';
-@import '/scss/base/general.scss';
-@import '/scss/variables/colors.scss';
-@import '/scss/variables/fonts.scss';
-@import '/scss/variables/sizes.scss';
-@import '/scss/variables/transitions.scss';
+@import '/css/base/reset.scss';
+@import '/css/base/fonts.scss';
+@import '/css/base/transition.scss';
+@import '/css/base/general.scss';
+@import '/css/variables/colors.scss';
+@import '/css/variables/fonts.scss';
+@import '/css/variables/sizes.scss';
+@import '/css/variables/transitions.scss';
 </style>
