@@ -45,11 +45,13 @@ const matchString = computed(() => {
     column-gap: 1rem;
   }
 
-  .img {
+  .img,
+  .img :deep(img) {
     width: 50px;
     aspect-ratio: 1;
     grid-column: span 1;
     grid-row: 1 / -1;
+    object-fit: contain;
   }
 
   .title {

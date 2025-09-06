@@ -1,10 +1,16 @@
 <template>
-  <InputWrapper class="psiw" rounded :icon="SearchIcon" iconPos="left">
+  <InputWrapper
+    class="psiw"
+    rounded
+    :icon="SearchIcon"
+    iconPos="left"
+    v-click-away="onClickAway"
+    v-arrow-navigation
+  >
     <TextInput
       placeholder="Поиск товара"
       v-model="searchValue"
       @focus="onInputFocus"
-      @blur="onInputBlur"
       @keyup.enter="onKeyupEnter"
     />
     <Transition name="drop-down">
@@ -38,6 +44,8 @@
 </template>
 
 <script setup lang="ts">
+import vClickAway from '~/directives/vClickAway'
+import { vArrowNavigation } from '~/directives/vArrowNavigation'
 import InputWrapper from '~/components/_UI/FormElements/InputWrapper.vue'
 import TextInput from '~/components/_UI/FormElements/TextInput.vue'
 import SearchIcon from '~/assets/images/icons/search.svg'
@@ -81,7 +89,7 @@ function onResultClick() {
 function onInputFocus() {
   inputFocused.value = true
 }
-function onInputBlur() {
+function onClickAway() {
   inputFocused.value = false
 }
 async function onKeyupEnter() {

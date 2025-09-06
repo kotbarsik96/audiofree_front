@@ -191,8 +191,16 @@ const className = computed(() => {
         border-bottom: 0;
       }
 
-      &:hover {
+      &:hover,
+      &:focus,
+      &:has(a:hover),
+      &:has(a:focus) {
         background-color: var(--stroke);
+      }
+
+      &:focus,
+      a:focus {
+        outline: none;
       }
     }
   }
