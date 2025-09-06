@@ -20,15 +20,10 @@
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import DeliveryPaymentCards from '~/components/SystemPages/DeliveryPayment/_UI/DeliveryPaymentCards.vue'
 import PaymentMethods from '~/components/SystemPages/DeliveryPayment/_Blocks/PaymentMethods.vue'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
+import { deliveryPaymentBreadcrumbs } from '~/domain/breadcrumbs/pages'
 
-const { setBreadcrumbs } = useBreadcrumbs()
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Доставка и оплата',
-    link: { name: 'DeliveryPaymentPage' },
-  },
-])
+useBreadcrumbs(deliveryPaymentBreadcrumbs)
 
 const { data } = await useAPI<{ data: IPageSeo }>('page/delivery-payment')
 usePageMeta(data)

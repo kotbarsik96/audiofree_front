@@ -59,27 +59,19 @@
 <script setup lang="ts">
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import OrderProduct from '~/components/Orders/_UI/OrderProduct.vue'
+import { orderBreadcrumbs } from '~/domain/breadcrumbs/pages/order'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
 import type { IOrder } from '~/domain/order/interfaces/IOrder'
 import { deliveryPlacesMap } from '~/domain/order/types/TDeliveryPlaces'
 
 const route = useRoute()
 
-const { setBreadcrumbs } = useBreadcrumbs()
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Ваши заказы',
-    link: { name: 'OrdersPage' },
-  },
-  {
-    index: 3,
-    label: `Заказ № ${route.params.id}`,
-    link: { name: 'OrderPage' },
-  },
-])
+const orderId = computed(() => route.params.id as string)
+
+useBreadcrumbs(orderBreadcrumbs(orderId), orderId)
 
 const [{ data: order }, { data: pageSeoData }] = await Promise.all([
-  useAPI<{ data: IOrder }>(`/order/single/${route.params.id}`, {
+  useAPI<{ data: IOrder }>(`/order/single/${orderId.value}`, {
     credentials: 'include',
   }),
   useAPI<{ data: IPageSeo }>('page/order'),

@@ -11,15 +11,10 @@
 <script setup lang="ts">
 import FavoritesPageMain from '~/components/SystemPages/Favorites/_Blocks/FavoritesPageMain.vue'
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
+import { favoritesBreadcrumbs } from '~/domain/breadcrumbs/pages'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
 
-const { setBreadcrumbs } = useBreadcrumbs()
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Избранное',
-    link: { name: 'FavoritesPage' },
-  },
-])
+useBreadcrumbs(favoritesBreadcrumbs)
 </script>
 
 <style lang="scss" scoped>

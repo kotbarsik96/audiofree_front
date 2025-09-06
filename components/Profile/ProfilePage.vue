@@ -14,15 +14,10 @@ import ProfileUserInfo from '~/components/Profile/_Blocks/ProfileUserInfo.vue'
 import ProfilePassword from '~/components/Profile/_Blocks/ProfilePassword.vue'
 import ProfileEmail from '~/components/Profile/_Blocks/ProfileEmail.vue'
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
+import { profileBreadcrumbs } from '~/domain/breadcrumbs/pages'
 
-const { setBreadcrumbs } = useBreadcrumbs()
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Профиль',
-    link: { name: 'ProfilePage' },
-  },
-])
+useBreadcrumbs(profileBreadcrumbs)
 
 const { data } = await useAPI<{ data: IPageSeo }>('page/profile')
 usePageMeta(data)

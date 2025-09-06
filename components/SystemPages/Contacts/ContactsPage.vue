@@ -24,15 +24,10 @@
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import ContactsList from '~/components/SystemPages/Contacts/_Blocks/ContactsList.vue'
 import SupportChatUser from '~/components/Support/SupportChat/_Blocks/SupportChatUser.vue'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
+import { contactsBreadcrumbs } from '~/domain/breadcrumbs/pages'
 
-const { setBreadcrumbs } = useBreadcrumbs()
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Контакты',
-    link: { name: 'ContactsPage' },
-  },
-])
+useBreadcrumbs(contactsBreadcrumbs)
 
 const { data } = await useAPI<{ data: IPageSeo }>('page/contacts')
 usePageMeta(data)

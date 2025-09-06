@@ -15,24 +15,14 @@
 import OrderForm from '~/components/Orders/NewOrder/_Blocks/OrderForm.vue'
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import SuccessfullyCreatedOrder from '~/components/Orders/NewOrder/_Blocks/SuccessfullyCreatedOrder.vue'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
+import { newOrderBreadcrumbs } from '~/domain/breadcrumbs/pages/order'
 
 const isCreated = ref(false)
 
 const { updateCollection } = useProductCollectionsStore()
 
-const { setBreadcrumbs } = useBreadcrumbs()
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Корзина',
-    link: { name: 'CartPage' },
-  },
-  {
-    index: 3,
-    label: 'Оформление заказа',
-    link: { name: 'NewOrderPage' },
-  },
-])
+useBreadcrumbs(newOrderBreadcrumbs)
 
 watch(isCreated, () => {
   window.scrollTo({ top: 0 })

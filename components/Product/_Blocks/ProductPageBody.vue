@@ -104,18 +104,16 @@ import HeartIcon from '~/assets/images/icons/heart.svg'
 import type { IProductData } from '~/domain/product/types/IProductData'
 import { useCart } from '~/domain/product/collections/cart/useCart'
 import { useFavorites } from '~/domain/product/collections/favorites/useFavorites'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
+import { productBreadcrumbs } from '~/domain/breadcrumbs/pages/product'
 
 const router = useRouter()
 const route = useRoute()
-
-const { setBreadcrumbs, breadCrumbs } = useBreadcrumbs()
 
 const productCollectionsStore = useProductCollectionsStore()
 const { cartCollection, favoritesCollection } = storeToRefs(
   productCollectionsStore
 )
-
-setBreadcrumbs(breadCrumbs.value)
 
 const { addToCart, updateQuantity, deleteCartItem } = useCart()
 
@@ -156,25 +154,9 @@ const oldPrice = computed(() =>
 )
 const { addToFavorites, deleteFavoriteByVariation } = useFavorites()
 
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Каталог',
-    link: { name: 'CatalogPage' },
-  },
-  {
-    index: 3,
-    label: `${product.value?.brand.value + ' ' || ''}${product.value?.name} (${
-      variation.value?.name
-    })`,
-    link: {
-      name: 'ProductPage',
-      params: {
-        product: product.value?.slug,
-        variation: variation.value?.slug,
-      },
-    },
-  },
+useBreadcrumbs(productBreadcrumbs(product, variation), () => [
+  product,
+  variation,
 ])
 
 const isLoadingCart = ref(false)

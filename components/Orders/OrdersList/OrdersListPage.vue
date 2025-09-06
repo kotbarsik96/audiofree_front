@@ -38,15 +38,10 @@ import SearchIcon from '~/assets/images/icons/search.svg'
 import type { IOrderListItem } from '~/domain/order/interfaces/IOrderListItem'
 import type ISelectOption from '~/interfaces/components/ISelectOption'
 import { useSorts } from '~/domain/product/useSorts'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
+import { ordersListBreadcrumbs } from '~/domain/breadcrumbs/pages/order'
 
-const { setBreadcrumbs } = useBreadcrumbs()
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Ваши заказы',
-    link: { name: 'OrdersPage' },
-  },
-])
+useBreadcrumbs(ordersListBreadcrumbs)
 
 const intersectionEl = ref<HTMLElement>()
 

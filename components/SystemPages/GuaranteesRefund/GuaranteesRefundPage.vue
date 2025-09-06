@@ -15,15 +15,10 @@
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import GRefundPageInfo from '~/components/SystemPages/GuaranteesRefund/_Blocks/GRefundPageInfo.vue'
 import GRefundPageSteps from '~/components/SystemPages/GuaranteesRefund/_Blocks/GRefundPageSteps.vue'
+import { guaranteesRefundBreadcrumbs } from '~/domain/breadcrumbs/pages'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
 
-const { setBreadcrumbs } = useBreadcrumbs()
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Гарантия и возврат',
-    link: { name: 'GuaranteesRefundPage' },
-  },
-])
+useBreadcrumbs(guaranteesRefundBreadcrumbs)
 
 const { data } = await useAPI<{ data: IPageSeo }>('page/warranty-returns')
 usePageMeta(data)

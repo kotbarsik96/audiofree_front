@@ -60,21 +60,15 @@ import ProductSearchResult from '~/components/Search/ProductSearch/_UI/ProductSe
 import SpinnerLoader from '~/components/_UI/Loaders/SpinnerLoader.vue'
 import AFPagination from '~/components/_UI/AFPagination.vue'
 import { useRouteQuery } from '@vueuse/router'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
+import { searchBreadcrumbs } from '~/domain/breadcrumbs/pages'
 
-const { setBreadcrumbs } = useBreadcrumbs()
+useBreadcrumbs(searchBreadcrumbs)
 
 const searchValue = useRouteQuery<string>('search')
 const page = useRouteQuery<number>('page', 1, {
   transform: Number,
 })
-
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Поиск',
-    link: { name: 'SearchPage' },
-  },
-])
 
 const {
   executeSearchWithDelay,

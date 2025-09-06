@@ -39,6 +39,8 @@ import type ISelectOption from '~/interfaces/components/ISelectOption'
 import type { IFilterItem } from '~/domain/product/types/IFilterItem'
 import type ICatalogProduct from '~/domain/product/types/ICatalogProduct'
 import type IPagination from '~/dataAccess/api/IPagination'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
+import { catalogBreadcrumbs } from '~/domain/breadcrumbs/pages'
 
 const route = useRoute()
 const urlQuery = computed(() => {
@@ -54,14 +56,7 @@ const urlQuery = computed(() => {
 
 const mainEl = ref<HTMLElement>()
 
-const { setBreadcrumbs } = useBreadcrumbs()
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Каталог',
-    link: { name: 'CatalogPage' },
-  },
-])
+useBreadcrumbs(catalogBreadcrumbs)
 
 const [
   { data: sortsData },

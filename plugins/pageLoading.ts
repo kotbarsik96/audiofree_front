@@ -1,7 +1,6 @@
 import { useGlobalStore } from '#imports'
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const { setPendingBreadcrumbs, breadCrumbs } = useBreadcrumbs()
   const { pageIsLoading } = storeToRefs(useGlobalStore())
 
   nuxtApp.hook('page:start', () => {
@@ -9,6 +8,5 @@ export default defineNuxtPlugin((nuxtApp) => {
   })
   nuxtApp.hook('page:finish', () => {
     pageIsLoading.value = false
-    setPendingBreadcrumbs(breadCrumbs.value)
   })
 })

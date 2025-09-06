@@ -13,15 +13,10 @@
 <script setup lang="ts">
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import CartList from '~/components/Cart/_Blocks/CartList.vue'
+import { cartBreadcrumbs } from '~/domain/breadcrumbs/pages'
+import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
 
-const { setBreadcrumbs } = useBreadcrumbs()
-setBreadcrumbs([
-  {
-    index: 2,
-    label: 'Корзина',
-    link: { name: 'CartPage' },
-  },
-])
+useBreadcrumbs(cartBreadcrumbs)
 </script>
 
 <style lang="scss" scoped>

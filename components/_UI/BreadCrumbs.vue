@@ -1,23 +1,23 @@
 <template>
   <ul class="breadcrumbs">
-    <li v-for="(item, index) in breadCrumbs">
+    <li v-for="(item, index) in breadcrumbs">
       <NuxtLink
-        v-if="index !== breadCrumbs.length - 1"
+        v-if="index !== breadcrumbs.length - 1"
         class="breadcrumbs__link _link"
         :to="item.link"
         tabindex="0"
       >
-        {{ item.label }}
+        {{ item.title }}
       </NuxtLink>
-      <span v-else> {{ item.label }} </span>
+      <span v-else> {{ item.title }} </span>
     </li>
   </ul>
 </template>
 
 <script setup lang="ts">
-import { useBreadcrumbs } from '#imports'
+import { getBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
 
-const { breadCrumbs } = useBreadcrumbs()
+const breadcrumbs = getBreadcrumbs()
 </script>
 
 <style lang="scss" scoped>
