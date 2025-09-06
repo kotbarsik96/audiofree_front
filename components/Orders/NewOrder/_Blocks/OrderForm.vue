@@ -134,7 +134,7 @@ const savedData = useCookie<Record<string, any>>('creating_order', {
   default: () => ({}),
 })
 
-const isOneclick = computed(() => route.query.oneclick === '1')
+const isOneclick = computed(() => route.query.is_oneclick === '1')
 
 const { data: creationData } = await useAPI<{ data: ICreationOrderData }>(
   '/order/creation-data',
