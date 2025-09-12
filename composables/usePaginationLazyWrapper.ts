@@ -8,7 +8,7 @@ export type PaginationLazyWrapperOptions<T> = UseFetchOptions<{
   NitroFetchOptions<string>
 
 export async function usePaginationLazyWrapper<T>(
-  intersectionEl: Ref<HTMLElement | undefined>,
+  intersectionEl: Ref<HTMLElement | undefined | null>,
   url: string,
   options: PaginationLazyWrapperOptions<T>
 ) {

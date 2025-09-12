@@ -11,7 +11,6 @@
             <ContactsList />
           </div>
           <div class="contacts__box-chat">
-            <!-- в разработке... -->
             <SupportChatUser />
           </div>
         </div>
@@ -23,7 +22,7 @@
 <script setup lang="ts">
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import ContactsList from '~/components/SystemPages/Contacts/_Blocks/ContactsList.vue'
-import SupportChatUser from '~/components/Support/SupportChat/_Blocks/SupportChatUser.vue'
+import SupportChatUser from '~/components/Support/_UI/SupportChat/SupportChatUser.vue'
 import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
 import { contactsBreadcrumbs } from '~/domain/breadcrumbs/pages'
 
@@ -71,7 +70,7 @@ usePageMeta(data)
 
   &__box-chat {
     flex: 1 1 auto;
-    padding: var(--cp-padding-y) var(--cp-padding-x);
+    padding: var(--cp-padding-y) 0;
     padding-left: 0;
   }
 
