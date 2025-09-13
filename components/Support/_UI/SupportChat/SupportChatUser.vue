@@ -1,32 +1,44 @@
 <template>
-  <div class="schat-user" :class="{ '--first-loading': !isMounted }">
+  <div
+    class="schat-user"
+    :class="{
+      '--first-loading': !isMounted,
+      '--scrolled-recently': wasScrolledRecently,
+      '--sending': sending,
+    }"
+  >
     <div v-if="!!user" class="chat">
-      <div class="chat-groups" ref="chatGroupsElement">
-        <div v-show="isMounted" class="spy" ref="spyElement"></div>
-        <div v-for="(item, i) in formattedList" :key="i" class="dated-group">
-          <div class="group-date">{{ formatMonthAndYear(item.date) }}</div>
-          <div
-            v-for="group in item.groups"
-            class="messages-group"
-            :class="{ '--right-sided': group[0].by_user }"
-          >
-            <div class="mg-avatar">
-              <UserIcon v-if="group[0].by_user" />
-              <OperatorIcon v-else />
+      <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
+        <div v-if="isMounted" class="chat-groups">
+          <div class="spy" ref="spyElement"></div>
+          <div v-for="(item, i) in formattedList" :key="i" class="dated-group">
+            <div class="group-date">
+              {{ formatMonthAndYear(item.date) }}
             </div>
-            <div class="mg-messages">
-              <SupportChatMessage
-                v-for="(message, mIndex) in group"
-                :key="message.id"
-                :message="message"
-                :is-first="mIndex === 0"
-                user-pov
-              />
+            <div
+              v-for="group in item.groups"
+              class="messages-group"
+              :class="{ '--right-sided': group[0].by_user }"
+            >
+              <div class="mg-avatar">
+                <UserIcon v-if="group[0].by_user" />
+                <OperatorIcon v-else />
+              </div>
+              <div class="mg-messages">
+                <SupportChatMessage
+                  v-for="(message, mIndex) in group"
+                  :key="message.id"
+                  :message="message"
+                  :is-first="mIndex === 0"
+                  user-pov
+                />
+              </div>
             </div>
           </div>
         </div>
+        <SupportChatSkeleton v-else class="chat-skeleton" />
       </div>
-      <SupportChatInput class="chat-input" @send="send" />
+      <SupportChatInput class="chat-input" v-model="newMessage" @send="send" />
     </div>
     <LoginToUseSupport v-else />
   </div>
@@ -36,23 +48,27 @@
 import LoginToUseSupport from '~/components/Support/_UI/SupportChat/LoginToUseSupport.vue'
 import SupportChatInput from '~/components/Support/_UI/SupportChat/SupportChatInput.vue'
 import SupportChatMessage from '~/components/Support/_UI/SupportChat/SupportChatMessage.vue'
-import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
 import OperatorIcon from '~/assets/images/icons/operator.svg'
 import UserIcon from '~/assets/images/icons/user.svg'
-import type IPagination from '~/dataAccess/api/IPagination'
 import { useSupportChat } from '~/domain/chats/support-chat/useSupportChat'
+import SupportChatSkeleton from '~/components/Support/_UI/SupportChat/SupportChatSkeleton.vue'
 
 const { $echo } = useNuxtApp()
 
 const { user } = useSanctumAuth()
 
 const spyElement = useTemplateRef<HTMLElement>('spyElement')
-const chatGroupsElement = useTemplateRef<HTMLElement>('chatGroupsElement')
+const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 
-const { formattedList, isMounted, send, sending } = useSupportChat(
-  spyElement,
-  chatGroupsElement
-)
+const {
+  formattedList,
+  isMounted,
+  send,
+  sending,
+  onChatBodyScroll,
+  wasScrolledRecently,
+  newMessage,
+} = useSupportChat(spyElement, chatBodyElement)
 </script>
 
 <style lang="scss" scoped>
@@ -91,10 +107,13 @@ const { formattedList, isMounted, send, sending } = useSupportChat(
     position: relative;
   }
 
-  .chat-groups {
-    padding: var(--chat-padding-block) var(--chat-padding-inline);
+  .chat-body {
     overflow: auto;
     max-height: 400px;
+    padding: var(--chat-padding-block) var(--chat-padding-inline);
+  }
+
+  .chat-groups {
     position: relative;
   }
 
@@ -111,6 +130,15 @@ const { formattedList, isMounted, send, sending } = useSupportChat(
     top: 0;
     border-radius: 8px;
     align-self: center;
+    background-color: var(--gray-200);
+    padding: 0.15rem 0.5rem;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    transition: var(--general-transition);
+
+    &:not(.--intersected) {
+      opacity: 0;
+      pointer-events: none;
+    }
   }
 
   .messages-group {
@@ -153,18 +181,26 @@ const { formattedList, isMounted, send, sending } = useSupportChat(
     pointer-events: none;
   }
 
-  .chat-input {
-  }
-
   &.--first-loading {
     .chat {
       pointer-events: none;
       opacity: 0.25;
     }
+  }
 
+  &.--first-loading,
+  &.--sending {
     .chat-input {
       pointer-events: none;
       opacity: 0.5;
+    }
+  }
+
+  &.--scrolled-recently {
+    .group-date,
+    .group-date:not(.--intersected) {
+      opacity: 1;
+      pointer-events: auto;
     }
   }
 }

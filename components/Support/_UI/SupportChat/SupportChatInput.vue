@@ -4,6 +4,7 @@
       <TextInput
         v-model="message"
         placeholder="Опишите проблему или задайте вопрос"
+        @keyup.enter="send"
       />
       <button class="send-button" type="button" @click="send">
         <SendIcon />
@@ -18,13 +19,13 @@ import TextInput from '~/components/_UI/FormElements/TextInput.vue'
 import SendIcon from '~/assets/images/icons/send.svg'
 
 const emit = defineEmits<{
-  (e: 'send', message: string): void
+  (e: 'send'): void
 }>()
 
-const message = ref('')
+const message = defineModel({ type: String })
 
 function send() {
-  emit('send', message.value)
+  emit('send')
 }
 </script>
 
