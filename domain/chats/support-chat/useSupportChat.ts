@@ -20,25 +20,25 @@ export function useSupportChat(
   const wasScrolledRecently = ref(false)
   let wasScrolledRecentlyTimeout: ReturnType<typeof setTimeout>
 
-  const { execute: _loadMore } = useAPI<IPagination<ISupportChatMessage[]>>(
-    'support-chat/user/history',
-    {
-      credentials: 'include',
-      query: {
-        page,
-      },
-      immediate: false,
-      watch: false,
-      onResponse({ response }) {
-        const messages = response._data?.data.data as ISupportChatMessage[]
+  const { data: paginationData, execute: _loadNextPage } = useAPI<
+    IPagination<ISupportChatMessage[]>
+  >('support-chat/user/history', {
+    credentials: 'include',
+    query: {
+      page,
+    },
+    immediate: false,
+    watch: false,
+    onResponse({ response }) {
+      const messages = response._data?.data as ISupportChatMessage[]
 
-        if (response.ok && messages) {
-          messages.forEach((message) => _prependMessage(message))
-          page.value += 1
-        }
-      },
-    }
-  )
+      if (response.ok && messages) {
+        messages.forEach((message) => _prependMessage(message))
+        const lastPage = paginationData.value?.last_page
+        if (!lastPage || page.value <= lastPage) page.value += 1
+      }
+    },
+  })
 
   let spyObserver: IntersectionObserver
 
@@ -46,11 +46,11 @@ export function useSupportChat(
     await _loadMore()
 
     _scrollChatBodyToBottom()
-    _initSpy()
 
     isMounted.value = true
     await nextTick()
     _scrollChatBodyToBottom()
+    _initSpy()
   })
 
   onUnmounted(() => {
@@ -72,8 +72,15 @@ export function useSupportChat(
     }
   }
 
-  function _intersectionCallback() {
-    _loadMore()
+  function _intersectionCallback(entries: IntersectionObserverEntry[]) {
+    if (entries.find((entry) => entry.isIntersecting)) _loadMore()
+  }
+
+  async function _loadMore() {
+    const lastPage = paginationData.value?.last_page
+    if (lastPage && page.value > lastPage) return
+
+    await _loadNextPage()
   }
 
   function _prependMessage(message: ISupportChatMessage) {
@@ -143,7 +150,7 @@ export function useSupportChat(
         if (response.ok && message) {
           newMessage.value = ''
           _appendMessage(message)
-          
+
           await nextTick()
           _scrollChatBodyToBottom()
         }

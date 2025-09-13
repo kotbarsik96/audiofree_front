@@ -9,8 +9,8 @@
   >
     <div v-if="!!user" class="chat">
       <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
-        <div v-if="isMounted" class="chat-groups">
-          <div class="spy" ref="spyElement"></div>
+        <div class="chat-groups">
+          <div v-show="isMounted" class="spy" ref="spyElement"></div>
           <div v-for="(item, i) in formattedList" :key="i" class="dated-group">
             <div class="group-date">
               {{ formatMonthAndYear(item.date) }}
@@ -36,7 +36,6 @@
             </div>
           </div>
         </div>
-        <SupportChatSkeleton v-else class="chat-skeleton" />
       </div>
       <SupportChatInput class="chat-input" v-model="newMessage" @send="send" />
     </div>
