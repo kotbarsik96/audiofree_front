@@ -20,9 +20,11 @@ export function useSupportChat(
   const wasScrolledRecently = ref(false)
   let wasScrolledRecentlyTimeout: ReturnType<typeof setTimeout>
 
-  const { data: paginationData, execute: _loadNextPage } = useAPI<
-    IPagination<ISupportChatMessage[]>
-  >('support-chat/user/history', {
+  const {
+    data: paginationData,
+    execute: _loadNextPage,
+    status,
+  } = useAPI<IPagination<ISupportChatMessage[]>>('support-chat/user/history', {
     credentials: 'include',
     query: {
       page,
@@ -79,6 +81,7 @@ export function useSupportChat(
   async function _loadMore() {
     const lastPage = paginationData.value?.last_page
     if (lastPage && page.value > lastPage) return
+    if (status.value === 'pending') return
 
     await _loadNextPage()
   }
@@ -177,5 +180,6 @@ export function useSupportChat(
     newMessage,
     send,
     onChatBodyScroll,
+    status,
   }
 }

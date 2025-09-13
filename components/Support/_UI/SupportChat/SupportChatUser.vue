@@ -10,6 +10,7 @@
     <div v-if="!!user" class="chat">
       <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
         <div class="chat-groups">
+          <SupportChatSkeleton v-if="status === 'pending'" />
           <div v-show="isMounted" class="spy" ref="spyElement"></div>
           <div v-for="(item, i) in formattedList" :key="i" class="dated-group">
             <div class="group-date">
@@ -67,6 +68,7 @@ const {
   onChatBodyScroll,
   wasScrolledRecently,
   newMessage,
+  status,
 } = useSupportChat(spyElement, chatBodyElement)
 </script>
 
@@ -100,6 +102,7 @@ const {
 
   .chat {
     width: 100%;
+    height: 100%;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;
@@ -170,7 +173,7 @@ const {
 
   .spy {
     position: absolute;
-    top: 0;
+    top: 200px;
     left: 0;
     right: 0;
     opacity: 0;
