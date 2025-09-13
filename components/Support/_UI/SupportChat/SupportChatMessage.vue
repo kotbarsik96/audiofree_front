@@ -47,13 +47,14 @@ const classes = computed(() => ({
 
   .author-name {
     font: var(--text-16);
+    font-weight: 600;
     color: var(--gray-800);
     margin-block-end: 0.5rem;
   }
 
   .message {
-    font: var(--text-16);
-    color: var(--gray-800);
+    font: var(--text-14);
+    color: var(--gray-700);
   }
 
   .time {

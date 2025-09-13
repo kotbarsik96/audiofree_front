@@ -70,8 +70,6 @@ usePageMeta(data)
 
   &__box-chat {
     flex: 1 1 auto;
-    padding: var(--cp-padding-y) 0;
-    padding-left: 0;
   }
 
   @include mixins.adaptive(tablet-big) {

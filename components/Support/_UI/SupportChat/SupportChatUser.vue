@@ -1,13 +1,9 @@
 <template>
-  <div class="schat-user">
+  <div class="schat-user" :class="{ '--first-loading': !isMounted }">
     <div v-if="!!user" class="chat">
-      <div class="chat-groups">
-        <div class="spy" ref="spyElement"></div>
-        <div
-          v-for="(item, i) in datedMessagesGroups"
-          :key="i"
-          class="dated-group"
-        >
+      <div class="chat-groups" ref="chatGroupsElement">
+        <div v-show="isMounted" class="spy" ref="spyElement"></div>
+        <div v-for="(item, i) in formattedList" :key="i" class="dated-group">
           <div class="group-date">{{ formatMonthAndYear(item.date) }}</div>
           <div
             v-for="group in item.groups"
@@ -43,71 +39,27 @@ import SupportChatMessage from '~/components/Support/_UI/SupportChat/SupportChat
 import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
 import OperatorIcon from '~/assets/images/icons/operator.svg'
 import UserIcon from '~/assets/images/icons/user.svg'
+import type IPagination from '~/dataAccess/api/IPagination'
+import { useSupportChat } from '~/domain/chats/support-chat/useSupportChat'
 
 const { $echo } = useNuxtApp()
 
 const { user } = useSanctumAuth()
 
-const { $afFetch } = useNuxtApp()
-
 const spyElement = useTemplateRef<HTMLElement>('spyElement')
+const chatGroupsElement = useTemplateRef<HTMLElement>('chatGroupsElement')
 
-const sending = ref(false)
-
-const [{ list: messages }] = await Promise.all([
-  usePaginationLazyWrapper<ISupportChatMessage>(
-    spyElement,
-    'support-chat/user/history',
-    {
-      credentials: 'include',
-    }
-  ),
-])
-
-const datedMessagesGroups = computed(() => {
-  const formatted: { date: string; groups: ISupportChatMessage[][] }[] = []
-
-  let currentGroupDayAndMonth: string = ''
-  messages.value.reverse().forEach((message) => {
-    const date = new Date(message.created_at)
-    const messageDayAndMonth = `${date.getDate()}.${date.getMonth()}`
-    if (messageDayAndMonth !== currentGroupDayAndMonth)
-      formatted.push({ date: message.created_at, groups: [] })
-
-    const groups = formatted[formatted.length - 1].groups
-    let lastGroup = groups[groups.length - 1]
-    if (!lastGroup) {
-      lastGroup = []
-      groups.push(lastGroup)
-    }
-    const lastMessage = lastGroup[lastGroup.length - 1]
-    if (lastMessage && lastMessage.by_user !== message.by_user)
-      groups.push([message])
-    else lastGroup.push(message)
-
-    currentGroupDayAndMonth = messageDayAndMonth
-  })
-
-  return formatted
-})
-
-async function send(message: string) {
-  sending.value = true
-
-  await $afFetch('support-chat/user/message', {
-    method: 'POST',
-    credentials: 'include',
-    body: {
-      message,
-    },
-  })
-
-  sending.value = false
-}
+const { formattedList, isMounted, send, sending } = useSupportChat(
+  spyElement,
+  chatGroupsElement
+)
 </script>
 
 <style lang="scss" scoped>
 .schat-user {
+  --chat-padding-block: 1rem;
+  --chat-padding-inline: 1rem;
+
   width: 100%;
   height: 100%;
   display: flex;
@@ -136,14 +88,18 @@ async function send(message: string) {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;
+    position: relative;
   }
 
   .chat-groups {
+    padding: var(--chat-padding-block) var(--chat-padding-inline);
     overflow: auto;
     max-height: 400px;
+    position: relative;
   }
 
   .dated-group {
+    padding-block-start: 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.625rem;
@@ -169,6 +125,7 @@ async function send(message: string) {
         position: sticky;
         top: 0;
         width: 1.5rem;
+        height: auto;
         aspect-ratio: 1;
       }
     }
@@ -197,6 +154,18 @@ async function send(message: string) {
   }
 
   .chat-input {
+  }
+
+  &.--first-loading {
+    .chat {
+      pointer-events: none;
+      opacity: 0.25;
+    }
+
+    .chat-input {
+      pointer-events: none;
+      opacity: 0.5;
+    }
   }
 }
 </style>
