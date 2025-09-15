@@ -1,0 +1,133 @@
+.schat {
+  --chat-padding-block: 1rem;
+  --chat-padding-inline: 1rem;
+
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .in-development {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    align-items: center;
+    text-align: center;
+    font: var(--text-18);
+    font-weight: 500;
+
+    .icon {
+      width: 5rem;
+      height: 5rem;
+    }
+  }
+
+  .chat {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    position: relative;
+  }
+
+  .chat-body {
+    overflow: auto;
+    height: 400px;
+    padding: var(--chat-padding-block) var(--chat-padding-inline);
+  }
+
+  .chat-groups {
+    position: relative;
+  }
+
+  .dated-group {
+    padding-block-start: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    position: relative;
+  }
+
+  .group-date {
+    position: sticky;
+    top: 0;
+    border-radius: 8px;
+    align-self: center;
+    background-color: var(--gray-200);
+    padding: 0.15rem 0.5rem;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    transition: var(--general-transition);
+
+    &:not(.--intersected) {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  .messages-group {
+    display: flex;
+    gap: 0.625rem;
+
+    .mg-avatar {
+      position: relative;
+      flex-shrink: 0;
+
+      svg {
+        position: sticky;
+        top: 0;
+        width: 1.5rem;
+        height: auto;
+        aspect-ratio: 1;
+      }
+    }
+
+    .mg-messages {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+
+    &.--right-sided {
+      flex-direction: row-reverse;
+    }
+  }
+
+  .spy {
+    position: absolute;
+    top: 400px;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    width: 100%;
+    height: 1px;
+    z-index: -999;
+    pointer-events: none;
+  }
+
+  &.--first-loading {
+    .chat {
+      pointer-events: none;
+      opacity: 0.25;
+    }
+  }
+
+  &.--first-loading,
+  &.--input-disabled {
+    .chat-input {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+  }
+
+  &.--scrolled-recently {
+    .group-date,
+    .group-date:not(.--intersected) {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}

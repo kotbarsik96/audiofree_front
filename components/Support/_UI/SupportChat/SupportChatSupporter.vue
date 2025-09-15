@@ -44,29 +44,33 @@
       </div>
       <SupportChatInput class="chat-input" v-model="newMessage" @send="send" />
     </div>
-    <LoginToUseSupport v-else />
   </div>
 </template>
 
 <script setup lang="ts">
-import LoginToUseSupport from '~/components/Support/_UI/SupportChat/LoginToUseSupport.vue'
 import SupportChatInput from '~/components/Support/_UI/SupportChat/SupportChatInput.vue'
 import SupportChatMessage from '~/components/Support/_UI/SupportChat/SupportChatMessage.vue'
 import OperatorIcon from '~/assets/images/icons/operator.svg'
 import UserIcon from '~/assets/images/icons/user.svg'
 import { useSupportChat } from '~/domain/chats/support-chat/useSupportChat'
 import SupportChatSkeleton from '~/components/Support/_UI/SupportChat/SupportChatSkeleton.vue'
-import { SupportChatUser } from '~/domain/chats/support-chat/SupportChatUser'
+import { SupportChatSupporter } from '~/domain/chats/support-chat/SupportChatSupporter'
 
 const { $echo, $afFetch } = useNuxtApp()
+
+const route = useRoute()
 
 const { user } = useSanctumAuth()
 
 const spyElement = useTemplateRef<HTMLElement>('spyElement')
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 
-const supportChat = new SupportChatUser($afFetch)
-const { formattedMessages, loadHistoryStatus } = supportChat
+const supportChat = new SupportChatSupporter(
+  $afFetch,
+  () => route.params.chat_user_id as string
+)
+
+const { newMessage, formattedMessages, loadHistoryStatus } = supportChat
 
 const {
   isMounted,
@@ -74,10 +78,9 @@ const {
   inputDisabled,
   onChatBodyScroll,
   wasScrolledRecently,
-  newMessage,
 } = useSupportChat(spyElement, chatBodyElement, supportChat)
 </script>
 
 <style lang="scss" scoped>
-@use '/css/components/SupportChat.scss';
+@use '/css/mixins/mixins.scss';
 </style>
