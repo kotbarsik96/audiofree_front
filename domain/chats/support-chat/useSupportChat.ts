@@ -5,8 +5,6 @@ export function useSupportChat(
   chatBodyElement: Ref<HTMLElement | null>,
   supportChat: ISupportChat
 ) {
-  const newMessage = ref('')
-
   const inputDisabled = ref(false)
   const isMounted = ref(false)
 
@@ -19,10 +17,7 @@ export function useSupportChat(
   let spyObserver: IntersectionObserver
 
   onMounted(async () => {
-    await _loadMore()
-
     _scrollChatBodyToBottom()
-
     isMounted.value = true
     await nextTick()
     _scrollChatBodyToBottom()
@@ -63,11 +58,13 @@ export function useSupportChat(
   async function send() {
     inputDisabled.value = true
 
-    const sent = await sendMessage()
-    if (sent) {
-      await nextTick()
-      _scrollChatBodyToBottom()
-    }
+    try {
+      const sent = await sendMessage()
+      if (sent) {
+        await nextTick()
+        _scrollChatBodyToBottom()
+      }
+    } catch (e) {}
 
     inputDisabled.value = false
   }
@@ -85,7 +82,6 @@ export function useSupportChat(
     inputDisabled,
     isMounted,
     wasScrolledRecently,
-    newMessage,
     send,
     onChatBodyScroll,
     loadHistoryStatus,

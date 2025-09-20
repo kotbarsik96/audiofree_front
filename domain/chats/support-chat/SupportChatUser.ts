@@ -6,19 +6,20 @@ import type { ISupportChat } from '~/domain/chats/support-chat/interfaces/ISuppo
 import type { AsyncDataRequestStatus } from '#app'
 
 export class SupportChatUser extends SupportChat implements ISupportChat {
-  public page: Ref<number> = ref(0)
+  public page: Ref<number> = ref(1)
   public paginationData: Ref<IPagination<ISupportChatMessage[]> | null>
   public loadHistory: () => Promise<void>
-  public fetch: typeof $fetch
   public newMessage: Ref<string>
   public loadHistoryStatus: Ref<AsyncDataRequestStatus>
+  public error: Ref
 
   constructor(fetch: typeof $fetch) {
-    super()
+    super(fetch)
     this.sendMessage = this.sendMessage.bind(this)
 
     const {
       data: paginationData,
+      error,
       execute: loadHistory,
       status,
     } = useAPI<IPagination<ISupportChatMessage[]>>(
@@ -44,9 +45,9 @@ export class SupportChatUser extends SupportChat implements ISupportChat {
 
     this.paginationData = paginationData
     this.loadHistory = loadHistory.bind(this)
-    this.fetch = fetch
     this.newMessage = ref('')
     this.loadHistoryStatus = status
+    this.error = error
   }
 
   public async sendMessage() {
@@ -59,15 +60,21 @@ export class SupportChatUser extends SupportChat implements ISupportChat {
         message: this.newMessage.value,
       },
       onResponse: async ({ response }) => {
-        const message = response._data.data.message as ISupportChatMessage
+        const message = response._data.data?.message as
+          | ISupportChatMessage
+          | undefined
         if (response.ok && message) {
           responseOk = true
           this.appendMessage(message)
           this.newMessage.value = ''
         }
       },
-      onResponseError() {
+      onResponseError: () => {
         responseOk = false
+        this.notificationsController.addNotification(
+          'error',
+          'Не удалось отправить сообщение'
+        )
       },
     })
 

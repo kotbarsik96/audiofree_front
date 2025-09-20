@@ -4,6 +4,13 @@ import type { ISupportChatBase } from '~/domain/chats/support-chat/interfaces/IS
 
 export class SupportChat implements ISupportChatBase {
   public formattedMessages: Ref<IFormattedSupportChatMessage[]> = ref([])
+  public fetch: typeof $fetch
+  public notificationsController: ReturnType<typeof useNotifications>
+
+  constructor(fetch: typeof $fetch) {
+    this.fetch = fetch
+    this.notificationsController = useNotifications()
+  }
 
   public prependMessage(message: ISupportChatMessage) {
     const messageDateDotted = this.getDottedDate(message.created_at)

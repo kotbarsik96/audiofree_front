@@ -9,7 +9,10 @@
   >
     <div v-if="!!user" class="chat">
       <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
-        <div class="chat-groups">
+        <div
+          v-if="loadHistoryStatus === 'pending' || formattedMessages.length > 0"
+          class="chat-groups"
+        >
           <SupportChatSkeleton v-if="loadHistoryStatus === 'pending'" />
           <div v-show="isMounted" class="spy" ref="spyElement"></div>
           <div
@@ -41,6 +44,12 @@
             </div>
           </div>
         </div>
+        <div v-else class="empty">
+          <SupportIcon class="e-svg" />
+          <p class="e-text">
+            Здесь будет история сообщений с технической поддержкой
+          </p>
+        </div>
       </div>
       <SupportChatInput class="chat-input" v-model="newMessage" @send="send" />
     </div>
@@ -54,6 +63,7 @@ import SupportChatInput from '~/components/Support/_UI/SupportChat/SupportChatIn
 import SupportChatMessage from '~/components/Support/_UI/SupportChat/SupportChatMessage.vue'
 import OperatorIcon from '~/assets/images/icons/operator.svg'
 import UserIcon from '~/assets/images/icons/user.svg'
+import SupportIcon from '~/assets/images/icons/operator.svg'
 import { useSupportChat } from '~/domain/chats/support-chat/useSupportChat'
 import SupportChatSkeleton from '~/components/Support/_UI/SupportChat/SupportChatSkeleton.vue'
 import { SupportChatUser } from '~/domain/chats/support-chat/SupportChatUser'
@@ -66,7 +76,12 @@ const spyElement = useTemplateRef<HTMLElement>('spyElement')
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 
 const supportChat = new SupportChatUser($afFetch)
-const { formattedMessages, loadHistoryStatus } = supportChat
+const { formattedMessages, loadHistoryStatus, newMessage, loadHistory } =
+  supportChat
+
+await loadHistory()
+
+console.log(supportChat);
 
 const {
   isMounted,
@@ -74,10 +89,10 @@ const {
   inputDisabled,
   onChatBodyScroll,
   wasScrolledRecently,
-  newMessage,
 } = useSupportChat(spyElement, chatBodyElement, supportChat)
 </script>
 
 <style lang="scss" scoped>
+@use '/css/mixins/mixins.scss';
 @use '/css/components/SupportChat.scss';
 </style>

@@ -83,7 +83,9 @@ button {
 }
 
 ._section-box {
-  border-radius: 8px;
+  --sb-border-radius: 8px;
+
+  border-radius: var(--sb-border-radius);
   background-color: var(--white);
   box-shadow: 0px 1px 25px rgba(0, 0, 0, 0.06);
 }

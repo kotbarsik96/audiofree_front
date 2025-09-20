@@ -11,6 +11,7 @@
             <p v-else-if="error?.statusCode === ServerStatuses.NOT_FOUND">
               Страница не найдена
             </p>
+            <p v-else>Ошибка: {{ error.message }}</p>
             <p>Вы можете перейти на главную страницу</p>
             <AFButton
               class="error__link"

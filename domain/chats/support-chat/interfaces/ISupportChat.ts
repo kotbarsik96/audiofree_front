@@ -7,6 +7,10 @@ export interface ISupportChatBase {
   /** Список групп сообщений, разделённых датой */
   formattedMessages: Ref<IFormattedSupportChatMessage[]>
 
+  fetch: typeof $fetch
+
+  notificationsController: ReturnType<typeof useNotifications>
+
   /** Вставить сообщение в начало formattedMessages */
   prependMessage: (message: ISupportChatMessage) => void
 
@@ -24,8 +28,6 @@ export interface ISupportChat extends ISupportChatBase {
   /** Информация о пагинации. Получается путём запроса истории */
   paginationData: Ref<IPagination<ISupportChatMessage[]> | null>
 
-  fetch: typeof $fetch
-
   loadHistoryStatus: Ref<AsyncDataRequestStatus>
 
   /** Новое сообщение. Используется в sendMessage */
@@ -36,4 +38,6 @@ export interface ISupportChat extends ISupportChatBase {
 
   /** Отправка нового сообщения, взятого из newMessage */
   sendMessage: () => Promise<boolean>
+  
+  error: Ref
 }

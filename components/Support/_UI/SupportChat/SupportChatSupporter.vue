@@ -1,6 +1,6 @@
 <template>
   <div
-    class="schat"
+    class="schat --supporter"
     :class="{
       '--first-loading': !isMounted,
       '--scrolled-recently': wasScrolledRecently,
@@ -9,7 +9,10 @@
   >
     <div v-if="!!user" class="chat">
       <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
-        <div class="chat-groups">
+        <div
+          v-if="loadHistoryStatus === 'pending' || formattedMessages.length > 0"
+          class="chat-groups"
+        >
           <SupportChatSkeleton v-if="loadHistoryStatus === 'pending'" />
           <div v-show="isMounted" class="spy" ref="spyElement"></div>
           <div
@@ -41,6 +44,10 @@
             </div>
           </div>
         </div>
+        <div v-else class="empty">
+          <OperatorIcon class="e-svg" />
+          <p class="e-text">Истории сообщений пока нет</p>
+        </div>
       </div>
       <SupportChatInput class="chat-input" v-model="newMessage" @send="send" />
     </div>
@@ -67,10 +74,13 @@ const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 
 const supportChat = new SupportChatSupporter(
   $afFetch,
-  () => route.params.chat_user_id as string
+  () => route.params.chat_id as string
 )
 
-const { newMessage, formattedMessages, loadHistoryStatus } = supportChat
+const { newMessage, formattedMessages, loadHistoryStatus, error, loadHistory } =
+  supportChat
+
+await loadHistory()
 
 const {
   isMounted,
@@ -79,8 +89,16 @@ const {
   onChatBodyScroll,
   wasScrolledRecently,
 } = useSupportChat(spyElement, chatBodyElement, supportChat)
+
+if (error.value) {
+  throw createError({
+    status: error.value.statusCode,
+    message: error.value.data?.message,
+  })
+}
 </script>
 
 <style lang="scss" scoped>
 @use '/css/mixins/mixins.scss';
+@use '/css/components/SupportChat.scss';
 </style>

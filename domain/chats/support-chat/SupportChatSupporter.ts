@@ -5,20 +5,21 @@ import type { ISupportChat } from '~/domain/chats/support-chat/interfaces/ISuppo
 import type { AsyncDataRequestStatus } from '#app'
 
 export class SupportChatSupporter extends SupportChat implements ISupportChat {
-  public page: Ref<number> = ref(0)
+  public page: Ref<number> = ref(1)
   public paginationData: Ref<IPagination<ISupportChatMessage[]> | null>
   public loadHistory: () => Promise<void>
-  public fetch: typeof $fetch
   public newMessage: Ref<string>
-  public chatUserId: MaybeRefOrGetter<string>
+  public chatId: MaybeRefOrGetter<string>
   public loadHistoryStatus: Ref<AsyncDataRequestStatus>
+  public error: Ref
 
-  constructor(fetch: typeof $fetch, chatUserId: MaybeRefOrGetter<string>) {
-    super()
+  constructor(fetch: typeof $fetch, chatId: MaybeRefOrGetter<string>) {
+    super(fetch)
     this.sendMessage = this.sendMessage.bind(this)
 
     const {
       data: paginationData,
+      error,
       execute: loadHistory,
       status,
     } = useAPI<IPagination<ISupportChatMessage[]>>(
@@ -27,7 +28,7 @@ export class SupportChatSupporter extends SupportChat implements ISupportChat {
         credentials: 'include',
         query: {
           page: this.page,
-          chat_user_id: chatUserId,
+          chat_id: toValue(chatId),
         },
         immediate: false,
         watch: false,
@@ -45,10 +46,10 @@ export class SupportChatSupporter extends SupportChat implements ISupportChat {
 
     this.paginationData = paginationData
     this.loadHistory = loadHistory.bind(this)
-    this.fetch = fetch
     this.newMessage = ref('')
-    this.chatUserId = chatUserId
+    this.chatId = chatId
     this.loadHistoryStatus = status
+    this.error = error
   }
 
   public async sendMessage() {
@@ -59,7 +60,7 @@ export class SupportChatSupporter extends SupportChat implements ISupportChat {
       credentials: 'include',
       body: {
         message: this.newMessage.value,
-        chat_user_id: this.chatUserId,
+        chat_id: toValue(this.chatId),
       },
       onResponse: async ({ response }) => {
         const message = response._data.data.message as ISupportChatMessage

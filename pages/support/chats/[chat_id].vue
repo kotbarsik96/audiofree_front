@@ -1,12 +1,12 @@
 <template>
-  <SupportChatsListPage />
+  <SupportChatSupporterPage />
 </template>
 
 <script setup lang="ts">
-import SupportChatsListPage from '~/components/Support/SupportChatsListPage.vue'
+import SupportChatSupporterPage from '~/components/Support/SupportChatSupporterPage.vue'
 
 definePageMeta({
-  name: 'SupportChatsListPage'
+  name: 'SupportChatPage',
 })
 </script>
 
