@@ -1,16 +1,11 @@
 import type { IFormattedSupportChatMessage } from '~/domain/chats/support-chat/interfaces/IFormattedSupportChatMessage'
 import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
-import type { ISupportChatBase } from '~/domain/chats/support-chat/interfaces/ISupportChat'
 
-export class SupportChat implements ISupportChatBase {
-  public formattedMessages: Ref<IFormattedSupportChatMessage[]> = ref([])
-  public fetch: typeof $fetch
-  public notificationsController: ReturnType<typeof useNotifications>
-
-  constructor(fetch: typeof $fetch) {
-    this.fetch = fetch
-    this.notificationsController = useNotifications()
-  }
+export class SupportChat {
+  public formattedMessages: Ref<IFormattedSupportChatMessage[]> = useState(
+    'formattedChatMessages',
+    () => []
+  )
 
   public prependMessage(message: ISupportChatMessage) {
     const messageDateDotted = this.getDottedDate(message.created_at)

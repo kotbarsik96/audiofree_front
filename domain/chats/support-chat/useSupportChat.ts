@@ -1,37 +1,39 @@
-import type { ISupportChat } from '~/domain/chats/support-chat/interfaces/ISupportChat'
+import type IPagination from '~/dataAccess/api/IPagination'
+import type { AsyncDataRequestStatus } from '#app'
+import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
 
 export function useSupportChat(
   spyElement: Ref<HTMLElement | null>,
   chatBodyElement: Ref<HTMLElement | null>,
-  supportChat: ISupportChat
+  page: Ref<number>,
+  paginationData: Ref<IPagination<ISupportChatMessage> | null>,
+  loadHistoryStatus: Ref<AsyncDataRequestStatus>,
+  loadHistory: () => Promise<void>
 ) {
-  const inputDisabled = ref(false)
   const isMounted = ref(false)
 
   const wasScrolledRecently = ref(false)
   let wasScrolledRecentlyTimeout: ReturnType<typeof setTimeout>
 
-  const { paginationData, loadHistory, loadHistoryStatus, page, sendMessage } =
-    supportChat
-
   let spyObserver: IntersectionObserver
 
   onMounted(async () => {
-    _scrollChatBodyToBottom()
-    isMounted.value = true
     await nextTick()
-    _scrollChatBodyToBottom()
+    scrollChatBodyToBottom()
+
+    await nextTick()
     _initSpy()
+    isMounted.value = true
   })
 
   onUnmounted(() => {
     if (spyObserver) spyObserver.disconnect()
   })
 
-  function _scrollChatBodyToBottom() {
+  function scrollChatBodyToBottom() {
     chatBodyElement.value?.scrollTo({
       top:
-        chatBodyElement.value?.scrollHeight -
+        chatBodyElement.value?.scrollHeight +
         chatBodyElement.value?.offsetHeight,
     })
   }
@@ -55,20 +57,6 @@ export function useSupportChat(
     await loadHistory()
   }
 
-  async function send() {
-    inputDisabled.value = true
-
-    try {
-      const sent = await sendMessage()
-      if (sent) {
-        await nextTick()
-        _scrollChatBodyToBottom()
-      }
-    } catch (e) {}
-
-    inputDisabled.value = false
-  }
-
   function onChatBodyScroll() {
     wasScrolledRecently.value = true
     if (wasScrolledRecentlyTimeout) clearTimeout(wasScrolledRecentlyTimeout)
@@ -79,11 +67,9 @@ export function useSupportChat(
   }
 
   return {
-    inputDisabled,
     isMounted,
     wasScrolledRecently,
-    send,
     onChatBodyScroll,
-    loadHistoryStatus,
+    scrollChatBodyToBottom,
   }
 }

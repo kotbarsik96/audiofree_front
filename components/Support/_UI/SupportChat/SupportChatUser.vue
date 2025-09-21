@@ -9,10 +9,7 @@
   >
     <div v-if="!!user" class="chat">
       <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
-        <div
-          v-if="loadHistoryStatus === 'pending' || formattedMessages.length > 0"
-          class="chat-groups"
-        >
+        <div v-if="formattedMessages.length > 0" class="chat-groups">
           <SupportChatSkeleton v-if="loadHistoryStatus === 'pending'" />
           <div v-show="isMounted" class="spy" ref="spyElement"></div>
           <div
@@ -51,7 +48,11 @@
           </p>
         </div>
       </div>
-      <SupportChatInput class="chat-input" v-model="newMessage" @send="send" />
+      <SupportChatInput
+        class="chat-input"
+        v-model="newMessage"
+        @send="sendMessage"
+      />
     </div>
     <LoginToUseSupport v-else />
   </div>
@@ -66,30 +67,100 @@ import UserIcon from '~/assets/images/icons/user.svg'
 import SupportIcon from '~/assets/images/icons/operator.svg'
 import { useSupportChat } from '~/domain/chats/support-chat/useSupportChat'
 import SupportChatSkeleton from '~/components/Support/_UI/SupportChat/SupportChatSkeleton.vue'
-import { SupportChatUser } from '~/domain/chats/support-chat/SupportChatUser'
+import { SupportChat } from '~/domain/chats/support-chat/SupportChat'
+import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
+import type IPagination from '~/dataAccess/api/IPagination'
 
 const { $echo, $afFetch } = useNuxtApp()
 
 const { user } = useSanctumAuth()
+const { addNotification } = useNotifications()
+
+const newMessage = ref('')
+const page = useState('support_chat_user_page', () => 1)
+const inputDisabled = ref(false)
 
 const spyElement = useTemplateRef<HTMLElement>('spyElement')
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 
-const supportChat = new SupportChatUser($afFetch)
-const { formattedMessages, loadHistoryStatus, newMessage, loadHistory } =
-  supportChat
+const supportChat = new SupportChat()
+const { formattedMessages } = supportChat
 
-await loadHistory()
+const {
+  data: paginationData,
+  execute: loadHistory,
+  status: loadHistoryStatus,
+} = await useAPI<IPagination<ISupportChatMessage>>(
+  'support-chat/user/history',
+  {
+    credentials: 'include',
+    query: {
+      page,
+    },
+    watch: false,
+    onResponse: ({ response }) => {
+      const messages = response._data?.data as ISupportChatMessage[]
 
-console.log(supportChat);
+      // предотвратить повторную загрузку первой страницы на клиенте
+      if (
+        page.value === 1 &&
+        formattedMessages.value.length > 0 &&
+        typeof window !== 'undefined'
+      ) {
+        page.value = 2
+        return
+      }
+
+      if (response.ok && messages) {
+        messages.forEach((message) => supportChat.prependMessage(message))
+        const lastPage = paginationData.value?.last_page
+        if (!lastPage || page.value <= lastPage) page.value += 1
+      }
+    },
+  }
+)
 
 const {
   isMounted,
-  send,
-  inputDisabled,
   onChatBodyScroll,
   wasScrolledRecently,
-} = useSupportChat(spyElement, chatBodyElement, supportChat)
+  scrollChatBodyToBottom,
+} = useSupportChat(
+  spyElement,
+  chatBodyElement,
+  page,
+  paginationData,
+  loadHistoryStatus,
+  loadHistory
+)
+
+async function sendMessage() {
+  inputDisabled.value = true
+
+  await $afFetch('support-chat/user/message', {
+    method: 'POST',
+    credentials: 'include',
+    body: {
+      message: newMessage.value,
+    },
+    onResponse: async ({ response }) => {
+      const message = response._data.data?.message as
+        | ISupportChatMessage
+        | undefined
+      if (response.ok && message) {
+        supportChat.appendMessage(message)
+        newMessage.value = ''
+        await nextTick()
+        scrollChatBodyToBottom()
+      }
+    },
+    onResponseError: () => {
+      addNotification('error', 'Не удалось отправить сообщение')
+    },
+  })
+
+  inputDisabled.value = false
+}
 </script>
 
 <style lang="scss" scoped>

@@ -10,10 +10,10 @@
     <div v-if="!!user" class="chat">
       <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
         <div
-          v-if="loadHistoryStatus === 'pending' || formattedMessages.length > 0"
+          v-if="status === 'pending' || formattedMessages.length > 0"
           class="chat-groups"
         >
-          <SupportChatSkeleton v-if="loadHistoryStatus === 'pending'" />
+          <SupportChatSkeleton v-if="status === 'pending'" />
           <div v-show="isMounted" class="spy" ref="spyElement"></div>
           <div
             v-for="(item, i) in formattedMessages"
@@ -49,7 +49,11 @@
           <p class="e-text">Истории сообщений пока нет</p>
         </div>
       </div>
-      <SupportChatInput class="chat-input" v-model="newMessage" @send="send" />
+      <SupportChatInput
+        class="chat-input"
+        v-model="newMessage"
+        @send="sendMessage"
+      />
     </div>
   </div>
 </template>
@@ -61,7 +65,9 @@ import OperatorIcon from '~/assets/images/icons/operator.svg'
 import UserIcon from '~/assets/images/icons/user.svg'
 import { useSupportChat } from '~/domain/chats/support-chat/useSupportChat'
 import SupportChatSkeleton from '~/components/Support/_UI/SupportChat/SupportChatSkeleton.vue'
-import { SupportChatSupporter } from '~/domain/chats/support-chat/SupportChatSupporter'
+import type IPagination from '~/dataAccess/api/IPagination'
+import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
+import { SupportChat } from '~/domain/chats/support-chat/SupportChat'
 
 const { $echo, $afFetch } = useNuxtApp()
 
@@ -71,30 +77,97 @@ const { user } = useSanctumAuth()
 
 const spyElement = useTemplateRef<HTMLElement>('spyElement')
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
+const newMessage = ref('')
 
-const supportChat = new SupportChatSupporter(
-  $afFetch,
-  () => route.params.chat_id as string
+const inputDisabled = ref(false)
+
+const page = ref(1)
+const chatId = computed(() => route.params.chat_id as string)
+
+const supportChat = new SupportChat()
+
+const { formattedMessages } = supportChat
+
+const {
+  data: paginationData,
+  error,
+  execute: loadHistory,
+  status,
+} = await useAPI<IPagination<ISupportChatMessage>>(
+  'support-chat/supporter/history',
+  {
+    credentials: 'include',
+    query: {
+      page,
+      chat_id: toValue(chatId),
+    },
+    watch: false,
+    onResponse: ({ response }) => {
+      const messages = response._data?.data as ISupportChatMessage[]
+
+      // предотвратить повторную загрузку первой страницы на клиенте
+      if (
+        page.value === 1 &&
+        formattedMessages.value.length > 0 &&
+        typeof window !== 'undefined'
+      ) {
+        page.value = 2
+        return
+      }
+
+      if (response.ok && messages) {
+        messages.forEach((message) => supportChat.prependMessage(message))
+        const lastPage = paginationData.value?.last_page
+        if (!lastPage || page.value <= lastPage) page.value += 1
+      }
+    },
+  }
 )
-
-const { newMessage, formattedMessages, loadHistoryStatus, error, loadHistory } =
-  supportChat
-
-await loadHistory()
 
 const {
   isMounted,
-  send,
-  inputDisabled,
   onChatBodyScroll,
   wasScrolledRecently,
-} = useSupportChat(spyElement, chatBodyElement, supportChat)
+  scrollChatBodyToBottom,
+} = useSupportChat(
+  spyElement,
+  chatBodyElement,
+  page,
+  paginationData,
+  status,
+  loadHistory
+)
 
 if (error.value) {
   throw createError({
     status: error.value.statusCode,
     message: error.value.data?.message,
   })
+}
+
+async function sendMessage() {
+  inputDisabled.value = true
+
+  await $afFetch('support-chat/supporter/message', {
+    method: 'POST',
+    credentials: 'include',
+    body: {
+      message: newMessage.value,
+      chat_id: chatId,
+    },
+    onResponse: async ({ response }) => {
+      const message = response._data.data.message as ISupportChatMessage
+      if (response.ok && message) {
+        supportChat.appendMessage(message)
+        newMessage.value = ''
+        await nextTick()
+        scrollChatBodyToBottom()
+      }
+    },
+    onResponseError() {},
+  })
+
+  inputDisabled.value = false
 }
 </script>
 
