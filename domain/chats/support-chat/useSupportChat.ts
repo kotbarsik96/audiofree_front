@@ -24,6 +24,8 @@ export function useSupportChat(
     await nextTick()
     _initSpy()
     isMounted.value = true
+
+    page.value = 2
   })
 
   onUnmounted(() => {
@@ -54,7 +56,20 @@ export function useSupportChat(
     if (lastPage && page.value > lastPage) return
     if (loadHistoryStatus.value === 'pending') return
 
+    // запомнить высоту чата до загрузки новых данных
+    const chatHeightBeforeLoad = chatBodyElement.value?.scrollHeight || 0
+
     await loadHistory()
+    page.value += 1
+
+    // компенсировать изменение высоты
+    if (chatHeightBeforeLoad)
+      chatBodyElement.value?.scrollTo({
+        behavior: 'instant',
+        top:
+          chatBodyElement.value.scrollTop +
+          (chatBodyElement.value.scrollHeight - chatHeightBeforeLoad),
+      })
   }
 
   function onChatBodyScroll() {

@@ -5,7 +5,7 @@
         {{ message.by_user ? user?.name || 'Вы' : 'Сотрудник тех.поддержки' }}
       </template>
       <template v-else>
-        {{ message.by_user ? 'Пользователь' : 'Сотрудник тех.поддержки' }}
+        {{ message.by_user ? user?.name : 'Сотрудник тех.поддержки' }}
       </template>
     </div>
     <div class="message">{{ message.message_text }}</div>

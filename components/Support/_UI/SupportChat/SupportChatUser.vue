@@ -70,6 +70,7 @@ import SupportChatSkeleton from '~/components/Support/_UI/SupportChat/SupportCha
 import { SupportChat } from '~/domain/chats/support-chat/SupportChat'
 import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
 import type IPagination from '~/dataAccess/api/IPagination'
+import type { ICurrentUserSupportChatInfo } from '~/domain/chats/support-chat/interfaces/ICurrentUserSupportChatInfo'
 
 const { $echo, $afFetch } = useNuxtApp()
 
@@ -86,13 +87,11 @@ const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 const supportChat = new SupportChat()
 const { formattedMessages } = supportChat
 
-const {
-  data: paginationData,
-  execute: loadHistory,
-  status: loadHistoryStatus,
-} = await useAPI<IPagination<ISupportChatMessage>>(
-  'support-chat/user/history',
-  {
+const [
+  { data: paginationData, execute: loadHistory, status: loadHistoryStatus },
+  { data: chatData },
+] = await Promise.all([
+  useAPI<IPagination<ISupportChatMessage>>('support-chat/user/history', {
     credentials: 'include',
     query: {
       page,
@@ -101,24 +100,21 @@ const {
     onResponse: ({ response }) => {
       const messages = response._data?.data as ISupportChatMessage[]
 
-      // предотвратить повторную загрузку первой страницы на клиенте
-      if (
-        page.value === 1 &&
-        formattedMessages.value.length > 0 &&
-        typeof window !== 'undefined'
-      ) {
-        page.value = 2
-        return
-      }
-
       if (response.ok && messages) {
         messages.forEach((message) => supportChat.prependMessage(message))
-        const lastPage = paginationData.value?.last_page
-        if (!lastPage || page.value <= lastPage) page.value += 1
       }
     },
-  }
-)
+  }),
+  useAPI<{ data: ICurrentUserSupportChatInfo }>(
+    'support-chat/current-user-chat',
+    {
+      credentials: 'include',
+      watch: false,
+    }
+  ),
+])
+
+
 
 const {
   isMounted,

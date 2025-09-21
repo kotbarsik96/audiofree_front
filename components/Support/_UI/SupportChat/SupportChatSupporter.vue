@@ -26,7 +26,7 @@
             <div
               v-for="group in item.groups"
               class="messages-group"
-              :class="{ '--right-sided': group[0].by_user }"
+              :class="{ '--right-sided': !group[0].by_user }"
             >
               <div class="mg-avatar">
                 <UserIcon v-if="group[0].by_user" />
@@ -38,7 +38,6 @@
                   :key="message.id"
                   :message="message"
                   :is-first="mIndex === 0"
-                  user-pov
                 />
               </div>
             </div>
@@ -105,20 +104,8 @@ const {
     onResponse: ({ response }) => {
       const messages = response._data?.data as ISupportChatMessage[]
 
-      // предотвратить повторную загрузку первой страницы на клиенте
-      if (
-        page.value === 1 &&
-        formattedMessages.value.length > 0 &&
-        typeof window !== 'undefined'
-      ) {
-        page.value = 2
-        return
-      }
-
       if (response.ok && messages) {
         messages.forEach((message) => supportChat.prependMessage(message))
-        const lastPage = paginationData.value?.last_page
-        if (!lastPage || page.value <= lastPage) page.value += 1
       }
     },
   }
@@ -153,7 +140,7 @@ async function sendMessage() {
     credentials: 'include',
     body: {
       message: newMessage.value,
-      chat_id: chatId,
+      chat_id: chatId.value,
     },
     onResponse: async ({ response }) => {
       const message = response._data.data.message as ISupportChatMessage
