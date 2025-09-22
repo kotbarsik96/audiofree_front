@@ -24,9 +24,11 @@ const { openSignupDialog, openLoginDialog } = useAuthStore()
 @use '/css/mixins/mixins.scss';
 
 .log-in {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 
   .li-icon {
     width: 4rem;

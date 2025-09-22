@@ -11,7 +11,8 @@
             <ContactsList />
           </div>
           <div class="contacts__box-chat">
-            <SupportChatUser />
+            <SupportChatUser v-if="!!user" />
+            <LoginToUseSupport v-else />
           </div>
         </div>
       </div>
@@ -20,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import LoginToUseSupport from '~/components/Support/_UI/SupportChat/LoginToUseSupport.vue'
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import ContactsList from '~/components/SystemPages/Contacts/_Blocks/ContactsList.vue'
 import SupportChatUser from '~/components/Support/_UI/SupportChat/SupportChatUser.vue'
@@ -30,6 +32,8 @@ useBreadcrumbs(contactsBreadcrumbs)
 
 const { data } = await useAPI<{ data: IPageSeo }>('page/contacts')
 usePageMeta(data)
+
+const { user } = useSanctumAuth()
 </script>
 
 <style lang="scss" scoped>
@@ -70,6 +74,8 @@ usePageMeta(data)
 
   &__box-chat {
     flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
   }
 
   @include mixins.adaptive(tablet-big) {

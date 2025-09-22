@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
 
-  modules: ['@pinia/nuxt', 'nuxt-auth-sanctum'],
+  modules: ['@pinia/nuxt', 'nuxt-auth-sanctum', 'nuxt-laravel-echo'],
 
   runtimeConfig: {
     public: {
@@ -27,6 +27,17 @@ export default defineNuxtConfig({
     },
   },
 
+  echo: {
+    key: process.env.VITE_REVERB_APP_KEY,
+    port: Number(process.env.VITE_REVERB_PORT),
+    scheme: process.env.VITE_REVERB_SCHEME as 'http' | 'https',
+    transports: process.env.VITE_REVERB_TRANSPORTS?.split(','),
+    authentication: {
+      baseUrl: process.env.VITE_API_URL as string,
+      mode: 'cookie',
+    },
+  },
+
   devServer: {
     port: 3002,
   },
@@ -37,5 +48,9 @@ export default defineNuxtConfig({
         svgo: false,
       }),
     ],
+    optimizeDeps: {
+      // include: ['pusher-js']
+      include: ['nuxt-laravel-echo > pusher-js'],
+    },
   },
 })

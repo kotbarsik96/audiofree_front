@@ -7,59 +7,54 @@
       '--input-disabled': inputDisabled,
     }"
   >
-    <div v-if="!!user" class="chat">
-      <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
-        <div v-if="formattedMessages.length > 0" class="chat-groups">
-          <SupportChatSkeleton v-if="loadHistoryStatus === 'pending'" />
-          <div v-show="isMounted" class="spy" ref="spyElement"></div>
+    <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
+      <div v-if="formattedMessages.length > 0" class="chat-groups">
+        <SupportChatSkeleton v-if="loadHistoryStatus === 'pending'" />
+        <div v-show="isMounted" class="spy" ref="spyElement"></div>
+        <div
+          v-for="(item, i) in formattedMessages"
+          :key="i"
+          class="dated-group"
+        >
+          <div class="group-date">
+            {{ formatMonthAndYear(item.date) }}
+          </div>
           <div
-            v-for="(item, i) in formattedMessages"
-            :key="i"
-            class="dated-group"
+            v-for="group in item.groups"
+            class="messages-group"
+            :class="{ '--right-sided': group[0].by_user }"
           >
-            <div class="group-date">
-              {{ formatMonthAndYear(item.date) }}
+            <div class="mg-avatar">
+              <UserIcon v-if="group[0].by_user" />
+              <OperatorIcon v-else />
             </div>
-            <div
-              v-for="group in item.groups"
-              class="messages-group"
-              :class="{ '--right-sided': group[0].by_user }"
-            >
-              <div class="mg-avatar">
-                <UserIcon v-if="group[0].by_user" />
-                <OperatorIcon v-else />
-              </div>
-              <div class="mg-messages">
-                <SupportChatMessage
-                  v-for="(message, mIndex) in group"
-                  :key="message.id"
-                  :message="message"
-                  :is-first="mIndex === 0"
-                  user-pov
-                />
-              </div>
+            <div class="mg-messages">
+              <SupportChatMessage
+                v-for="(message, mIndex) in group"
+                :message="message"
+                :is-first="mIndex === 0"
+                user-pov
+              />
             </div>
           </div>
         </div>
-        <div v-else class="empty">
-          <SupportIcon class="e-svg" />
-          <p class="e-text">
-            Здесь будет история сообщений с технической поддержкой
-          </p>
-        </div>
       </div>
-      <SupportChatInput
-        class="chat-input"
-        v-model="newMessage"
-        @send="sendMessage"
-      />
+      <div v-else class="empty">
+        <SupportIcon class="e-svg" />
+        <p class="e-text">
+          Здесь будет история сообщений с технической поддержкой
+        </p>
+      </div>
     </div>
-    <LoginToUseSupport v-else />
+    <SupportChatInput
+      class="chat-input"
+      v-model="newMessage"
+      @send="sendMessage"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import LoginToUseSupport from '~/components/Support/_UI/SupportChat/LoginToUseSupport.vue'
 import SupportChatInput from '~/components/Support/_UI/SupportChat/SupportChatInput.vue'
 import SupportChatMessage from '~/components/Support/_UI/SupportChat/SupportChatMessage.vue'
 import OperatorIcon from '~/assets/images/icons/operator.svg'
@@ -71,10 +66,12 @@ import { SupportChat } from '~/domain/chats/support-chat/SupportChat'
 import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
 import type IPagination from '~/dataAccess/api/IPagination'
 import type { ICurrentUserSupportChatInfo } from '~/domain/chats/support-chat/interfaces/ICurrentUserSupportChatInfo'
+import type { IEchoMessage } from '~/domain/echo/interfaces/IEchoMessage'
 
-const { $echo, $afFetch } = useNuxtApp()
+const { $afFetch } = useNuxtApp()
 
-const { user } = useSanctumAuth()
+const echo = useEcho()
+
 const { addNotification } = useNotifications()
 
 const newMessage = ref('')
@@ -105,16 +102,11 @@ const [
       }
     },
   }),
-  useAPI<{ data: ICurrentUserSupportChatInfo }>(
-    'support-chat/current-user-chat',
-    {
-      credentials: 'include',
-      watch: false,
-    }
-  ),
+  useAPI<{ data: ICurrentUserSupportChatInfo }>('support-chat/chat-info', {
+    credentials: 'include',
+    watch: false,
+  }),
 ])
-
-
 
 const {
   isMounted,
@@ -130,30 +122,51 @@ const {
   loadHistory
 )
 
+onMounted(() => {
+  echo
+    .private(`support.message.${chatData.value?.data.chat_id}`)
+    .listen(
+      '.support-message',
+      (message: IEchoMessage<{ message: ISupportChatMessage }>) => {
+        console.log(message)
+        if (message.event === 'new_message') {
+          supportChat.appendMessage(message.data.message)
+        }
+      }
+    )
+})
+
 async function sendMessage() {
   inputDisabled.value = true
 
-  await $afFetch('support-chat/user/message', {
-    method: 'POST',
-    credentials: 'include',
-    body: {
-      message: newMessage.value,
-    },
-    onResponse: async ({ response }) => {
-      const message = response._data.data?.message as
-        | ISupportChatMessage
-        | undefined
-      if (response.ok && message) {
-        supportChat.appendMessage(message)
-        newMessage.value = ''
-        await nextTick()
-        scrollChatBodyToBottom()
-      }
-    },
-    onResponseError: () => {
-      addNotification('error', 'Не удалось отправить сообщение')
-    },
-  })
+  try {
+    await $afFetch('support-chat/user/message', {
+      method: 'POST',
+      credentials: 'include',
+      body: {
+        message: newMessage.value,
+      },
+      headers: {
+        'X-Socket-ID': echo.socketId() as string,
+      },
+      onResponse: async ({ response }) => {
+        const message = response._data.data?.message as
+          | ISupportChatMessage
+          | undefined
+        if (response.ok && message) {
+          supportChat.appendMessage(message)
+          newMessage.value = ''
+          await nextTick()
+          scrollChatBodyToBottom()
+        }
+      },
+      onResponseError: () => {
+        addNotification('error', 'Не удалось отправить сообщение')
+      },
+    })
+  } catch (er) {
+    console.error(er)
+  }
 
   inputDisabled.value = false
 }

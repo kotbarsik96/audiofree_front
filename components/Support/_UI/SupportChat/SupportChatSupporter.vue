@@ -7,53 +7,51 @@
       '--input-disabled': inputDisabled,
     }"
   >
-    <div v-if="!!user" class="chat">
-      <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
+    <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
+      <div
+        v-if="status === 'pending' || formattedMessages.length > 0"
+        class="chat-groups"
+      >
+        <SupportChatSkeleton v-if="status === 'pending'" />
+        <div v-show="isMounted" class="spy" ref="spyElement"></div>
         <div
-          v-if="status === 'pending' || formattedMessages.length > 0"
-          class="chat-groups"
+          v-for="(item, i) in formattedMessages"
+          :key="i"
+          class="dated-group"
         >
-          <SupportChatSkeleton v-if="status === 'pending'" />
-          <div v-show="isMounted" class="spy" ref="spyElement"></div>
+          <div class="group-date">
+            {{ formatMonthAndYear(item.date) }}
+          </div>
           <div
-            v-for="(item, i) in formattedMessages"
-            :key="i"
-            class="dated-group"
+            v-for="group in item.groups"
+            class="messages-group"
+            :class="{ '--right-sided': !group[0].by_user }"
           >
-            <div class="group-date">
-              {{ formatMonthAndYear(item.date) }}
+            <div class="mg-avatar">
+              <UserIcon v-if="group[0].by_user" />
+              <OperatorIcon v-else />
             </div>
-            <div
-              v-for="group in item.groups"
-              class="messages-group"
-              :class="{ '--right-sided': !group[0].by_user }"
-            >
-              <div class="mg-avatar">
-                <UserIcon v-if="group[0].by_user" />
-                <OperatorIcon v-else />
-              </div>
-              <div class="mg-messages">
-                <SupportChatMessage
-                  v-for="(message, mIndex) in group"
-                  :key="message.id"
-                  :message="message"
-                  :is-first="mIndex === 0"
-                />
-              </div>
+            <div class="mg-messages">
+              <SupportChatMessage
+                v-for="(message, mIndex) in group"
+                :key="message.id"
+                :message="message"
+                :is-first="mIndex === 0"
+              />
             </div>
           </div>
         </div>
-        <div v-else class="empty">
-          <OperatorIcon class="e-svg" />
-          <p class="e-text">Истории сообщений пока нет</p>
-        </div>
       </div>
-      <SupportChatInput
-        class="chat-input"
-        v-model="newMessage"
-        @send="sendMessage"
-      />
+      <div v-else class="empty">
+        <OperatorIcon class="e-svg" />
+        <p class="e-text">Истории сообщений пока нет</p>
+      </div>
     </div>
+    <SupportChatInput
+      class="chat-input"
+      v-model="newMessage"
+      @send="sendMessage"
+    />
   </div>
 </template>
 
@@ -67,12 +65,13 @@ import SupportChatSkeleton from '~/components/Support/_UI/SupportChat/SupportCha
 import type IPagination from '~/dataAccess/api/IPagination'
 import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
 import { SupportChat } from '~/domain/chats/support-chat/SupportChat'
+import type { IEchoMessage } from '~/domain/echo/interfaces/IEchoMessage'
+import type { ICurrentUserSupportChatInfo } from '~/domain/chats/support-chat/interfaces/ICurrentUserSupportChatInfo'
 
-const { $echo, $afFetch } = useNuxtApp()
+const echo = useEcho()
+const { $afFetch } = useNuxtApp()
 
 const route = useRoute()
-
-const { user } = useSanctumAuth()
 
 const spyElement = useTemplateRef<HTMLElement>('spyElement')
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
@@ -87,14 +86,11 @@ const supportChat = new SupportChat()
 
 const { formattedMessages } = supportChat
 
-const {
-  data: paginationData,
-  error,
-  execute: loadHistory,
-  status,
-} = await useAPI<IPagination<ISupportChatMessage>>(
-  'support-chat/supporter/history',
-  {
+const [
+  { data: paginationData, error, execute: loadHistory, status },
+  { data: chatData },
+] = await Promise.all([
+  useAPI<IPagination<ISupportChatMessage>>('support-chat/supporter/history', {
     credentials: 'include',
     query: {
       page,
@@ -108,8 +104,14 @@ const {
         messages.forEach((message) => supportChat.prependMessage(message))
       }
     },
-  }
-)
+  }),
+  useAPI<{ data: ICurrentUserSupportChatInfo }>('support-chat/chat-info', {
+    credentials: 'include',
+    query: {
+      chat_id: chatId,
+    },
+  }),
+])
 
 const {
   isMounted,
@@ -132,6 +134,19 @@ if (error.value) {
   })
 }
 
+onMounted(() => {
+  echo
+    .private(`support.message.${chatId.value}`)
+    .listen(
+      '.support-message',
+      (message: IEchoMessage<{ message: ISupportChatMessage }>) => {
+        if (message.event === 'new_message') {
+          supportChat.appendMessage(message.data.message)
+        }
+      }
+    )
+})
+
 async function sendMessage() {
   inputDisabled.value = true
 
@@ -141,6 +156,9 @@ async function sendMessage() {
     body: {
       message: newMessage.value,
       chat_id: chatId.value,
+    },
+    headers: {
+      'X-Socket-ID': echo.socketId() as string,
     },
     onResponse: async ({ response }) => {
       const message = response._data.data.message as ISupportChatMessage
