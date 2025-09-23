@@ -5,13 +5,21 @@
         {{ message.by_user ? user?.name || 'Вы' : 'Сотрудник тех.поддержки' }}
       </template>
       <template v-else>
-        {{ message.by_user ? user?.name : 'Сотрудник тех.поддержки' }}
+        {{ message.by_user ? message.author : 'Сотрудник тех.поддержки' }}
       </template>
     </div>
     <div class="message">{{ message.message_text }}</div>
-    <time class="time" :datetime="message.created_at">
-      {{ formatTime(message.created_at) }}
-    </time>
+    <div class="bottom">
+      <time class="time" :datetime="message.created_at">
+        {{ formatTime(message.created_at) }}
+      </time>
+      <div class="checkmarks">
+        <IconCheckmark />
+        <Transition name="fade-in">
+          <IconCheckmark v-if="message.was_read" />
+        </Transition>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -19,6 +27,7 @@
 import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
 import type IUser from '~/domain/user/types/IUser'
 import { formatTime } from '~/utils/date'
+import IconCheckmark from '~/assets/images/icons/checkmark.svg'
 
 const props = defineProps<{
   message: ISupportChatMessage
@@ -29,6 +38,7 @@ const props = defineProps<{
 const { user } = useSanctumAuth<IUser>()
 
 const classes = computed(() => ({
+  '--was-read': props.message.was_read,
   '--right-sided':
     (props.userPov && props.message.by_user) ||
     (!props.userPov && !props.message.by_user),
@@ -57,12 +67,37 @@ const classes = computed(() => ({
     color: var(--gray-700);
   }
 
+  .bottom {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
   .time {
     display: block;
     width: 100%;
     text-align: right;
     color: var(--gray-600);
     font: var(--text-14);
+  }
+
+  .checkmarks {
+    svg {
+      width: 1rem;
+      aspect-ratio: 1;
+      color: var(--gray-400);
+      display: inline-block;
+      transition: var(--general-transition);
+    }
+  }
+
+  &.--was-read {
+    .checkmarks {
+      svg {
+        color: var(--primary);
+      }
+    }
   }
 }
 </style>

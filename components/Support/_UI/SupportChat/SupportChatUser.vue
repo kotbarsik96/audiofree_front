@@ -66,7 +66,6 @@ import { SupportChat } from '~/domain/chats/support-chat/SupportChat'
 import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
 import type IPagination from '~/dataAccess/api/IPagination'
 import type { ICurrentUserSupportChatInfo } from '~/domain/chats/support-chat/interfaces/ICurrentUserSupportChatInfo'
-import type { IEchoMessage } from '~/domain/echo/interfaces/IEchoMessage'
 
 const { $afFetch } = useNuxtApp()
 
@@ -125,15 +124,12 @@ const {
 onMounted(() => {
   echo
     .private(`support.message.${chatData.value?.data.chat_id}`)
-    .listen(
-      '.support-message',
-      (message: IEchoMessage<{ message: ISupportChatMessage }>) => {
-        console.log(message)
-        if (message.event === 'new_message') {
-          supportChat.appendMessage(message.data.message)
-        }
-      }
-    )
+    .listen('.support-message', (message: ISupportChatMessage) => {
+      supportChat.appendMessage(message)
+    })
+    .listen('.support-read-message', (messagesIds: number[]) => {
+      supportChat.readMessages(messagesIds)
+    })
 })
 
 async function sendMessage() {

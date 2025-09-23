@@ -65,7 +65,6 @@ import SupportChatSkeleton from '~/components/Support/_UI/SupportChat/SupportCha
 import type IPagination from '~/dataAccess/api/IPagination'
 import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
 import { SupportChat } from '~/domain/chats/support-chat/SupportChat'
-import type { IEchoMessage } from '~/domain/echo/interfaces/IEchoMessage'
 import type { ICurrentUserSupportChatInfo } from '~/domain/chats/support-chat/interfaces/ICurrentUserSupportChatInfo'
 
 const echo = useEcho()
@@ -137,14 +136,12 @@ if (error.value) {
 onMounted(() => {
   echo
     .private(`support.message.${chatId.value}`)
-    .listen(
-      '.support-message',
-      (message: IEchoMessage<{ message: ISupportChatMessage }>) => {
-        if (message.event === 'new_message') {
-          supportChat.appendMessage(message.data.message)
-        }
-      }
-    )
+    .listen('.support-message', (message: ISupportChatMessage) => {
+      supportChat.appendMessage(message)
+    })
+    .listen('.support-read-message', (messagesIds: number[]) => {
+      supportChat.readMessages(messagesIds)
+    })
 })
 
 async function sendMessage() {

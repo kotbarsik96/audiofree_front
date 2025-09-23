@@ -64,4 +64,14 @@ export class SupportChat {
       messageDate.getMonth() + 1
     }.${messageDate.getDate()}.${messageDate.getFullYear()}`
   }
+
+  public readMessages(messagesIds: number[]) {
+    this.formattedMessages.value.forEach((fmsg) => {
+      fmsg.groups.forEach((group) => {
+        group.forEach((message) => {
+          if (messagesIds.includes(message.id)) message.was_read = true
+        })
+      })
+    })
+  }
 }

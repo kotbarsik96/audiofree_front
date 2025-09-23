@@ -13,6 +13,6 @@ export function formatTime(date: string) {
   const d = new Date(date)
 
   return d.toLocaleTimeString('ru-RU', {
-    second: undefined
+    timeStyle: 'short'
   })
 }

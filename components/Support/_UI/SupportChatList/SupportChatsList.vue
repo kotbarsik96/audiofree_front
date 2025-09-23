@@ -38,10 +38,16 @@ import BoxIcon from '~/assets/images/icons/empty-box.svg'
 import type IPagination from '~/dataAccess/api/IPagination'
 import type { ISupportChatsListItem } from '~/domain/chats/support-chat/interfaces/ISupportChatsListItem'
 
+const route = useRoute()
+const page = computed(() => route.query.page)
+
 const [{ data: chatsData, status: chatsLoadingStatus, error }] =
   await Promise.all([
     useAPI<IPagination<ISupportChatsListItem>>('support-chat/chats-list', {
       credentials: 'include',
+      query: {
+        page,
+      },
     }),
   ])
 
