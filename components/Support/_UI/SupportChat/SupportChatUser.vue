@@ -9,8 +9,8 @@
   >
     <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
       <div v-if="formattedMessages.length > 0" class="chat-groups">
-        <SupportChatSkeleton v-if="loadHistoryStatus === 'pending'" />
-        <div v-show="isMounted" class="spy" ref="spyElement"></div>
+        <div v-show="isMounted" class="spy" ref="spyElementTop"></div>
+        <SupportChatSkeleton v-if="isLoadingTop" />
         <div
           v-for="(item, i) in formattedMessages"
           :key="i"
@@ -38,6 +38,12 @@
             </div>
           </div>
         </div>
+        <SupportChatSkeleton v-if="isLoadingBottom" />
+        <div
+          v-show="isMounted"
+          class="spy --bottom"
+          ref="spyElementBottom"
+        ></div>
       </div>
       <div v-else class="empty">
         <SupportIcon class="e-svg" />
@@ -65,33 +71,29 @@ import SupportChatSkeleton from '~/components/Support/_UI/SupportChat/SupportCha
 import { SupportChat } from '~/domain/chats/support-chat/SupportChat'
 import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
 import type IPagination from '~/dataAccess/api/IPagination'
-import type { ICurrentUserSupportChatInfo } from '~/domain/chats/support-chat/interfaces/ICurrentUserSupportChatInfo'
+import type { IChatInfo } from '~/domain/chats/support-chat/interfaces/IChatInfo'
 
 const { $afFetch } = useNuxtApp()
 
-const echo = useEcho()
-
 const { addNotification } = useNotifications()
 
+const echo = useEcho()
+
 const newMessage = ref('')
-const page = useState('support_chat_user_page', () => 1)
 const inputDisabled = ref(false)
 
-const spyElement = useTemplateRef<HTMLElement>('spyElement')
+const spyElementTop = useTemplateRef<HTMLElement>('spyElementTop')
+const spyElementBottom = useTemplateRef<HTMLElement>('spyElementBottom')
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 
 const supportChat = new SupportChat()
 const { formattedMessages } = supportChat
 
-const [
-  { data: paginationData, execute: loadHistory, status: loadHistoryStatus },
-  { data: chatData },
-] = await Promise.all([
-  useAPI<IPagination<ISupportChatMessage>>('support-chat/user/history', {
+const loadHistoryUrl = 'support-chat/user/history'
+
+const [{ data: paginationData }, { data: chatInfoData }] = await Promise.all([
+  useAPI<IPagination<ISupportChatMessage>>(loadHistoryUrl, {
     credentials: 'include',
-    query: {
-      page,
-    },
     watch: false,
     onResponse: ({ response }) => {
       const messages = response._data?.data as ISupportChatMessage[]
@@ -101,36 +103,30 @@ const [
       }
     },
   }),
-  useAPI<{ data: ICurrentUserSupportChatInfo }>('support-chat/chat-info', {
+  useAPI<{ data: IChatInfo }>('support-chat/chat-info', {
     credentials: 'include',
     watch: false,
   }),
 ])
 
+const chatInfo = computed(() => chatInfoData.value?.data)
+
 const {
   isMounted,
   onChatBodyScroll,
   wasScrolledRecently,
+  isLoadingTop,
+  isLoadingBottom,
   scrollChatBodyToBottom,
 } = useSupportChat(
-  spyElement,
+  spyElementTop,
+  spyElementBottom,
   chatBodyElement,
-  page,
   paginationData,
-  loadHistoryStatus,
-  loadHistory
+  supportChat,
+  chatInfo,
+  loadHistoryUrl
 )
-
-onMounted(() => {
-  echo
-    .private(`support.message.${chatData.value?.data.chat_id}`)
-    .listen('.support-message', (message: ISupportChatMessage) => {
-      supportChat.appendMessage(message)
-    })
-    .listen('.support-read-message', (messagesIds: number[]) => {
-      supportChat.readMessages(messagesIds)
-    })
-})
 
 async function sendMessage() {
   inputDisabled.value = true

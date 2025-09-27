@@ -12,8 +12,8 @@
         v-if="status === 'pending' || formattedMessages.length > 0"
         class="chat-groups"
       >
+        <div v-show="isMounted" class="spy" ref="spyElementTop"></div>
         <SupportChatSkeleton v-if="status === 'pending'" />
-        <div v-show="isMounted" class="spy" ref="spyElement"></div>
         <div
           v-for="(item, i) in formattedMessages"
           :key="i"
@@ -41,6 +41,12 @@
             </div>
           </div>
         </div>
+        <SupportChatSkeleton v-if="status === 'pending'" />
+        <div
+          v-show="isMounted"
+          class="spy --bottom"
+          ref="spyElementBottom"
+        ></div>
       </div>
       <div v-else class="empty">
         <OperatorIcon class="e-svg" />
@@ -65,14 +71,15 @@ import SupportChatSkeleton from '~/components/Support/_UI/SupportChat/SupportCha
 import type IPagination from '~/dataAccess/api/IPagination'
 import type { ISupportChatMessage } from '~/domain/chats/support-chat/interfaces/ISupportChatMessage'
 import { SupportChat } from '~/domain/chats/support-chat/SupportChat'
-import type { ICurrentUserSupportChatInfo } from '~/domain/chats/support-chat/interfaces/ICurrentUserSupportChatInfo'
+import type { IChatInfo } from '~/domain/chats/support-chat/interfaces/IChatInfo'
 
 const echo = useEcho()
 const { $afFetch } = useNuxtApp()
 
 const route = useRoute()
 
-const spyElement = useTemplateRef<HTMLElement>('spyElement')
+const spyElementTop = useTemplateRef<HTMLElement>('spyElementTop')
+const spyElementBottom = useTemplateRef<HTMLElement>('spyElementBottom')
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 const newMessage = ref('')
 
@@ -85,11 +92,13 @@ const supportChat = new SupportChat()
 
 const { formattedMessages } = supportChat
 
+const loadHistoryUrl = 'support-chat/supporter/history'
+
 const [
   { data: paginationData, error, execute: loadHistory, status },
-  { data: chatData },
+  { data: chatInfoData },
 ] = await Promise.all([
-  useAPI<IPagination<ISupportChatMessage>>('support-chat/supporter/history', {
+  useAPI<IPagination<ISupportChatMessage>>(loadHistoryUrl, {
     credentials: 'include',
     query: {
       page,
@@ -104,26 +113,30 @@ const [
       }
     },
   }),
-  useAPI<{ data: ICurrentUserSupportChatInfo }>('support-chat/chat-info', {
+  useAPI<{ data: IChatInfo }>('support-chat/chat-info', {
     credentials: 'include',
     query: {
       chat_id: chatId,
     },
   }),
 ])
+const chatInfo = computed(() => chatInfoData.value?.data)
 
 const {
   isMounted,
   onChatBodyScroll,
   wasScrolledRecently,
+  isLoadingTop,
+  isLoadingBottom,
   scrollChatBodyToBottom,
 } = useSupportChat(
-  spyElement,
+  spyElementTop,
+  spyElementBottom,
   chatBodyElement,
-  page,
   paginationData,
-  status,
-  loadHistory
+  supportChat,
+  chatInfo,
+  loadHistoryUrl
 )
 
 if (error.value) {
