@@ -83,10 +83,13 @@ const classes = computed(() => ({
   }
 
   .checkmarks {
+    display: flex;
+    align-items: center;
+
     svg {
       width: 1rem;
       aspect-ratio: 1;
-      color: var(--gray-400);
+      color: var(--gray-300);
       display: inline-block;
       transition: var(--general-transition);
     }
