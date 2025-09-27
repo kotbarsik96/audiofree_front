@@ -118,11 +118,14 @@ const {
   isLoadingTop,
   isLoadingBottom,
   scrollChatBodyToBottom,
+  pageTop,
+  pageBottom
 } = useSupportChat(
   spyElementTop,
   spyElementBottom,
   chatBodyElement,
-  paginationData,
+  paginationData.value?.current_page ?? 0,
+  paginationData.value?.last_page ?? 0,
   supportChat,
   chatInfo,
   loadHistoryUrl

@@ -99,6 +99,11 @@
     height: 1px;
     z-index: -999;
     pointer-events: none;
+
+    &.--bottom {
+      top: auto;
+      bottom: 100px;
+    }
   }
 
   .empty {

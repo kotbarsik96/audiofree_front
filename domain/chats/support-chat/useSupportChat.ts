@@ -8,7 +8,8 @@ export function useSupportChat(
   spyTopElement: Ref<HTMLElement | null>,
   spyBottomElement: Ref<HTMLElement | null>,
   chatBodyElement: Ref<HTMLElement | null>,
-  paginationData: Ref<IPagination<ISupportChatMessage> | null>,
+  initialLoadPage: number,
+  initialLoadLastPage: number,
   supportChat: SupportChat,
   chatInfo: ComputedRef<IChatInfo | undefined>,
   loadHistoryUrl: string
@@ -17,21 +18,11 @@ export function useSupportChat(
   const { addNotification } = useNotifications()
   const echo = useEcho()
 
+  const lastPage = ref(initialLoadLastPage)
   const isLoadingTop = ref(false)
   const isLoadingBottom = ref(false)
-  const pageTop = ref<number | undefined>(
-    paginationData.value ? paginationData.value.current_page - 1 : undefined
-  )
-  const pageBottom = ref<number | undefined>(
-    paginationData.value ? paginationData.value.current_page + 1 : undefined
-  )
-
-  const allTopIsLoaded = computed(() => pageTop.value === 1)
-  const allBottomIsLoaded = computed(
-    () =>
-      !!pageBottom.value &&
-      pageBottom.value === paginationData?.value?.last_page
-  )
+  const pageTop = ref<number>(initialLoadPage + 1)
+  const pageBottom = ref<number>(initialLoadPage - 1)
 
   const isMounted = ref(false)
 
@@ -73,6 +64,7 @@ export function useSupportChat(
       _spyTopObserver = new IntersectionObserver((entries) => {
         if (entries.find((entry) => entry.isIntersecting)) _loadMoreTop()
       })
+      _spyTopObserver.observe(spyTopElement.value)
     }
   }
 
@@ -81,16 +73,18 @@ export function useSupportChat(
       _spyBottomObserver = new IntersectionObserver((entries) => {
         if (entries.find((entry) => entry.isIntersecting)) _loadMoreBottom()
       })
+      _spyBottomObserver.observe(spyBottomElement.value)
     }
   }
 
   async function _loadMoreTop() {
-    if (isLoadingTop.value || allTopIsLoaded.value || !chatInfo.value) return
+    if (isLoadingTop.value || pageTop.value > lastPage.value || !chatInfo.value) return
 
     isLoadingTop.value = true
 
     try {
       await $afFetch(loadHistoryUrl, {
+        credentials: 'include',
         query: {
           page: pageTop.value,
           chat_id: chatInfo.value?.chat_id,
@@ -114,11 +108,14 @@ export function useSupportChat(
                   (chatBodyElement.value.scrollHeight -
                     chatHeightBeforePrepend),
               })
+
+            pageTop.value = response._data.current_page + 1
+            lastPage.value = response._data.last_page
           }
         },
         onResponseError() {
           addNotification('error', 'Не удалось загрузить предыдущие сообщения')
-        }
+        },
       })
     } catch (e) {
       console.error(e)
@@ -128,13 +125,15 @@ export function useSupportChat(
   }
 
   async function _loadMoreBottom() {
-    if (isLoadingBottom.value || allBottomIsLoaded.value || !chatInfo.value)
+    console.log(pageBottom.value);
+    if (isLoadingBottom.value || pageBottom.value < 1 || !chatInfo.value)
       return
 
     isLoadingBottom.value = true
 
     try {
       await $afFetch(loadHistoryUrl, {
+        credentials: 'include',
         query: {
           page: pageBottom.value,
           chat_id: chatInfo.value?.chat_id,
@@ -143,12 +142,15 @@ export function useSupportChat(
           const messages = response._data?.data as ISupportChatMessage[]
 
           if (response.ok && messages) {
-            messages.forEach((message) => supportChat.prependMessage(message))
+            messages.reverse().forEach((message) => supportChat.appendMessage(message))
+
+            pageBottom.value = response._data.current_page - 1
+            lastPage.value = response._data.last_page
           }
         },
         onResponseError() {
           addNotification('error', 'Не удалось загрузить новые сообщения')
-        }
+        },
       })
     } catch (e) {
       console.error(e)
