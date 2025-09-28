@@ -13,7 +13,7 @@
         class="chat-groups"
       >
         <div v-show="isMounted" class="spy" ref="spyElementTop"></div>
-        <SupportChatSkeleton v-if="status === 'pending'" />
+        <SupportChatSkeleton v-if="isLoadingTop" />
         <div
           v-for="(item, i) in formattedMessages"
           :key="i"
@@ -37,11 +37,12 @@
                 :key="message.id"
                 :message="message"
                 :is-first="mIndex === 0"
+                v-model:readMessages="readMessages"
               />
             </div>
           </div>
         </div>
-        <SupportChatSkeleton v-if="status === 'pending'" />
+        <SupportChatSkeleton v-if="isLoadingBottom" />
         <div
           v-show="isMounted"
           class="spy --bottom"
@@ -129,6 +130,7 @@ const {
   isLoadingTop,
   isLoadingBottom,
   scrollChatBodyToBottom,
+  readMessages
 } = useSupportChat(
   spyElementTop,
   spyElementBottom,
@@ -146,17 +148,6 @@ if (error.value) {
     message: error.value.data?.message,
   })
 }
-
-onMounted(() => {
-  echo
-    .private(`support.message.${chatId.value}`)
-    .listen('.support-message', (message: ISupportChatMessage) => {
-      supportChat.appendMessage(message)
-    })
-    .listen('.support-read-message', (messagesIds: number[]) => {
-      supportChat.readMessages(messagesIds)
-    })
-})
 
 async function sendMessage() {
   inputDisabled.value = true

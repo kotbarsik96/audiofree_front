@@ -1,5 +1,5 @@
 <template>
-  <div class="sc-message" :class="classes">
+  <div class="sc-message" :class="classes" ref="element">
     <div v-if="isFirst" class="author-name">
       <template v-if="userPov">
         {{ message.by_user ? user?.name || 'Вы' : 'Сотрудник тех.поддержки' }}
@@ -33,16 +33,54 @@ const props = defineProps<{
   message: ISupportChatMessage
   isFirst: boolean
   userPov?: boolean
+  readMessages: number[]
 }>()
+
+const emit = defineEmits<{
+  (e: 'update:readMessages', updated: number[]): void
+}>()
+
+const element = useTemplateRef<HTMLDivElement>('element')
 
 const { user } = useSanctumAuth<IUser>()
 
+const isMessageBySelf = computed(
+  () =>
+    (props.userPov && props.message.by_user) ||
+    (!props.userPov && !props.message.by_user)
+)
+
 const classes = computed(() => ({
   '--was-read': props.message.was_read,
-  '--right-sided':
-    (props.userPov && props.message.by_user) ||
-    (!props.userPov && !props.message.by_user),
+  '--right-sided': !isMessageBySelf.value,
 }))
+
+let intersectionObserver: IntersectionObserver | undefined
+
+onMounted(() => {
+  if (element.value && !isMessageBySelf.value && !props.message.was_read) {
+    intersectionObserver = new IntersectionObserver(onIntersection, {
+      threshold: 0.75,
+    })
+    intersectionObserver.observe(element.value)
+  }
+})
+
+onUnmounted(() => {
+  if (element.value) {
+    intersectionObserver?.unobserve(element.value)
+  }
+})
+
+function onIntersection(entries: IntersectionObserverEntry[]) {
+  if (entries.find((entry) => entry.isIntersecting)) {
+    props.message.was_read = true
+    if (element.value) intersectionObserver?.unobserve(element.value)
+
+    if (!props.readMessages.includes(props.message.id))
+      emit('update:readMessages', [...props.readMessages, props.message.id])
+  }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -29,6 +29,22 @@ export function useSupportChat(
   const wasScrolledRecently = ref(false)
   let _wasScrolledRecentlyTimeout: ReturnType<typeof setTimeout>
 
+  const readMessages = ref<number[]>([])
+  const sendReadMessagesDebounced = debounce(async () => {
+    console.log(readMessages.value);
+    await $afFetch('support-chat/read', {
+      method: 'POST',
+      credentials: 'include',
+      body: {
+        chat_id: chatInfo.value?.chat_id,
+        first_message_id: readMessages.value.at(0),
+        read_count: readMessages.value.length,
+      },
+    })
+  }, 1000)
+
+  watch(readMessages, sendReadMessagesDebounced)
+
   let _spyTopObserver: IntersectionObserver
   let _spyBottomObserver: IntersectionObserver
 
@@ -36,6 +52,7 @@ export function useSupportChat(
     _initEcho()
     _initSpyTop()
     _initSpyBottom()
+    _scrollChatBodyOnMount()
     isMounted.value = true
   })
 
@@ -165,6 +182,15 @@ export function useSupportChat(
     isLoadingBottom.value = false
   }
 
+  function _scrollChatBodyOnMount() {
+    if (initialLoadPage === 1) scrollChatBodyToBottom()
+    else {
+      chatBodyElement.value?.scrollTo({
+        top: chatBodyElement.value.scrollHeight,
+      })
+    }
+  }
+
   function onChatBodyScroll() {
     wasScrolledRecently.value = true
     if (_wasScrolledRecentlyTimeout) clearTimeout(_wasScrolledRecentlyTimeout)
@@ -191,6 +217,7 @@ export function useSupportChat(
     isLoadingBottom,
     onChatBodyScroll,
     scrollChatBodyToBottom,
+    readMessages,
   }
 }
 

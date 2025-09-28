@@ -14,7 +14,7 @@
 <style lang="scss" scoped>
 @use '/css/mixins/mixins.scss';
 
-.chat-skeleton {
+.sc-skeleton {
   .skeleton-group {
     display: flex;
     flex-direction: column;

@@ -34,6 +34,7 @@
                 :message="message"
                 :is-first="mIndex === 0"
                 user-pov
+                v-model:readMessages="readMessages"
               />
             </div>
           </div>
@@ -118,8 +119,7 @@ const {
   isLoadingTop,
   isLoadingBottom,
   scrollChatBodyToBottom,
-  pageTop,
-  pageBottom
+  readMessages
 } = useSupportChat(
   spyElementTop,
   spyElementBottom,
