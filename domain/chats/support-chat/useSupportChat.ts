@@ -40,6 +40,7 @@ export function useSupportChat(
   })
 
   onUnmounted(() => {
+    _leaveEcho()
     if (_spyTopObserver) _spyTopObserver.disconnect()
     if (_spyBottomObserver) _spyTopObserver.disconnect()
   })
@@ -57,6 +58,10 @@ export function useSupportChat(
     } else {
       throw new Error('No chat info provided')
     }
+  }
+
+  function _leaveEcho() {
+    if (chatInfo.value) echo.leave(`support.message.${chatInfo.value.chat_id}`)
   }
 
   function _initSpyTop() {
@@ -78,7 +83,8 @@ export function useSupportChat(
   }
 
   async function _loadMoreTop() {
-    if (isLoadingTop.value || pageTop.value > lastPage.value || !chatInfo.value) return
+    if (isLoadingTop.value || pageTop.value > lastPage.value || !chatInfo.value)
+      return
 
     isLoadingTop.value = true
 
@@ -125,9 +131,7 @@ export function useSupportChat(
   }
 
   async function _loadMoreBottom() {
-    console.log(pageBottom.value);
-    if (isLoadingBottom.value || pageBottom.value < 1 || !chatInfo.value)
-      return
+    if (isLoadingBottom.value || pageBottom.value < 1 || !chatInfo.value) return
 
     isLoadingBottom.value = true
 
@@ -142,7 +146,9 @@ export function useSupportChat(
           const messages = response._data?.data as ISupportChatMessage[]
 
           if (response.ok && messages) {
-            messages.reverse().forEach((message) => supportChat.appendMessage(message))
+            messages
+              .reverse()
+              .forEach((message) => supportChat.appendMessage(message))
 
             pageBottom.value = response._data.current_page - 1
             lastPage.value = response._data.last_page
