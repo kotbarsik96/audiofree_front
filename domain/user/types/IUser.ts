@@ -1,3 +1,4 @@
+import type { EUserPermissions } from '~/domain/user/types/EUserPermissions'
 import type IUserConfirmations from '~/domain/user/types/IUserConfirmations'
 
 export default interface IUser {
@@ -13,4 +14,5 @@ export default interface IUser {
   created_at: string
   updated_at: string
   confirmations: IUserConfirmations
+  permissions_list: Record<EUserPermissions, boolean>
 }
