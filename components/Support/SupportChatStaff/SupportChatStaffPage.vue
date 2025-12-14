@@ -1,38 +1,25 @@
 <template>
   <div class="sc-staff">
-    
+    <div class="top-spy" ref="topSpyElement"></div>
+    <div class="bottom-spy" ref="bottomSpyElement"></div>
   </div>
 </template>
 
 <script setup lang="ts">
+const topSpyElement = useTemplateRef<HTMLElement>('topSpyElement')
+const bottomSpyElement = useTemplateRef<HTMLElement>('bottomSpyElement')
+
 const route = useRoute()
 
-const chat_id = computed(() => route.params.id)
+const chatId = computed(() => Number(route.params.id ?? 0))
 
-const [
-  { data: chatInfoData, error: chatInfoError },
-  { data: messagesData, error: messagesError },
-] = await Promise.all([
-  useAPI('/support-chat/', {
-    credentials: 'include',
-    query: {
-      chat_id,
-    },
-  }),
-  useAPI('/support-chat/messages', {
-    credentials: 'include',
-    query: {
-      chat_id,
-    },
-  }),
-])
+const { messages } = await useSupportChat(
+  topSpyElement,
+  bottomSpyElement,
+  chatId
+)
 
-if (chatInfoError.value) {
-  throw createError(chatInfoError.value)
-}
-if (messagesError.value) {
-  throw createError(messagesError.value)
-}
+console.log(messages);
 </script>
 
 <style lang="scss" scoped>
