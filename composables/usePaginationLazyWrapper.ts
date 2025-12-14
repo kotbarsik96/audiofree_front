@@ -8,7 +8,7 @@ export type PaginationLazyWrapperOptions<T> = UseFetchOptions<{
   NitroFetchOptions<string>
 
 export async function usePaginationLazyWrapper<T>(
-  intersectionEl: Ref<HTMLElement | undefined>,
+  intersectionEl: Ref<HTMLElement | undefined | null>,
   url: string,
   options: PaginationLazyWrapperOptions<T>
 ) {
@@ -18,6 +18,7 @@ export async function usePaginationLazyWrapper<T>(
   const page = ref(1)
   const isLoading = ref(false)
   const paginationData = ref<IPagination<T>>()
+  const error = ref()
 
   const isLastPage = computed(
     () =>
@@ -59,6 +60,8 @@ export async function usePaginationLazyWrapper<T>(
     const responseData = await useAPI<{
       data: IPagination<T>
     }>(url, optionsWithDefaults)
+
+    if (responseData.error) error.value = responseData.error.value
 
     isLoading.value = false
 
@@ -114,5 +117,6 @@ export async function usePaginationLazyWrapper<T>(
     isLoading,
     reset,
     refresh,
+    error,
   }
 }

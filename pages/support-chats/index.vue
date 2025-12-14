@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import SupportChatsListPage from '~/components/Support/SupportChatStaff/SupportChatsListPage.vue'
+import SupportChatsListPage from '~/components/Support/SupportChatStaff/SupportChatsPage.vue'
 
 definePageMeta({
   name: "SupportChatsListPage"
