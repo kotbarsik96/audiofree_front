@@ -79,7 +79,7 @@ const userEmail = ref('')
 const userPhoneNumber = ref('')
 const page = computed(() => Number(route.query.page ?? '1'))
 
-const { data, refresh, status } = await useAPI<{
+const { data, error, refresh, status } = await useAPI<{
   data: IPagination<ISupportChatListItem>
 }>('/support-chat/list', {
   query: {
@@ -92,6 +92,10 @@ const { data, refresh, status } = await useAPI<{
   watch: false,
   credentials: 'include',
 })
+
+if (error.value) {
+  throw createError(error.value)
+}
 
 const pagination = computed(() => data.value?.data)
 const chats = computed(() => pagination.value?.data)
