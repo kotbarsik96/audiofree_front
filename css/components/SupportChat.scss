@@ -1,0 +1,16 @@
+.support-chat {
+  .chat-body {
+    position: relative;
+    overflow: auto;
+    max-height: 600px;
+    padding: 0.5rem 1rem;
+  }
+
+  .dated-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+}

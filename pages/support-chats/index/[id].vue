@@ -1,9 +1,9 @@
 <template>
-  <SupportChatStaffPage />
+  <SupportChatStafView />
 </template>
 
 <script setup lang="ts">
-import SupportChatStaffPage from '~/components/Support/SupportChatStaff/SupportChatStaffPage.vue'
+import SupportChatStafView from '~/components/Support/SupportChatStaff/SupportChatStaffView.vue'
 
 definePageMeta({
   name: 'SupportChatStaffPage',
