@@ -24,6 +24,10 @@ const props = defineProps<{
   chatId?: number
 }>()
 
+const emit = defineEmits<{
+  (e: 'message-written'): void
+}>()
+
 const { addNotification } = useNotifications()
 
 const { $afFetch } = useNuxtApp()
@@ -63,6 +67,8 @@ async function send() {
         )
         latestMessageId.value = latest_loaded_id
         text.value = ''
+
+        emit('message-written')
       },
       onResponseError({ response }) {
         addNotification('error', 'Не удалось отправить сообщение')

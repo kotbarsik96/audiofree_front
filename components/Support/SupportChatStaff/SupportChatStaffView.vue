@@ -11,7 +11,7 @@
         <div class="bottom-spy" ref="bottomSpyElement"></div>
       </div>
     </div>
-    <SupportChatInput :chat-id="chatId" />
+    <SupportChatInput :chat-id="chatId" @message-written="onMessageWritten" />
   </div>
 </template>
 
@@ -35,6 +35,11 @@ await useSupportChat(chatBodyElement, topSpyElement, bottomSpyElement, chatId)
 
 const store = useSupportChatStaffStore()
 const { messagesGroupedByDate } = storeToRefs(store)
+
+async function onMessageWritten() {
+  await nextTick()
+  chatBodyElement.value?.scrollTo({ top: chatBodyElement.value.scrollHeight })
+}
 </script>
 
 <style lang="scss" scoped>
