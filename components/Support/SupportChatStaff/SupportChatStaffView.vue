@@ -4,21 +4,24 @@
       <div class="inner">
         <div class="top-spy" ref="topSpyElement"></div>
         <SupportChatDatedGroup
-          v-for="group in groupedByDateMessages"
+          v-for="group in messagesGroupedByDate"
           :group="group"
           :current-sender-type="ESupportChatSenderType.Staff"
         />
         <div class="bottom-spy" ref="bottomSpyElement"></div>
       </div>
     </div>
-    <SupportChatInput />
+    <SupportChatInput :chat-id="chatId" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import SupportChatInput from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatInput.vue'
 import SupportChatDatedGroup from '~/components/Support/SupportChat/_Blocks/SupportChatDatedGroup.vue'
+import { useSupportChat } from '~/composables/useSupportChat'
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
+import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 const topSpyElement = useTemplateRef<HTMLElement>('topSpyElement')
@@ -28,12 +31,10 @@ const route = useRoute()
 
 const chatId = computed(() => Number(route.params.id ?? 0))
 
-const { groupedByDateMessages } = await useSupportChat(
-  chatBodyElement,
-  topSpyElement,
-  bottomSpyElement,
-  chatId
-)
+await useSupportChat(chatBodyElement, topSpyElement, bottomSpyElement, chatId)
+
+const store = useSupportChatStaffStore()
+const { messagesGroupedByDate } = storeToRefs(store)
 </script>
 
 <style lang="scss" scoped>

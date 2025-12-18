@@ -1,15 +1,20 @@
+import { createError } from 'nuxt/app'
+import { storeToRefs } from 'pinia'
 import type { ShallowRef } from 'vue'
+import { useAPI } from '~/composables/useAPI'
 import type { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import type { ISupportChatMessagesList } from '~/domain/support/chat/interfaces/ISupportChatMessagesList'
+import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
+import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
 
 export interface ISupportChatMessagesDateGroup {
   date: string
-  groups: ISupportChatMessageSenderGroup[]
+  groups: ISupportChatMessagesSenderGroup[]
 }
 
-export interface ISupportChatMessageSenderGroup {
+export interface ISupportChatMessagesSenderGroup {
   sender_type: ESupportChatSenderType
   messages: ISupportChatMessage[]
 }
@@ -30,40 +35,64 @@ export async function useSupportChat(
     if (bottomSpyObserver) bottomSpyObserver.disconnect()
   })
 
+  const _OBSERVER_MARGIN_ = 100
+
   const { addNotification } = useNotifications()
 
   const { $afFetch } = useNuxtApp()
 
-  const [
-    { data: chatInfoData, error: chatInfoError },
-    { data: messagesData, error: messagesError },
-  ] = await Promise.all([
-    useAPI<{ data: ISupportChatInfo }>('/support-chat/', {
-      credentials: 'include',
-      query: {
-        chat_id,
-      },
-      watch: false,
-    }),
-    useAPI<{ data: ISupportChatMessagesList }>('/support-chat/messages', {
-      credentials: 'include',
-      query: {
-        chat_id,
-      },
-      watch: false,
-    }),
-  ])
+  const store = chat_id ? useSupportChatStaffStore() : useSupportChatUserStore()
+  const storeRefs = storeToRefs(store)
+  const {
+    messagesGroupedByDate,
+    earliestMessageId,
+    latestMessageId,
+    chatInfo,
+    savedScrollPosition,
+  } = storeRefs
 
-  if (chatInfoError.value) throw createError(chatInfoError.value)
-  if (messagesError.value) throw createError(messagesError.value)
+  // достать чат из кэша, если есть
+  if ('changeChat' in store && chat_id) store.changeChat(toValue(chat_id))
+  // если чата в кэше по данному id нет - загрузить
+  if (!chatInfo.value) {
+    const [
+      { data: chatInfoData, error: chatInfoError },
+      { data: messagesData, error: messagesError },
+    ] = await Promise.all([
+      useAPI<{ data: ISupportChatInfo }>('/support-chat/', {
+        credentials: 'include',
+        query: {
+          chat_id,
+        },
+        watch: false,
+      }),
+      useAPI<{ data: ISupportChatMessagesList }>('/support-chat/messages', {
+        credentials: 'include',
+        query: {
+          chat_id,
+        },
+        watch: false,
+      }),
+    ])
 
-  const chatInfo = computed(() => chatInfoData.value)
+    if (chatInfoError.value) throw createError(chatInfoError.value)
+    if (messagesError.value) throw createError(messagesError.value)
 
-  const groupedByDateMessages = ref<ISupportChatMessagesDateGroup[]>(
-    formatAndAppendMessages([], messagesData.value?.data.messages ?? [])
-  )
-  const earliestMessageId = ref(messagesData.value?.data.earliest_loaded_id)
-  const latestMessageId = ref(messagesData.value?.data.latest_loaded_id)
+    messagesGroupedByDate.value = formatAndAppendMessages(
+      messagesGroupedByDate.value,
+      messagesData.value?.data.messages ?? []
+    )
+    earliestMessageId.value = messagesData.value?.data.earliest_loaded_id
+    latestMessageId.value = messagesData.value?.data.latest_loaded_id
+    chatInfo.value = chatInfoData.value?.data
+  }
+
+  nextTick().then(() => {
+    console.log(savedScrollPosition.value)
+    if (savedScrollPosition.value)
+      chatBodyElement.value?.scrollTo({ top: savedScrollPosition.value })
+    else chatBodyElement.value?.scrollTo({ top: _OBSERVER_MARGIN_ })
+  })
 
   let topSpyObserver: IntersectionObserver
   let bottomSpyObserver: IntersectionObserver
@@ -75,7 +104,7 @@ export async function useSupportChat(
         },
         {
           root: chatBodyElement.value,
-          rootMargin: '200px 0px 0px 0px',
+          rootMargin: `${_OBSERVER_MARGIN_}px 0px 0px 0px`,
         }
       )
       topSpyObserver.observe(topSpyElement.value)
@@ -89,6 +118,7 @@ export async function useSupportChat(
         },
         {
           root: chatBodyElement.value,
+          rootMargin: `0px 0px ${_OBSERVER_MARGIN_}px 0px`,
         }
       )
       bottomSpyObserver.observe(bottomSpyElement.value)
@@ -112,8 +142,8 @@ export async function useSupportChat(
           const heightBefore = chatBodyElement.value?.scrollHeight ?? 0
 
           earliestMessageId.value = earliest_loaded_id
-          groupedByDateMessages.value = formatAndPrependMessages(
-            groupedByDateMessages.value,
+          messagesGroupedByDate.value = formatAndPrependMessages(
+            messagesGroupedByDate.value,
             loadedMessages
           )
 
@@ -148,8 +178,8 @@ export async function useSupportChat(
           const heightBefore = chatBodyElement.value?.scrollHeight ?? 0
 
           latestMessageId.value = latest_loaded_id
-          groupedByDateMessages.value = formatAndAppendMessages(
-            groupedByDateMessages.value,
+          messagesGroupedByDate.value = formatAndAppendMessages(
+            messagesGroupedByDate.value,
             loadedMessages
           )
 
@@ -170,13 +200,12 @@ export async function useSupportChat(
 
   return {
     chatInfo,
-    groupedByDateMessages,
     earliestMessageId,
     latestMessageId,
   }
 }
 
-function formatAndPrependMessages(
+export function formatAndPrependMessages(
   currentArray: ISupportChatMessagesDateGroup[],
   messages: ISupportChatMessage[]
 ) {
@@ -192,7 +221,7 @@ function formatAndPrependMessages(
       arr.unshift(firstDateGroup)
     }
 
-    let firstSenderGroup: ISupportChatMessageSenderGroup | undefined =
+    let firstSenderGroup: ISupportChatMessagesSenderGroup | undefined =
       firstDateGroup.groups.at(0)
     if (
       !firstSenderGroup ||
@@ -208,7 +237,7 @@ function formatAndPrependMessages(
   return arr
 }
 
-function formatAndAppendMessages(
+export function formatAndAppendMessages(
   currentArray: ISupportChatMessagesDateGroup[],
   messages: ISupportChatMessage[]
 ) {
@@ -226,7 +255,7 @@ function formatAndAppendMessages(
       arr.push(lastDateGroup)
     }
 
-    let lastSenderGroup: ISupportChatMessageSenderGroup | undefined =
+    let lastSenderGroup: ISupportChatMessagesSenderGroup | undefined =
       lastDateGroup.groups.at(lastDateGroup.groups.length - 1)
     if (
       !lastSenderGroup ||
@@ -242,7 +271,7 @@ function formatAndAppendMessages(
   return arr
 }
 
-function checkSameDate(dateFirstStr: string, dateSecondStr: string) {
+export function checkSameDate(dateFirstStr: string, dateSecondStr: string) {
   const dateFirst = new Date(dateFirstStr)
   const dateSecond = new Date(dateSecondStr)
 

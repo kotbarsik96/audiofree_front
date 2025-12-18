@@ -19,11 +19,11 @@ import SupportChatMessage from '~/components/Support/SupportChat/_Blocks/Support
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import SupportIcon from '~/assets/images/icons/support.svg?component'
 import UserIcon from '~/assets/images/icons/user.svg?component'
-import type { ISupportChatMessageSenderGroup } from '~/composables/useSupportChat'
+import type { ISupportChatMessagesSenderGroup } from '~/composables/useSupportChat'
 import type { Component } from 'vue'
 
 const props = defineProps<{
-  messagesGroup: ISupportChatMessageSenderGroup
+  messagesGroup: ISupportChatMessagesSenderGroup
   currentSenderType: ESupportChatSenderType
 }>()
 
