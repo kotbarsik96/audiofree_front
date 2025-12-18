@@ -53,5 +53,9 @@ useBreadcrumbs(supportChatsListBreadcrumbs)
   .list {
     border-right: var(--border);
   }
+
+  .chat {
+    min-width: 0;
+  }
 }
 </style>

@@ -58,6 +58,9 @@ const contactsString = computed(() =>
   .latest-message {
     color: var(--gray-800);
     font: var(--text-16);
+    min-width: 0;
+    overflow-wrap: break-word;
+    @include mixins.lines(3);
   }
 
   &:not(:first-child) {

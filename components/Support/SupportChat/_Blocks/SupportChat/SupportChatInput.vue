@@ -1,13 +1,14 @@
 <template>
   <form class="sc-input" @submit.prevent="onSubmit">
     <div class="input-wrap">
-      <textarea
+      <input
+        class="input"
         type="text"
         maxlength="3000"
         placeholder="Сообщение"
         v-model="text"
         @keyup.enter="onEnter"
-      ></textarea>
+      />
     </div>
     <button class="send-btn" type="submit">
       <IconSend />
@@ -96,7 +97,7 @@ async function send() {
     display: flex;
     align-items: center;
 
-    textarea {
+    .input {
       width: 100%;
       height: 2.15rem;
       border-radius: 8px;

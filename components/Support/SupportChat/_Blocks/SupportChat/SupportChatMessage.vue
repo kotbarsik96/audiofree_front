@@ -84,6 +84,7 @@ function formatTime(time: string, withDate?: boolean) {
   border-radius: 8px;
   padding: 0.5rem 1rem;
   background: var(--gray-50);
+  max-width: 100%;
 
   .time-block {
     font: var(--text-14);
@@ -92,6 +93,17 @@ function formatTime(time: string, withDate?: boolean) {
     display: flex;
     align-items: center;
     gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .name {
+    min-width: 0;
+  }
+
+  .text{ 
+    margin-block: 0.5rem;
+    overflow-wrap: break-word;
+    min-width: 0;
   }
 
   .checkmarks {

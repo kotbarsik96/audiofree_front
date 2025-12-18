@@ -102,3 +102,14 @@
   opacity: 1;
   transform: translateY(0px);
 }
+
+@mixin lines($count) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  display: -webkit-box;
+  -webkit-line-clamp: $count;
+  -webkit-box-orient: vertical;
+  line-clamp: $count;
+}
