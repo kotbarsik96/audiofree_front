@@ -7,6 +7,12 @@
       <time v-if="updatedAt" class="time" :datetime="updatedAt">
         (изменено: {{ updatedAt }})
       </time>
+      <div class="checkmarks">
+        <CheckmarkIcon />
+        <Transition name="fade-in">
+          <CheckmarkIcon v-if="props.message.read_at" class="second" />
+        </Transition>
+      </div>
     </div>
   </div>
 </template>
@@ -18,6 +24,7 @@ import {
 } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import DOMPurify from 'dompurify'
+import CheckmarkIcon from '~/assets/images/icons/checkmark.svg?component'
 
 const props = defineProps<{
   message: ISupportChatMessage
@@ -38,7 +45,11 @@ const name = computed(() => {
   return n
 })
 
-const purifiedText = computed(() => DOMPurify.sanitize(props.message.text))
+const purifiedText = computed(() =>
+  typeof window !== 'undefined'
+    ? DOMPurify.sanitize(props.message.text)
+    : props.message.text
+)
 
 const createdAt = computed(() => formatTime(props.message.created_at))
 const updatedAt = computed(() => {
@@ -48,6 +59,7 @@ const updatedAt = computed(() => {
 
 const classes = computed(() => ({
   '--opposite': isOpposite.value,
+  '--is-read': !!props.message.read_at,
 }))
 
 function formatTime(time: string, withDate?: boolean) {
@@ -72,5 +84,35 @@ function formatTime(time: string, withDate?: boolean) {
   border-radius: 8px;
   padding: 0.5rem 1rem;
   background: var(--gray-50);
+
+  .time-block {
+    font: var(--text-14);
+    color: var(--gray-500);
+    text-align: right;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .checkmarks {
+    color: var(--gray-500);
+    padding-inline-start: 0.25rem;
+    display: flex;
+    align-items: center;
+
+    svg {
+      width: 1rem;
+    }
+
+    .second {
+      transform: translateX(-0.5rem);
+    }
+  }
+
+  &.--is-read {
+    .checkmarks {
+      color: var(--primary);
+    }
+  }
 }
 </style>

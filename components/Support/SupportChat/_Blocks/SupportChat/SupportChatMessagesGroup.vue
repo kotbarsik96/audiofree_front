@@ -5,7 +5,8 @@
     </div>
     <div class="list">
       <SupportChatMessage
-        v-for="message in groupData.group"
+        v-for="message in messagesGroup.messages"
+        :key="message.id"
         :message="message"
         :current-sender-type="currentSenderType"
       />
@@ -16,25 +17,25 @@
 <script setup lang="ts">
 import SupportChatMessage from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatMessage.vue'
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
-import OperatorIcon from '~/assets/images/icons/operator.svg?component'
+import SupportIcon from '~/assets/images/icons/support.svg?component'
 import UserIcon from '~/assets/images/icons/user.svg?component'
-import type { ISupportChatFormattedMessagesGroup } from '~/composables/useSupportChat'
+import type { ISupportChatMessageSenderGroup } from '~/composables/useSupportChat'
 import type { Component } from 'vue'
 
 const props = defineProps<{
-  groupData: ISupportChatFormattedMessagesGroup
+  messagesGroup: ISupportChatMessageSenderGroup
   currentSenderType: ESupportChatSenderType
 }>()
 
 const avatarMap: Record<ESupportChatSenderType, Component> = {
-  [ESupportChatSenderType.Staff]: OperatorIcon,
+  [ESupportChatSenderType.Staff]: SupportIcon,
   [ESupportChatSenderType.User]: UserIcon,
 }
 
-const avatarIcon = computed(() => avatarMap[props.groupData.sender_type])
+const avatarIcon = computed(() => avatarMap[props.messagesGroup.sender_type])
 
 const isRight = computed(
-  () => props.currentSenderType === props.groupData.sender_type
+  () => props.currentSenderType === props.messagesGroup.sender_type
 )
 
 const classes = computed(() => ({

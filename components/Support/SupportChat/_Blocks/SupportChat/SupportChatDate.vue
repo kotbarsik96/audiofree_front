@@ -1,16 +1,14 @@
 <template>
-  <time class="sc-date" :datetime="dateData.date">{{ date }}</time>
+  <time class="sc-date" :datetime="dateFormatted">{{ dateFormatted }}</time>
 </template>
 
 <script setup lang="ts">
-import type { ISupportChatFormattedMessagesDate } from '~/composables/useSupportChat'
-
 const props = defineProps<{
-  dateData: ISupportChatFormattedMessagesDate
+  date: string
 }>()
 
-const date = computed(() =>
-  new Date(props.dateData.date).toLocaleDateString('ru-RU', {
+const dateFormatted = computed(() =>
+  new Date(props.date).toLocaleDateString('ru-RU', {
     year: undefined,
     month: 'long',
     day: 'numeric',

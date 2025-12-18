@@ -6,11 +6,26 @@
     padding: 0.5rem 1rem;
   }
 
-  .dated-group {
+  .inner {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+  }
+
+  .top-spy,
+  .bottom-spy {
+    background: transparent;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    height: 1px;
+    left: 0;
+    right: 0;
+  }
+
+  .top-spy {
+    top: 0;
+  }
+
+  .bottom-spy {
+    bottom: 0;
   }
 }
