@@ -25,14 +25,30 @@ export async function useSupportChat(
   bottomSpyElement: ShallowRef<HTMLElement | null>,
   chat_id?: MaybeRefOrGetter<number>
 ) {
+  const onChatBodyScroll = debounce(() => {
+    if (chatBodyElement.value)
+      savedScrollPosition.value = chatBodyElement.value.scrollTop
+  }, 500)
+
   onMounted(() => {
-    initTopObserver()
-    initBottomObserver()
+    nextTick().then(() => {
+      if (savedScrollPosition.value)
+        chatBodyElement.value?.scrollTo({ top: savedScrollPosition.value })
+      else chatBodyElement.value?.scrollTo({ top: _OBSERVER_MARGIN_ * 2 })
+
+      setTimeout(() => {
+        initTopObserver()
+        initBottomObserver()
+      }, 1000)
+    })
+
+    chatBodyElement.value?.addEventListener('scroll', onChatBodyScroll)
   })
 
   onUnmounted(() => {
     if (topSpyObserver) topSpyObserver.disconnect()
     if (bottomSpyObserver) bottomSpyObserver.disconnect()
+    chatBodyElement.value?.removeEventListener('scroll', onChatBodyScroll)
   })
 
   const _OBSERVER_MARGIN_ = 100
@@ -86,13 +102,6 @@ export async function useSupportChat(
     latestMessageId.value = messagesData.value?.data.latest_loaded_id
     chatInfo.value = chatInfoData.value?.data
   }
-
-  nextTick().then(() => {
-    console.log(savedScrollPosition.value)
-    if (savedScrollPosition.value)
-      chatBodyElement.value?.scrollTo({ top: savedScrollPosition.value })
-    else chatBodyElement.value?.scrollTo({ top: _OBSERVER_MARGIN_ })
-  })
 
   let topSpyObserver: IntersectionObserver
   let bottomSpyObserver: IntersectionObserver
