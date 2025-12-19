@@ -184,22 +184,11 @@ export async function useSupportChat(
           const { messages: loadedMessages, latest_loaded_id } =
             response._data.data
 
-          const heightBefore = chatBodyElement.value?.scrollHeight ?? 0
-
           latestMessageId.value = latest_loaded_id
           messagesGroupedByDate.value = formatAndAppendMessages(
             messagesGroupedByDate.value,
             loadedMessages
           )
-
-          nextTick().then(() => {
-            const heightAfter = chatBodyElement.value?.scrollHeight ?? 0
-            const diff = heightAfter - heightBefore
-
-            chatBodyElement.value?.scrollTo({
-              top: chatBodyElement.value.scrollTop - diff,
-            })
-          })
         },
       })
     } catch (err) {

@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import SupportChatInput from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatInput.vue'
-import SupportChatDatedGroup from '~/components/Support/SupportChat/_Blocks/SupportChatDatedGroup.vue'
+import SupportChatDatedGroup from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatDatedGroup.vue'
 import { useSupportChat } from '~/composables/useSupportChat'
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'

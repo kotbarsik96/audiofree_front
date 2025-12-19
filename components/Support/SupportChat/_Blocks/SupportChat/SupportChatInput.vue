@@ -7,7 +7,6 @@
         maxlength="3000"
         placeholder="Сообщение"
         v-model="text"
-        @keyup.enter="onEnter"
       />
     </div>
     <button class="send-btn" type="submit">
@@ -41,17 +40,12 @@ const store = props.chatId
 
 const { messagesGroupedByDate, latestMessageId } = storeToRefs(store)
 
-function onEnter(event: KeyboardEvent) {
-  if (!event.shiftKey) {
-    send()
-  }
-}
-
 async function onSubmit() {
   await send()
 }
 
 async function send() {
+  console.log('sending')
   try {
     await $afFetch('/support-chat/message', {
       method: 'POST',
