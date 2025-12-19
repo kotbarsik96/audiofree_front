@@ -82,8 +82,8 @@ async function send() {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: var(--white);
-  box-shadow: 1px 1px 1px #000;
+  background-color: var(--gray-50);
+  box-shadow: 0px -5px 30px rgba(0, 0, 0, 0.05);
   padding: 0.5rem 1rem;
 
   .input-wrap {
@@ -96,14 +96,20 @@ async function send() {
       height: 2.15rem;
       border-radius: 8px;
       resize: none;
-      border: 1px solid var(--gray-300);
+      border: 1px solid var(--gray-200);
+      background-color: var(--gray-50);
       padding: 0.25rem 0.75rem;
       font: var(--text-18);
       color: var(--gray-800);
       outline: none;
+      transition: var(--general-transition);
 
       &::placeholder {
-        color: var(--gray-200);
+        color: var(--gray-300);
+      }
+
+      &:focus {
+        border-color: var(--gray-400);
       }
     }
   }

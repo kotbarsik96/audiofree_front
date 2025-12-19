@@ -7,13 +7,14 @@
       <div class="contacts">({{ contactsString }})</div>
     </div>
     <div class="latest-message">
-      {{ chat.lateset_message.text.slice(0, 250) }}
+      {{ chat.lateset_message?.text.slice(0, 250) }}
     </div>
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
+import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 
 const props = defineProps<{
   chat: ISupportChatListItem
@@ -41,7 +42,10 @@ const contactsString = computed(() =>
   display: flex;
   flex-direction: column;
   background-color: transparent;
+  border-radius: 8px;
+  background-color: var(--gray-100);
   transition: var(--general-transition);
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.05);
 
   .credentials {
     .name {
@@ -63,12 +67,9 @@ const contactsString = computed(() =>
     @include mixins.lines(3);
   }
 
-  &:not(:first-child) {
-    border-top: 1px solid var(--gray-800);
-  }
-  
   &:hover {
     background-color: var(--gray-200);
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0);
   }
 }
 </style>

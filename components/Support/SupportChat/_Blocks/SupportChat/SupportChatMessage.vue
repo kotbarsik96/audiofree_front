@@ -85,6 +85,7 @@ function formatTime(time: string, withDate?: boolean) {
   padding: 0.5rem 1rem;
   background: var(--gray-50);
   max-width: 100%;
+  box-shadow: 0px 0px 90px rgba(0, 0, 0, 0.05);
 
   .time-block {
     font: var(--text-14);
@@ -100,7 +101,7 @@ function formatTime(time: string, withDate?: boolean) {
     min-width: 0;
   }
 
-  .text{ 
+  .text {
     margin-block: 0.5rem;
     overflow-wrap: break-word;
     min-width: 0;

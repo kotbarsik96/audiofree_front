@@ -1,11 +1,25 @@
 <template>
   <div class="sc-list">
-    <SupportChatStaffLink v-for="chat in list" :key="chat.id" :chat="chat" />
-    <div class="spy" ref="spyElement"></div>
+    <div class="search-block">
+      <InputWrapper
+        class="input-wrapper"
+        label="Поиск (email, телефон, ФИО)"
+        input-id="search-filter"
+      >
+        <TextInput v-model="search" id="search-filter" />
+      </InputWrapper>
+    </div>
+    <div class="list">
+      <!-- todo: сделать обновление текста последнего сообщения при написании новых сообщений/получении новых сообщений -->
+      <SupportChatStaffLink v-for="chat in list" :key="chat.id" :chat="chat" />
+      <div class="spy" ref="spyElement"></div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import InputWrapper from '~/components/_UI/FormElements/InputWrapper.vue'
+import TextInput from '~/components/_UI/FormElements/TextInput.vue'
 import SupportChatStaffLink from '~/components/Support/SupportChatStaff/_Blocks/SupportChatStaffLink.vue'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
 
@@ -47,6 +61,30 @@ watch(search, refetch)
 @use '/css/mixins/mixins.scss';
 
 .sc-list {
-  overflow: auto;
+  --padding-inline: 1rem;
+
+  display: flex;
+  flex-direction: column;
+
+  .search-block {
+    padding-inline: var(--padding-inline);
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .list {
+    padding-block: 1rem;
+    padding-inline: var(--padding-inline);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  @include mixins.adaptive(tablet-small){
+    .list {
+      height: 300px;
+    }
+  }
 }
 </style>

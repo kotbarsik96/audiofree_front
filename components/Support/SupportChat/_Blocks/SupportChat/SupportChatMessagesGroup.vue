@@ -54,7 +54,7 @@ const classes = computed(() => ({
   .avatar {
     svg {
       position: sticky;
-      top: 0;
+      top: 10px;
       aspect-ratio: 1;
       width: 25px;
       height: auto;
@@ -79,6 +79,12 @@ const classes = computed(() => ({
 
     .avatar {
       order: 2;
+    }
+  }
+
+  @include mixins.adaptive(tablet-big){
+    .list {
+      width: 90%;
     }
   }
 }

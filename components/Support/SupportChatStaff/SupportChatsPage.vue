@@ -27,7 +27,7 @@ useBreadcrumbs(supportChatsListBreadcrumbs)
 @use '/css/mixins/mixins.scss';
 
 .support-chats {
-  --border: 1px solid var(--gray-700);
+  --border: 1px solid var(--gray-200);
 
   margin-block-end: 3.75rem;
 
@@ -48,14 +48,36 @@ useBreadcrumbs(supportChatsListBreadcrumbs)
     display: grid;
     grid-template-columns: 400px 1fr;
     overflow: hidden;
+    height: 75svh;
+    min-height: 800px;
   }
 
   .list {
     border-right: var(--border);
+    min-height: 0;
   }
 
   .chat {
     min-width: 0;
+    min-height: 0;
+  }
+
+  @include mixins.adaptive(tablet-big) {
+    .main {
+      grid-template-columns: 300px 1fr;
+    }
+  }
+
+  @include mixins.adaptive(tablet-small) {
+    .main {
+      grid-template-columns: 1fr;
+      height: auto;
+    }
+
+    .list {
+      border-right: 0;
+      border-bottom: var(--border);
+    }
   }
 }
 </style>
