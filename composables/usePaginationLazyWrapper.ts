@@ -1,6 +1,7 @@
 import type { UseFetchOptions } from '#app'
 import type IPagination from '~/dataAccess/api/IPagination'
 import { type NitroFetchOptions } from 'nitropack'
+import type { ShallowRef } from 'vue'
 
 export type PaginationLazyWrapperOptions<T> = UseFetchOptions<{
   data: IPagination<T>
@@ -8,13 +9,14 @@ export type PaginationLazyWrapperOptions<T> = UseFetchOptions<{
   NitroFetchOptions<string>
 
 export async function usePaginationLazyWrapper<T>(
+  listRef: Ref<T[]> | ShallowRef<T[]>,
   intersectionEl: Ref<HTMLElement | undefined | null>,
   url: string,
-  options: PaginationLazyWrapperOptions<T>
+  options: PaginationLazyWrapperOptions<T>,
 ) {
   const { $afFetch } = useNuxtApp()
 
-  const list = shallowRef<T[]>([])
+  const list = listRef ?? shallowRef<T[]>([])
   const page = ref(1)
   const isLoading = ref(false)
   const paginationData = ref<IPagination<T>>()

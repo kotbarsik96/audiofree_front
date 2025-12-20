@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
-import { readonly, ref, shallowRef, watch } from 'vue'
+import { ref } from 'vue'
 import type { ISupportChatMessagesDateGroup } from '~/composables/useSupportChat'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
+import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
 
 interface ICachedStaffSupportChat {
   chat: string // JSON.stringify
@@ -28,6 +29,8 @@ export const useSupportChatStaffStore = defineStore(
     const savedScrollPosition = ref<number>()
 
     const chatInfo = ref<ISupportChatInfo>()
+
+    const chatsList = shallowRef<ISupportChatListItem[]>([])
 
     function cacheCurrentChat() {
       if (!_currentChatId.value) return
@@ -71,6 +74,7 @@ export const useSupportChatStaffStore = defineStore(
       latestMessageId,
       savedScrollPosition,
       chatInfo,
+      chatsList,
     }
   }
 )

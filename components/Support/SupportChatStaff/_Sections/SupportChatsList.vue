@@ -10,8 +10,7 @@
       </InputWrapper>
     </div>
     <div class="list">
-      <!-- todo: сделать обновление текста последнего сообщения при написании новых сообщений/получении новых сообщений -->
-      <SupportChatStaffLink v-for="chat in list" :key="chat.id" :chat="chat" />
+      <SupportChatStaffLink v-for="chat in chatsList" :key="chat.id" :chat="chat" />
       <div class="spy" ref="spyElement"></div>
     </div>
   </div>
@@ -22,6 +21,7 @@ import InputWrapper from '~/components/_UI/FormElements/InputWrapper.vue'
 import TextInput from '~/components/_UI/FormElements/TextInput.vue'
 import SupportChatStaffLink from '~/components/Support/SupportChatStaff/_Blocks/SupportChatStaffLink.vue'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
+import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 
 const spyElement = useTemplateRef<HTMLElement>('spyElement')
 
@@ -33,20 +33,23 @@ const page = computed(() => Number(route.query.page ?? '1'))
 
 const search = ref('')
 
-const { list, error, reset } =
-  await usePaginationLazyWrapper<ISupportChatListItem>(
-    spyElement,
-    '/support-chat/list',
-    {
-      credentials: 'include',
-      watch: false,
-      query: {
-        search,
-        page,
-        per_page,
-      },
-    }
-  )
+const supportChatStaffStore = useSupportChatStaffStore()
+const { chatsList } = storeToRefs(supportChatStaffStore)
+
+const { error, reset } = await usePaginationLazyWrapper<ISupportChatListItem>(
+  chatsList,
+  spyElement,
+  '/support-chat/list',
+  {
+    credentials: 'include',
+    watch: false,
+    query: {
+      search,
+      page,
+      per_page,
+    },
+  }
+)
 
 if (error.value) {
   throw createError(error.value)
@@ -81,7 +84,7 @@ watch(search, refetch)
     gap: 0.5rem;
   }
 
-  @include mixins.adaptive(tablet-small){
+  @include mixins.adaptive(tablet-small) {
     .list {
       height: 300px;
     }

@@ -53,11 +53,14 @@ const { options, orderOptions, sort, sortOrder } = useSorts(sortData)
 
 const searchString = useRouteQuery('search') as Ref<string>
 
+const list = shallowRef<IVariationProduct[]>([])
+
 const [
-  { list, reset: resetList, isLoading: isLoadingProducts },
+  { reset: resetList, isLoading: isLoadingProducts },
   { data: pageSeoData },
 ] = await Promise.all([
   usePaginationLazyWrapper<IVariationProduct>(
+    list,
     intersectionEl,
     '/product/favorites',
     {

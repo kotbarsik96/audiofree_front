@@ -56,19 +56,26 @@ const { data: sortData } = await useAPI<{ data: ISelectOption[] }>(
 
 const { options, orderOptions, sort, sortOrder } = useSorts(sortData)
 
+const ordersList = shallowRef<IOrderListItem[]>([])
+
 const [
-  { list: ordersList, reset: resetList, isLoading: isLoadingOrders },
+  { reset: resetList, isLoading: isLoadingOrders },
   { data: pageSeoData },
 ] = await Promise.all([
-  usePaginationLazyWrapper<IOrderListItem>(intersectionEl, '/order/list', {
-    credentials: 'include',
-    watch: false,
-    query: {
-      sort: sort,
-      sort_order: sortOrder,
-      search: searchString,
-    },
-  }),
+  usePaginationLazyWrapper<IOrderListItem>(
+    ordersList,
+    intersectionEl,
+    '/order/list',
+    {
+      credentials: 'include',
+      watch: false,
+      query: {
+        sort: sort,
+        sort_order: sortOrder,
+        search: searchString,
+      },
+    }
+  ),
   useAPI<{ data: IPageSeo }>('page/orders'),
 ])
 usePageMeta(pageSeoData)

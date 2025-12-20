@@ -7,14 +7,13 @@
       <div class="contacts">({{ contactsString }})</div>
     </div>
     <div class="latest-message">
-      {{ chat.lateset_message?.text.slice(0, 250) }}
+      {{ chat.latest_message?.slice(0, 250) }}
     </div>
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
-import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 
 const props = defineProps<{
   chat: ISupportChatListItem

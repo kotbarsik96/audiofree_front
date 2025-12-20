@@ -17,6 +17,7 @@
 
 <script setup lang="ts">
 import IconSend from '~/assets/images/icons/send.svg?component'
+import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
 
@@ -45,7 +46,6 @@ async function onSubmit() {
 }
 
 async function send() {
-  console.log('sending')
   try {
     await $afFetch('/support-chat/message', {
       method: 'POST',
@@ -63,6 +63,8 @@ async function send() {
         latestMessageId.value = latest_loaded_id
         text.value = ''
 
+        updateLastMessageInChatList(message)
+
         emit('message-written')
       },
       onResponseError({ response }) {
@@ -71,6 +73,20 @@ async function send() {
     })
   } catch (err) {
     addNotification('error', 'Не удалось отправить сообщение')
+  }
+}
+
+function updateLastMessageInChatList(message: ISupportChatMessage) {
+  if ('chatsList' in store && props.chatId) {
+    const chat = store.chatsList.find((item) => item.id === props.chatId)
+    if (chat) {
+      chat.latest_message = message.text
+
+      store.chatsList = store.chatsList.sort((item1, item2) => {
+        if (item1.id === chat.id) return -1
+        return 0
+      })
+    }
   }
 }
 </script>
