@@ -1,12 +1,12 @@
 <template>
-  <div class="sc-message" :class="classes">
+  <div class="sc-message" :class="classes" ref="element">
     <div class="name">{{ name }}</div>
     <div class="text" v-html="purifiedText"></div>
     <div class="time-block">
       <time class="time" :datetime="createdAt">{{ createdAt }}</time>
-      <time v-if="updatedAt" class="time" :datetime="updatedAt">
-        (изменено: {{ updatedAt }})
-      </time>
+      <!-- todom (бэк): <time v-if="editedAt" class="time" :datetime="editedAt">
+        (изменено: {{ editedAt }})
+      </time> -->
       <div class="checkmarks">
         <CheckmarkIcon />
         <Transition name="fade-in">
@@ -25,11 +25,23 @@ import {
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import DOMPurify from 'dompurify'
 import CheckmarkIcon from '~/assets/images/icons/checkmark.svg?component'
+import { getChatBodyElement } from '~/composables/useSupportChat'
+import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
+import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 
 const props = defineProps<{
   message: ISupportChatMessage
   currentSenderType: ESupportChatSenderType
 }>()
+
+const element = useTemplateRef<HTMLElement>('element')
+
+const store =
+  props.currentSenderType === ESupportChatSenderType.User
+    ? useSupportChatUserStore()
+    : useSupportChatStaffStore()
+
+const { readMessage } = store
 
 const isOpposite = computed(
   () => props.currentSenderType !== props.message.sender_type
@@ -52,15 +64,41 @@ const purifiedText = computed(() =>
 )
 
 const createdAt = computed(() => formatTime(props.message.created_at))
-const updatedAt = computed(() => {
-  if (props.message.created_at === props.message.updated_at) return null
-  else return formatTime(props.message.updated_at, true)
-})
+// todo (бэк): const editedAt = computed(() => {
+//   if (props.message.created_at === props.message.edited_at) return null
+//   else return formatTime(props.message.updated_at, true)
+// })
 
 const classes = computed(() => ({
   '--opposite': isOpposite.value,
   '--is-read': !!props.message.read_at,
 }))
+
+let intersectionObserver: IntersectionObserver
+
+onMounted(() => {
+  setIntersectionObserver()
+})
+
+onUnmounted(() => {
+  if (intersectionObserver) intersectionObserver.disconnect()
+})
+
+function setIntersectionObserver() {
+  if (isOpposite.value && element.value) {
+    intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries.find((entry) => entry.isIntersecting))
+          readMessage(props.message.id)
+      },
+      {
+        root: getChatBodyElement(element.value),
+        threshold: 1,
+      }
+    )
+    intersectionObserver.observe(element.value)
+  }
+}
 
 function formatTime(time: string, withDate?: boolean) {
   const date = new Date(time)

@@ -32,9 +32,13 @@ export async function useSupportChat(
 
   onMounted(() => {
     nextTick().then(() => {
+      const totalMessages = chatInfo.value?.total_messages ?? 0
+      const unreadMessages = chatInfo.value?.unread_messages ?? 0
+
       if (savedScrollPosition.value)
         chatBodyElement.value?.scrollTo({ top: savedScrollPosition.value })
-      else chatBodyElement.value?.scrollTo({ top: _OBSERVER_MARGIN_ * 2 })
+      else if (totalMessages - unreadMessages > 3)
+        chatBodyElement.value?.scrollTo({ top: _OBSERVER_MARGIN_ * 2 })
 
       setTimeout(() => {
         initTopObserver()
@@ -277,4 +281,8 @@ export function checkSameDate(dateFirstStr: string, dateSecondStr: string) {
   const isSameMonth = dateFirst.getMonth() === dateSecond.getMonth()
   const isSameYear = dateFirst.getFullYear() === dateSecond.getFullYear()
   return isSameDay && isSameMonth && isSameYear
+}
+
+export function getChatBodyElement(element: HTMLElement | null) {
+  return element?.closest('.chat-body')
 }

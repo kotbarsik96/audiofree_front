@@ -10,11 +10,15 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
   const chatInfo = ref<ISupportChatInfo>()
   const savedScrollPosition = ref<number>()
 
+  const _readMessagesIds = ref<number[]>([])
+  const readMessage = (messageId: number) => {}
+
   return {
     messagesGroupedByDate,
     earliestMessageId,
     latestMessageId,
     chatInfo,
     savedScrollPosition,
+    readMessage,
   }
 })

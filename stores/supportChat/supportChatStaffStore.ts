@@ -5,21 +5,60 @@ import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupport
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
 
 interface ICachedStaffSupportChat {
-  chat: string // JSON.stringify
-  chat_info: string // JSON.stringify
+  chat: string // JSON.stringify<ISupportChatMessagesDateGroup[]>
+  chat_info: string // JSON.stringify<ISupportChatInfo>
   earliest_message_id: number | undefined
   latest_message_id: number | undefined
   scroll_position: number | undefined
 }
 
+interface IReadMessageByChatData {
+  messagesIds: number[]
+  timeout: ReturnType<typeof setTimeout> | undefined
+}
+
 export const useSupportChatStaffStore = defineStore(
   'support-chat-staff',
   () => {
+    const { $afFetch } = useNuxtApp()
+
     const _currentChatId = ref<number>()
     const currentChatId = computed(() => _currentChatId.value)
     const changeChat = (newChatId: number) => {
       cacheCurrentChat()
       restoreCachedChat(newChatId)
+    }
+
+    /** массивы списков id прочитанных сообщений по чатам:
+     * ключ number - chat_id,
+     * значение number[] - список id прочитанных сообщений в этом чате
+     * */
+    const _readMessagesByChats = ref<Record<number, IReadMessageByChatData>>({})
+    /** прочитать сообщение. messageId добавляется в массив _readMessagesByChats[chat_id].messagesIds и перезапускается таймер, по окончанию которого собранный список прочитанных сообщений отправляется на бэк
+     */
+    const readMessage = (messageId: number) => {
+      const chat_id = toValue(currentChatId)
+      if (chat_id) {
+        let data = _readMessagesByChats.value[chat_id]
+        if (!data) {
+          _readMessagesByChats.value[chat_id] = {
+            messagesIds: [],
+            timeout: undefined,
+          }
+          data = _readMessagesByChats.value[chat_id]
+        }
+
+        if (!data.messagesIds.includes(messageId)) {
+          data.messagesIds.push(messageId)
+
+          if (data.timeout) clearTimeout(data.timeout)
+          data.timeout = setTimeout(async () => {
+            await submitReadMessages(data.messagesIds, chat_id)
+            data.messagesIds = []
+            data.timeout = undefined
+          }, 1000)
+        }
+      }
     }
 
     const messagesGroupedByDate = ref<ISupportChatMessagesDateGroup[]>([])
@@ -68,9 +107,52 @@ export const useSupportChatStaffStore = defineStore(
       }
     }
 
+    async function submitReadMessages(
+      readMessagesIds: number[],
+      chat_id: number
+    ) {
+      if (readMessagesIds.length < 1) return
+
+      try {
+        await $afFetch('/support-chat/read', {
+          method: 'POST',
+          credentials: 'include',
+          body: {
+            chat_id,
+            first_read_message_id: readMessagesIds[0],
+            read_count: readMessagesIds.length,
+          },
+          onResponse({ response }) {
+            if (response.ok) {
+              // если чат не менялся - поменять значения read_at только локально
+              if (chat_id === currentChatId.value) {
+                messagesGroupedByDate.value = setReadAtToMessages(
+                  messagesGroupedByDate.value,
+                  readMessagesIds
+                )
+              }
+              // если чат менялся - поменять значения read_at внутри кэша
+              else {
+                const foundCached = cachedChats.value[chat_id]
+                const cachedChat = JSON.parse(
+                  foundCached.chat
+                ) as ISupportChatMessagesDateGroup[]
+                foundCached.chat = JSON.stringify(
+                  setReadAtToMessages(cachedChat, readMessagesIds)
+                )
+              }
+            }
+          },
+        })
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
     return {
       currentChatId,
       changeChat,
+      readMessage,
       messagesGroupedByDate,
       earliestMessageId,
       latestMessageId,
@@ -82,3 +164,22 @@ export const useSupportChatStaffStore = defineStore(
     }
   }
 )
+
+function setReadAtToMessages(
+  messagesGroupedByDate: ISupportChatMessagesDateGroup[],
+  readMessagesIds: number[]
+) {
+  const arr = [...messagesGroupedByDate]
+
+  arr.forEach((datedGroup) => {
+    datedGroup.groups.forEach((item) => {
+      item.messages.forEach((msg) => {
+        if (readMessagesIds.includes(msg.id)) {
+          msg.read_at = new Date().toLocaleString()
+        }
+      })
+    })
+  })
+
+  return arr
+}

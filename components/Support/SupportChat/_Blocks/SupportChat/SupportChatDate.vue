@@ -7,6 +7,8 @@
 </template>
 
 <script setup lang="ts">
+import { getChatBodyElement } from '~/composables/useSupportChat'
+
 const props = defineProps<{
   date: string
 }>()
@@ -53,7 +55,7 @@ onMounted(() => {
         sticky.value ? addScrollHandler() : removeScrollHandler()
       },
       {
-        root: getChatBodyElement(),
+        root: getChatBodyElement(element.value),
         rootMargin: '-1px 0px 0px 0px',
         threshold: [0, 1],
       }
@@ -79,15 +81,11 @@ const onScroll = debounce(() => {
   }, 1000)
 }, 100)
 
-function getChatBodyElement() {
-  return element.value?.closest('.chat-body')
-}
-
 function addScrollHandler() {
-  getChatBodyElement()?.addEventListener('scroll', onScroll)
+  getChatBodyElement(element.value)?.addEventListener('scroll', onScroll)
 }
 function removeScrollHandler() {
-  getChatBodyElement()?.removeEventListener('scroll', onScroll)
+  getChatBodyElement(element.value)?.removeEventListener('scroll', onScroll)
   if (setHiddenTimeout) clearTimeout(setHiddenTimeout)
   hidden.value = false
 }
