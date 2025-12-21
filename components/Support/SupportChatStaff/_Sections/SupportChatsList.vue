@@ -10,7 +10,11 @@
       </InputWrapper>
     </div>
     <div class="list">
-      <SupportChatStaffLink v-for="chat in chatsList" :key="chat.id" :chat="chat" />
+      <SupportChatStaffLink
+        v-for="chat in chatsList"
+        :key="chat.id"
+        :chat="chat"
+      />
       <div class="spy" ref="spyElement"></div>
     </div>
   </div>
@@ -25,31 +29,24 @@ import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffS
 
 const spyElement = useTemplateRef<HTMLElement>('spyElement')
 
-const route = useRoute()
-
-const per_page = 10
-
-const page = computed(() => Number(route.query.page ?? '1'))
-
 const search = ref('')
 
 const supportChatStaffStore = useSupportChatStaffStore()
-const { chatsList } = storeToRefs(supportChatStaffStore)
+const { chatsList, chatsListTrigger } = storeToRefs(supportChatStaffStore)
 
-const { error, reset } = await usePaginationLazyWrapper<ISupportChatListItem>(
-  chatsList,
-  spyElement,
-  '/support-chat/list',
-  {
-    credentials: 'include',
-    watch: false,
-    query: {
-      search,
-      page,
-      per_page,
-    },
-  }
-)
+const { error, reset, fullRefresh } =
+  await usePaginationLazyWrapper<ISupportChatListItem>(
+    chatsList,
+    spyElement,
+    '/support-chat/list',
+    {
+      credentials: 'include',
+      watch: false,
+      query: {
+        search,
+      },
+    }
+  )
 
 if (error.value) {
   throw createError(error.value)
@@ -58,6 +55,7 @@ if (error.value) {
 const refetch = debounce(reset, 500)
 
 watch(search, refetch)
+watch(chatsListTrigger, fullRefresh)
 </script>
 
 <style lang="scss" scoped>

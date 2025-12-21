@@ -63,7 +63,7 @@ async function send() {
         latestMessageId.value = latest_loaded_id
         text.value = ''
 
-        updateLastMessageInChatList(message)
+        updateLastMessageInChatList()
 
         emit('message-written')
       },
@@ -76,17 +76,9 @@ async function send() {
   }
 }
 
-function updateLastMessageInChatList(message: ISupportChatMessage) {
-  if ('chatsList' in store && props.chatId) {
-    const chat = store.chatsList.find((item) => item.id === props.chatId)
-    if (chat) {
-      chat.latest_message = message.text
-
-      store.chatsList = store.chatsList.sort((item1, item2) => {
-        if (item1.id === chat.id) return -1
-        return 0
-      })
-    }
+function updateLastMessageInChatList() {
+  if ('triggerChatsListRefresh' in store) {
+    store.triggerChatsListRefresh()
   }
 }
 </script>

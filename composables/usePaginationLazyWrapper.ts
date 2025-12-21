@@ -8,11 +8,13 @@ export type PaginationLazyWrapperOptions<T> = UseFetchOptions<{
 }> &
   NitroFetchOptions<string>
 
+type TLoadMoreResponse<T> = { data: IPagination<T> } | null
+
 export async function usePaginationLazyWrapper<T>(
   listRef: Ref<T[]> | ShallowRef<T[]>,
   intersectionEl: Ref<HTMLElement | undefined | null>,
   url: string,
-  options: PaginationLazyWrapperOptions<T>,
+  options: PaginationLazyWrapperOptions<T>
 ) {
   const { $afFetch } = useNuxtApp()
 
@@ -21,6 +23,7 @@ export async function usePaginationLazyWrapper<T>(
   const isLoading = ref(false)
   const paginationData = ref<IPagination<T>>()
   const error = ref()
+  let loadingMorePromise: Promise<TLoadMoreResponse<T>> | undefined
 
   const isLastPage = computed(
     () =>
@@ -98,10 +101,19 @@ export async function usePaginationLazyWrapper<T>(
         },
       })
     )
-    const response = await $afFetch<{ data: IPagination<T> } | null>(url, opts)
-    if (resetList) list.value = []
-    if (response?.data.data) list.value = list.value.concat(response.data.data)
-    paginationData.value = response?.data
+
+    try {
+      // промис нужен, чтобы обождать его в fullRefresh
+      loadingMorePromise = $afFetch<TLoadMoreResponse<T>>(url, opts)
+      const response = await loadingMorePromise
+
+      if (resetList) list.value = []
+      if (response?.data.data)
+        list.value = list.value.concat(response.data.data)
+      paginationData.value = response?.data
+    } catch (err) {}
+
+    loadingMorePromise = undefined
 
     isLoading.value = false
   }
@@ -109,8 +121,42 @@ export async function usePaginationLazyWrapper<T>(
     page.value = 1
     await _loadMore(true)
   }
+  /** загрузить ещё к существующим записям */
   async function refresh() {
     _loadMore()
+  }
+  /** полностью обновить существующие записи */
+  async function fullRefresh() {
+    isLoading.value = true
+
+    let opts: NitroFetchOptions<string> = toValue(
+      ref({
+        ...options,
+        query: {
+          ...queryWithDefaults,
+          page: 1,
+          per_page: list.value.length,
+        },
+        onResponseError(responseData) {
+          showResponseMessage(responseData.response, { noOkResponse: true })
+          if (typeof options.onResponseError === 'function')
+            options.onResponseError(responseData)
+        },
+      })
+    )
+
+    // если данные уже подгружаются - подождать их и только после подгрузки полностью перезапросить
+    if (loadingMorePromise) {
+      await loadingMorePromise
+      isLoading.value = true
+    }
+
+    try {
+      const response = await $afFetch<TLoadMoreResponse<T>>(url, opts)
+      if (response?.data.data) list.value = response.data.data
+    } catch (err) {}
+
+    isLoading.value = false
   }
 
   return {
@@ -119,6 +165,7 @@ export async function usePaginationLazyWrapper<T>(
     isLoading,
     reset,
     refresh,
+    fullRefresh,
     error,
   }
 }

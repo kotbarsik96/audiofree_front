@@ -31,6 +31,8 @@ export const useSupportChatStaffStore = defineStore(
     const chatInfo = ref<ISupportChatInfo>()
 
     const chatsList = shallowRef<ISupportChatListItem[]>([])
+    const chatsListTrigger = ref(0)
+    const triggerChatsListRefresh = () => chatsListTrigger.value++
 
     function cacheCurrentChat() {
       if (!_currentChatId.value) return
@@ -75,6 +77,8 @@ export const useSupportChatStaffStore = defineStore(
       savedScrollPosition,
       chatInfo,
       chatsList,
+      chatsListTrigger,
+      triggerChatsListRefresh,
     }
   }
 )
