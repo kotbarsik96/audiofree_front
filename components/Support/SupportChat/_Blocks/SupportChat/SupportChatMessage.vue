@@ -4,9 +4,9 @@
     <div class="text" v-html="purifiedText"></div>
     <div class="time-block">
       <time class="time" :datetime="createdAt">{{ createdAt }}</time>
-      <!-- todom (бэк): <time v-if="editedAt" class="time" :datetime="editedAt">
+      <time v-if="editedAt" class="time" :datetime="editedAt">
         (изменено: {{ editedAt }})
-      </time> -->
+      </time>
       <div class="checkmarks">
         <CheckmarkIcon />
         <Transition name="fade-in">
@@ -40,8 +40,8 @@ const store =
   props.currentSenderType === ESupportChatSenderType.User
     ? useSupportChatUserStore()
     : useSupportChatStaffStore()
-
 const { readMessage } = store
+const { chatInfo } = storeToRefs(store)
 
 const isOpposite = computed(
   () => props.currentSenderType !== props.message.sender_type
@@ -50,9 +50,11 @@ const isOpposite = computed(
 const name = computed(() => {
   let n = supportChatSenderTypeMap[props.message.sender_type]
 
-  if (!isOpposite.value) {
-    if (props.currentSenderType === ESupportChatSenderType.User) n = 'Вы'
-  }
+  if (
+    props.message.sender_type === ESupportChatSenderType.User &&
+    chatInfo.value
+  )
+    n = chatInfo.value.user_name
 
   return n
 })
@@ -64,10 +66,10 @@ const purifiedText = computed(() =>
 )
 
 const createdAt = computed(() => formatTime(props.message.created_at))
-// todo (бэк): const editedAt = computed(() => {
-//   if (props.message.created_at === props.message.edited_at) return null
-//   else return formatTime(props.message.updated_at, true)
-// })
+const editedAt = computed(() => {
+  if (!props.message.edited_at) return null
+  else return formatTime(props.message.edited_at, true)
+})
 
 const classes = computed(() => ({
   '--opposite': isOpposite.value,

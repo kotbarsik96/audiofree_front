@@ -7,6 +7,7 @@ export interface ISupportChatMessage {
   sender_type: ESupportChatSenderType
   text: string
   read_at?: string
+  edited_at?: string
   created_at: string
   updated_at: string
 }

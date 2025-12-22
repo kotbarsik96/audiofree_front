@@ -4,4 +4,5 @@ export interface ISupportChatInfo {
   total_messages: number
   first_message_id: number
   last_message_id: number
+  user_name: string
 }
