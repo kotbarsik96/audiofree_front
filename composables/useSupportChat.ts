@@ -37,6 +37,10 @@ export async function useSupportChat(
 
       if (savedScrollPosition.value)
         chatBodyElement.value?.scrollTo({ top: savedScrollPosition.value })
+      else if (unreadMessages === 0)
+        chatBodyElement.value?.scrollTo({
+          top: chatBodyElement.value.scrollHeight,
+        })
       else if (totalMessages - unreadMessages > 3)
         chatBodyElement.value?.scrollTo({ top: _OBSERVER_MARGIN_ * 2 })
 
