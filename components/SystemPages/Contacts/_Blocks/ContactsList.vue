@@ -9,7 +9,7 @@
       class="contacts-list__contact-item"
     >
       <ButtonIcon :icon="item.icon" type="div" />
-      <div>
+      <div class="item-wrap">
         <div class="contacts-list__contact-item-title">{{ item.title }}</div>
         <div class="contacts-list__contact-item-detail">{{ item.detail }}</div>
       </div>
@@ -38,6 +38,7 @@ import ButtonIcon from '~/components/_UI/ButtonIcon.vue'
 
     :deep(.btn-icon) {
       background-color: var(--secondary);
+      flex-shrink: 0;
     }
     :deep(.btn-icon:not(div)):hover {
       background-color: var(--secondary-2);
@@ -51,6 +52,13 @@ import ButtonIcon from '~/components/_UI/ButtonIcon.vue'
   &__contact-item-detail {
     font: var(--text-16);
     font-weight: 700;
+    overflow-wrap: break-word;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .item-wrap {
+    min-width: 0;
   }
 
   @include mixins.adaptive(tablet-big) {

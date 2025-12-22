@@ -25,12 +25,39 @@ export async function useSupportChat(
   bottomSpyElement: ShallowRef<HTMLElement | null>,
   chat_id?: MaybeRefOrGetter<number>
 ) {
+  const echo = useEcho()
+  const channelName = chat_id
+    ? `support-chat.${toValue(chat_id)}`
+    : 'support-chat'
+  const echoSubscribe = () => {
+    echo
+      .private(channelName)
+      .listen(
+        '.support-chat-message-created',
+        ({ message }: { message: ISupportChatMessage }) => {
+          formatAndAppendMessages(messagesGroupedByDate.value, [message])
+        }
+      )
+      .listen(
+        '.support-chat-read',
+        ({ readMessagesIds }: { readMessagesIds: number[] }) => {
+          setReadAtToMessages(messagesGroupedByDate.value, readMessagesIds)
+        }
+      )
+      .error((err: any) => console.error(err))
+  }
+  const echoLeave = () => {
+    echo.leave(channelName)
+  }
+
   const onChatBodyScroll = debounce(() => {
     if (chatBodyElement.value)
       savedScrollPosition.value = chatBodyElement.value.scrollTop
   }, 500)
 
   onMounted(() => {
+    echoSubscribe()
+
     nextTick().then(() => {
       const totalMessages = chatInfo.value?.total_messages ?? 0
       const unreadMessages = chatInfo.value?.unread_messages ?? 0
@@ -54,6 +81,7 @@ export async function useSupportChat(
   })
 
   onUnmounted(() => {
+    echoLeave()
     if (topSpyObserver) topSpyObserver.disconnect()
     if (bottomSpyObserver) bottomSpyObserver.disconnect()
     chatBodyElement.value?.removeEventListener('scroll', onChatBodyScroll)
@@ -74,6 +102,17 @@ export async function useSupportChat(
     chatInfo,
     savedScrollPosition,
   } = storeRefs
+
+  const allEarlierMessagesLoaded = computed(
+    () =>
+      earliestMessageId.value &&
+      earliestMessageId.value <= (chatInfo.value?.first_message_id ?? 0)
+  )
+  const allLaterMessagesLoaded = computed(
+    () =>
+      latestMessageId.value &&
+      latestMessageId.value >= (chatInfo.value?.last_message_id ?? 0)
+  )
 
   // достать чат из кэша, если есть
   if ('changeChat' in store && chat_id) store.changeChat(toValue(chat_id))
@@ -143,7 +182,7 @@ export async function useSupportChat(
   }
 
   async function _loadMoreTop() {
-    if (!earliestMessageId.value) return
+    if (!earliestMessageId.value || allEarlierMessagesLoaded.value) return
 
     try {
       await $afFetch('/support-chat/messages', {
@@ -178,14 +217,15 @@ export async function useSupportChat(
       addNotification('error', 'Не удалось загрузить ранние сообщения')
     }
   }
-  async function _loadMoreBottom() {
-    if (!latestMessageId.value) return
+  async function _loadMoreBottom(load_all?: boolean) {
+    if (!latestMessageId.value || allLaterMessagesLoaded.value) return
 
     try {
       await $afFetch('/support-chat/messages', {
         query: {
           latest_message_id: latestMessageId.value,
           chat_id: toValue(chat_id),
+          load_all,
         },
         credentials: 'include',
         onResponse({ response }) {
@@ -204,10 +244,22 @@ export async function useSupportChat(
     }
   }
 
+  async function onMessageWritten() {
+    // если загружены не все последние сообщения - дозагрузить и выставить всем текущим прочитанное состояние
+    if (!allLaterMessagesLoaded.value) {
+      setReadAtToMessages(messagesGroupedByDate.value)
+      await _loadMoreBottom(true)
+    }
+
+    await nextTick()
+    chatBodyElement.value?.scrollTo({ top: chatBodyElement.value.scrollHeight })
+  }
+
   return {
     chatInfo,
     earliestMessageId,
     latestMessageId,
+    onMessageWritten,
   }
 }
 
@@ -289,4 +341,19 @@ export function checkSameDate(dateFirstStr: string, dateSecondStr: string) {
 
 export function getChatBodyElement(element: HTMLElement | null) {
   return element?.closest('.chat-body')
+}
+
+export function setReadAtToMessages(
+  messagesGroupedByDate: ISupportChatMessagesDateGroup[],
+  readMessagesIds?: number[]
+) {
+  messagesGroupedByDate.forEach((datedGroup) => {
+    datedGroup.groups.forEach((item) => {
+      item.messages.forEach((msg) => {
+        if (!readMessagesIds || readMessagesIds.includes(msg.id)) {
+          msg.read_at = new Date().toLocaleString()
+        }
+      })
+    })
+  })
 }

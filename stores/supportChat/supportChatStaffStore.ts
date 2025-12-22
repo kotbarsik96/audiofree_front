@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import type { ISupportChatMessagesDateGroup } from '~/composables/useSupportChat'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
+import { setReadAtToMessages } from '~/composables/useSupportChat'
 
 interface ICachedStaffSupportChat {
   chat: string // JSON.stringify<ISupportChatMessagesDateGroup[]>
@@ -53,10 +54,11 @@ export const useSupportChatStaffStore = defineStore(
 
           if (data.timeout) clearTimeout(data.timeout)
           data.timeout = setTimeout(async () => {
-            await submitReadMessages(data.messagesIds, chat_id)
+            const sorted = data.messagesIds.sort((id1, id2) => id1 - id2)
+            await submitReadMessages(sorted, chat_id)
             data.messagesIds = []
             data.timeout = undefined
-          }, 1000)
+          }, 250)
         }
       }
     }
@@ -126,7 +128,7 @@ export const useSupportChatStaffStore = defineStore(
             if (response.ok) {
               // если чат не менялся - поменять значения read_at только локально
               if (chat_id === currentChatId.value) {
-                messagesGroupedByDate.value = setReadAtToMessages(
+                setReadAtToMessages(
                   messagesGroupedByDate.value,
                   readMessagesIds
                 )
@@ -137,9 +139,8 @@ export const useSupportChatStaffStore = defineStore(
                 const cachedChat = JSON.parse(
                   foundCached.chat
                 ) as ISupportChatMessagesDateGroup[]
-                foundCached.chat = JSON.stringify(
-                  setReadAtToMessages(cachedChat, readMessagesIds)
-                )
+                setReadAtToMessages(cachedChat, readMessagesIds)
+                foundCached.chat = JSON.stringify(cachedChat)
               }
             }
           },
@@ -164,22 +165,3 @@ export const useSupportChatStaffStore = defineStore(
     }
   }
 )
-
-function setReadAtToMessages(
-  messagesGroupedByDate: ISupportChatMessagesDateGroup[],
-  readMessagesIds: number[]
-) {
-  const arr = [...messagesGroupedByDate]
-
-  arr.forEach((datedGroup) => {
-    datedGroup.groups.forEach((item) => {
-      item.messages.forEach((msg) => {
-        if (readMessagesIds.includes(msg.id)) {
-          msg.read_at = new Date().toLocaleString()
-        }
-      })
-    })
-  })
-
-  return arr
-}

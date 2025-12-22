@@ -76,26 +76,29 @@ const classes = computed(() => ({
   '--is-read': !!props.message.read_at,
 }))
 
-let intersectionObserver: IntersectionObserver
+let intersectionObserver: IntersectionObserver | undefined
 
 onMounted(() => {
   setIntersectionObserver()
 })
 
 onUnmounted(() => {
-  if (intersectionObserver) intersectionObserver.disconnect()
+  intersectionObserver?.disconnect()
 })
 
 function setIntersectionObserver() {
-  if (isOpposite.value && element.value) {
+  if (isOpposite.value && element.value && !props.message.read_at) {
     intersectionObserver = new IntersectionObserver(
       (entries) => {
-        if (entries.find((entry) => entry.isIntersecting))
+        if (entries.find((entry) => entry.isIntersecting)) {
           readMessage(props.message.id)
+          intersectionObserver?.disconnect
+          intersectionObserver = undefined
+        }
       },
       {
         root: getChatBodyElement(element.value),
-        threshold: 1,
+        threshold: 0.75,
       }
     )
     intersectionObserver.observe(element.value)

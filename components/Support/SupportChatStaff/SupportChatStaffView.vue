@@ -31,15 +31,10 @@ const route = useRoute()
 
 const chatId = computed(() => Number(route.params.id ?? 0))
 
-await useSupportChat(chatBodyElement, topSpyElement, bottomSpyElement, chatId)
+const { onMessageWritten } = await useSupportChat(chatBodyElement, topSpyElement, bottomSpyElement, chatId)
 
 const store = useSupportChatStaffStore()
 const { messagesGroupedByDate } = storeToRefs(store)
-
-async function onMessageWritten() {
-  await nextTick()
-  chatBodyElement.value?.scrollTo({ top: chatBodyElement.value.scrollHeight })
-}
 </script>
 
 <style lang="scss" scoped>

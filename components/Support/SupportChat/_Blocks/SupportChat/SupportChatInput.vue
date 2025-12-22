@@ -55,16 +55,8 @@ async function send() {
         text: text.value,
       },
       onResponse({ response }) {
-        const { message, latest_loaded_id } = response._data.data
-        messagesGroupedByDate.value = formatAndAppendMessages(
-          messagesGroupedByDate.value,
-          [message]
-        )
-        latestMessageId.value = latest_loaded_id
         text.value = ''
-
         updateLastMessageInChatList()
-
         emit('message-written')
       },
       onResponseError({ response }) {

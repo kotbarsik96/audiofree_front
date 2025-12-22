@@ -1,38 +1,43 @@
 <template>
-  <div class="schat-user">
-    <div class="schat-user__in-development">
-      <OperatorIcon class="icon" />
-      <p>Чат с технической поддержкой в данный момент в разработке</p>
+  <div class="sc-user support-chat">
+    <div class="chat-body" ref="chatBodyElement">
+      <div class="inner">
+        <div class="top-spy" ref="topSpyElement"></div>
+        <SupportChatDatedGroup
+          v-for="group in messagesGroupedByDate"
+          :group="group"
+          :current-sender-type="ESupportChatSenderType.User"
+        />
+        <div class="bottom-spy" ref="bottomSpyElement"></div>
+      </div>
     </div>
+    <SupportChatInput @message-written="onMessageWritten" />
   </div>
 </template>
 
 <script setup lang="ts">
-import OperatorIcon from '~/assets/images/icons/operator.svg'
+import { storeToRefs } from 'pinia'
+import SupportChatInput from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatInput.vue'
+import SupportChatDatedGroup from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatDatedGroup.vue'
+import { useSupportChat } from '~/composables/useSupportChat'
+import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
+import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
+
+const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
+const topSpyElement = useTemplateRef<HTMLElement>('topSpyElement')
+const bottomSpyElement = useTemplateRef<HTMLElement>('bottomSpyElement')
+
+const [{ data: pageData }, { onMessageWritten }] = await Promise.all([
+  useAPI<{ data: IPageSeo }>('page/contacts'),
+  useSupportChat(chatBodyElement, topSpyElement, bottomSpyElement),
+])
+usePageMeta(pageData)
+
+const store = useSupportChatUserStore()
+const { messagesGroupedByDate } = storeToRefs(store)
 </script>
 
 <style lang="scss" scoped>
-.schat-user {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  &__in-development {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 1rem;
-    align-items: center;
-    text-align: center;
-    font: var(--text-18);
-    font-weight: 500;
-
-    .icon {
-      width: 5rem;
-      height: 5rem;
-    }
-  }
-}
+@use '/css/mixins/mixins.scss';
+@use '/css/components/SupportChat.scss';
 </style>
