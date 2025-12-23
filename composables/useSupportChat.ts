@@ -6,6 +6,7 @@ import type { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ES
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import type { ISupportChatMessagesList } from '~/domain/support/chat/interfaces/ISupportChatMessagesList'
+import type IUser from '~/domain/user/types/IUser'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
 
@@ -25,10 +26,12 @@ export async function useSupportChat(
   bottomSpyElement: ShallowRef<HTMLElement | null>,
   chat_id?: MaybeRefOrGetter<number>
 ) {
+  const user = useSanctumUser<IUser>()
+
   const echo = useEcho()
   const channelName = chat_id
-    ? `support-chat.${toValue(chat_id)}`
-    : 'support-chat'
+    ? `support-chat-staff.${toValue(chat_id)}`
+    : `support-chat-user.${user.value?.id}`
   const echoSubscribe = () => {
     if (!chatInfo.value) {
       console.warn('Chat was not found')

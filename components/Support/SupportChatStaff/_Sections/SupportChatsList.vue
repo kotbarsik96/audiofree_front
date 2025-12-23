@@ -29,6 +29,8 @@ import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffS
 
 const spyElement = useTemplateRef<HTMLElement>('spyElement')
 
+const echo = useEcho()
+
 const search = ref('')
 
 const supportChatStaffStore = useSupportChatStaffStore()
@@ -56,6 +58,16 @@ const refetch = debounce(reset, 500)
 
 watch(search, refetch)
 watch(chatsListTrigger, fullRefresh)
+
+const channelName = 'support-chats-list'
+
+onMounted(() => {
+  echo.private(channelName).listen('.support-chat-message-created', fullRefresh)
+})
+
+onUnmounted(() => {
+  echo.leave(channelName)
+})
 </script>
 
 <style lang="scss" scoped>
