@@ -9,7 +9,7 @@ export default [
   },
   {
     title: "По всем вопросам пишите:",
-    detail: "audiofree@audiofree.kotbarsik96.ru",
+    detail: "example@mail.com",
     icon: MailIcon,
   },
 ]

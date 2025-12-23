@@ -43,16 +43,22 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
         },
         onResponse({ response }) {
           if (response.ok) {
-            setReadAtToMessages(
-              messagesGroupedByDate.value,
-              readMessagesIds
-            )
+            setReadAtToMessages(messagesGroupedByDate.value, readMessagesIds)
           }
         },
       })
     } catch (err) {
       console.error(err)
     }
+  }
+
+  function clear() {
+    messagesGroupedByDate.value = []
+    earliestMessageId.value = undefined
+    latestMessageId.value = undefined
+    chatInfo.value = undefined
+    savedScrollPosition.value = undefined
+    _readMessagesIds.value = []
   }
 
   return {
@@ -62,5 +68,6 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     chatInfo,
     savedScrollPosition,
     readMessage,
+    clear,
   }
 })

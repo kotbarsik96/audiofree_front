@@ -1,4 +1,5 @@
 import type { FetchResult } from '#app'
+import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
 
 export class Auth {
   public static async requestCsrfToken() {
@@ -66,6 +67,7 @@ export class Auth {
     const { initApp } = useGlobalStore()
     const { logout } = useSanctumAuth()
     const { updateCollection } = useProductCollectionsStore()
+    const { clear: clearUserSupportChatStore } = useSupportChatUserStore()
 
     try {
       await logout()
@@ -73,6 +75,7 @@ export class Auth {
       addNotification('info', 'Выполнен выход из профиля')
       await initApp()
       await updateCollection(true)
+      clearUserSupportChatStore()
     } catch (e: any) {
       console.error(e)
     }

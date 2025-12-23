@@ -39,8 +39,6 @@ const store = props.chatId
   ? useSupportChatStaffStore()
   : useSupportChatUserStore()
 
-const { messagesGroupedByDate, latestMessageId } = storeToRefs(store)
-
 async function onSubmit() {
   await send()
 }

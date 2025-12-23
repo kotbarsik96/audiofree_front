@@ -10,9 +10,9 @@
             <h1 class="_h1 title">Контакты</h1>
             <ContactsList />
           </div>
-          <div class="chat-wrap">
+          <LogInToSeePage class="chat-wrap">
             <SupportChatUser />
-          </div>
+          </LogInToSeePage>
         </div>
       </div>
     </div>
@@ -23,6 +23,7 @@
 import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import ContactsList from '~/components/SystemPages/Contacts/_Blocks/ContactsList.vue'
 import SupportChatUser from '~/components/Support/SupportChat/_Blocks/SupportChatUser.vue'
+import LogInToSeePage from '~/components/Auth/_Blocks/LogInToSeePage.vue'
 import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
 import { contactsBreadcrumbs } from '~/domain/breadcrumbs/pages'
 
@@ -72,6 +73,7 @@ useBreadcrumbs(contactsBreadcrumbs)
     .chat-wrap {
       height: 60vh;
       min-height: 500px;
+      min-width: 0;
     }
   }
 

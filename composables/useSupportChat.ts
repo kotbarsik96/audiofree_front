@@ -30,6 +30,11 @@ export async function useSupportChat(
     ? `support-chat.${toValue(chat_id)}`
     : 'support-chat'
   const echoSubscribe = () => {
+    if (!chatInfo.value) {
+      console.warn('Chat was not found')
+      return
+    }
+
     echo
       .private(channelName)
       .listen(
@@ -117,38 +122,7 @@ export async function useSupportChat(
   // достать чат из кэша, если есть
   if ('changeChat' in store && chat_id) store.changeChat(toValue(chat_id))
   // если чата в кэше по данному id нет - загрузить
-  if (!chatInfo.value) {
-    const [
-      { data: chatInfoData, error: chatInfoError },
-      { data: messagesData, error: messagesError },
-    ] = await Promise.all([
-      useAPI<{ data: ISupportChatInfo }>('/support-chat/', {
-        credentials: 'include',
-        query: {
-          chat_id,
-        },
-        watch: false,
-      }),
-      useAPI<{ data: ISupportChatMessagesList }>('/support-chat/messages', {
-        credentials: 'include',
-        query: {
-          chat_id,
-        },
-        watch: false,
-      }),
-    ])
-
-    if (chatInfoError.value) throw createError(chatInfoError.value)
-    if (messagesError.value) throw createError(messagesError.value)
-
-    messagesGroupedByDate.value = formatAndAppendMessages(
-      messagesGroupedByDate.value,
-      messagesData.value?.data.messages ?? []
-    )
-    earliestMessageId.value = messagesData.value?.data.earliest_loaded_id
-    latestMessageId.value = messagesData.value?.data.latest_loaded_id
-    chatInfo.value = chatInfoData.value?.data
-  }
+  if (!chatInfo.value) await _loadFirst()
 
   let topSpyObserver: IntersectionObserver
   let bottomSpyObserver: IntersectionObserver
@@ -179,6 +153,39 @@ export async function useSupportChat(
       )
       bottomSpyObserver.observe(bottomSpyElement.value)
     }
+  }
+
+  async function _loadFirst() {
+    const [
+      { data: chatInfoData, error: chatInfoError },
+      { data: messagesData, error: messagesError },
+    ] = await Promise.all([
+      useAPI<{ data: ISupportChatInfo }>('/support-chat/', {
+        credentials: 'include',
+        query: {
+          chat_id,
+        },
+        watch: false,
+      }),
+      useAPI<{ data: ISupportChatMessagesList }>('/support-chat/messages', {
+        credentials: 'include',
+        query: {
+          chat_id,
+        },
+        watch: false,
+      }),
+    ])
+
+    if (chatInfoError.value && chatInfoError.value.statusCode !== 404)
+      throw createError(chatInfoError.value)
+
+    messagesGroupedByDate.value = formatAndAppendMessages(
+      messagesGroupedByDate.value,
+      messagesData.value?.data.messages ?? []
+    )
+    earliestMessageId.value = messagesData.value?.data.earliest_loaded_id
+    latestMessageId.value = messagesData.value?.data.latest_loaded_id
+    chatInfo.value = chatInfoData.value?.data
   }
 
   async function _loadMoreTop() {
@@ -245,6 +252,12 @@ export async function useSupportChat(
   }
 
   async function onMessageWritten() {
+    // если у пользователя ещё нет чата - он будет создан при первом написании сообщения, поэтому его нужно загрузить
+    if (!chatInfo.value) {
+      await _loadFirst()
+      echoSubscribe()
+    }
+
     // если загружены не все последние сообщения - дозагрузить и выставить всем текущим прочитанное состояние
     if (!allLaterMessagesLoaded.value) {
       setReadAtToMessages(messagesGroupedByDate.value)
