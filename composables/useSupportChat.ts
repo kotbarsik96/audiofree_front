@@ -3,10 +3,11 @@ import { storeToRefs } from 'pinia'
 import type { ShallowRef } from 'vue'
 import { useAPI } from '~/composables/useAPI'
 import { useNotifications } from '~/composables/useNotifications'
-import type { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
+import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import type { ISupportChatMessagesList } from '~/domain/support/chat/interfaces/ISupportChatMessagesList'
+import type { ISupportChatWriteStatusChangeEvent } from '~/domain/support/chat/interfaces/ISupportChatWriteStatusChangeEvent'
 import {
   formatAndAppendMessages,
   formatAndPrependMessages,
@@ -56,6 +57,14 @@ export async function useSupportChat(
         '.support-chat-read',
         ({ readMessagesIds }: { readMessagesIds: number[] }) => {
           setReadAtToMessages(messagesGroupedByDate.value, readMessagesIds)
+        }
+      )
+      .listen(
+        '.support-chat-write-status',
+        (data: ISupportChatWriteStatusChangeEvent) => {
+          console.log(data)
+          if (data.sender !== currentSenderType.value)
+            isCompanionWriting.value = data.is_writing
         }
       )
       .error((err: any) => console.error(err))
@@ -114,6 +123,7 @@ export async function useSupportChat(
     latestMessageId,
     chatInfo,
     savedScrollPosition,
+    isCompanionWriting,
   } = storeRefs
 
   const { loadMoreEarlier, loadMoreLater } = useSupportChatLoading(
@@ -132,6 +142,13 @@ export async function useSupportChat(
     () =>
       latestMessageId.value &&
       latestMessageId.value >= (chatInfo.value?.last_message_id ?? 0)
+  )
+
+  const currentSenderType = computed(() =>
+    chat_id ? ESupportChatSenderType.Staff : ESupportChatSenderType.User
+  )
+  const companionSenderType = computed(() =>
+    chat_id ? ESupportChatSenderType.User : ESupportChatSenderType.Staff
   )
 
   // достать чат из кэша, если есть

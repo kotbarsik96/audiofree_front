@@ -30,6 +30,8 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     }
   }
 
+  const isCompanionWriting = ref(false)
+
   async function submitReadMessages(readMessagesIds: number[]) {
     if (readMessagesIds.length < 1) return
 
@@ -67,6 +69,7 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     latestMessageId,
     chatInfo,
     savedScrollPosition,
+    isCompanionWriting,
     readMessage,
     clear,
   }

@@ -31,6 +31,7 @@ export const useSupportChatStaffStore = defineStore(
     const changeChat = async (newChatId: number) => {
       cacheCurrentChat()
       restoreCachedChatOrReset(newChatId)
+      isCompanionWriting.value = false
       if (newChatId in cachedChats.value) {
         await loadMoreLater(true)
       }
@@ -87,6 +88,8 @@ export const useSupportChatStaffStore = defineStore(
       messagesGroupedByDate,
       currentChatId
     )
+
+    const isCompanionWriting = ref(false)
 
     function cacheCurrentChat() {
       if (
@@ -182,6 +185,7 @@ export const useSupportChatStaffStore = defineStore(
       chatsList,
       chatsListTrigger,
       triggerChatsListRefresh,
+      isCompanionWriting,
     }
   }
 )

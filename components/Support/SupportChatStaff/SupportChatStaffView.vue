@@ -1,5 +1,10 @@
 <template>
   <div class="sc-staff support-chat">
+    <SupportChatHeader
+      :chat-info="chatInfo"
+      :current-sender-type="ESupportChatSenderType.Staff"
+      :is-companion-writing="isCompanionWriting"
+    />
     <div class="chat-body" ref="chatBodyElement">
       <div class="inner">
         <div class="top-spy" ref="topSpyElement"></div>
@@ -16,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import SupportChatHeader from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatHeader.vue'
 import { storeToRefs } from 'pinia'
 import SupportChatInput from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatInput.vue'
 import SupportChatDatedGroup from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatDatedGroup.vue'
@@ -31,10 +37,16 @@ const route = useRoute()
 
 const chatId = computed(() => Number(route.params.id ?? 0))
 
-const { onMessageWritten } = await useSupportChat(chatBodyElement, topSpyElement, bottomSpyElement, chatId)
+const { onMessageWritten } = await useSupportChat(
+  chatBodyElement,
+  topSpyElement,
+  bottomSpyElement,
+  chatId
+)
 
 const store = useSupportChatStaffStore()
-const { messagesGroupedByDate } = storeToRefs(store)
+const { messagesGroupedByDate, chatInfo, isCompanionWriting } =
+  storeToRefs(store)
 </script>
 
 <style lang="scss" scoped>

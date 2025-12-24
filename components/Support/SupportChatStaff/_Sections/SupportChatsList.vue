@@ -25,6 +25,7 @@ import InputWrapper from '~/components/_UI/FormElements/InputWrapper.vue'
 import TextInput from '~/components/_UI/FormElements/TextInput.vue'
 import SupportChatStaffLink from '~/components/Support/SupportChatStaff/_Blocks/SupportChatStaffLink.vue'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
+import type { ISupportChatWriteStatusChangeEvent } from '~/domain/support/chat/interfaces/ISupportChatWriteStatusChangeEvent'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 
 const spyElement = useTemplateRef<HTMLElement>('spyElement')
@@ -62,7 +63,15 @@ watch(chatsListTrigger, fullRefresh)
 const channelName = 'support-chats-list'
 
 onMounted(() => {
-  echo.private(channelName).listen('.support-chat-message-created', fullRefresh)
+  echo
+    .private(channelName)
+    .listen('.support-chat-message-created', fullRefresh)
+    .listen(
+      '.support-chat-write-status',
+      (data: ISupportChatWriteStatusChangeEvent) => {
+        
+      }
+    )
 })
 
 onUnmounted(() => {
