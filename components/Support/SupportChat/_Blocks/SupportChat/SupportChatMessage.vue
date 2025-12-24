@@ -25,7 +25,7 @@ import {
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import DOMPurify from 'dompurify'
 import CheckmarkIcon from '~/assets/images/icons/checkmark.svg?component'
-import { getChatBodyElement } from '~/composables/useSupportChat'
+import { getChatBodyElement } from '~/domain/support/chat/utils'
 import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 

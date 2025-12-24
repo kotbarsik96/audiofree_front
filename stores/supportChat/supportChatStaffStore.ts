@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { ISupportChatMessagesDateGroup } from '~/composables/useSupportChat'
+import {
+  useSupportChatLoading,
+  type ISupportChatMessagesDateGroup,
+} from '~/composables/useSupportChat'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
-import { setReadAtToMessages } from '~/composables/useSupportChat'
+import { setReadAtToMessages } from '~/domain/support/chat/utils'
 
 interface ICachedStaffSupportChat {
   chat: string // JSON.stringify<ISupportChatMessagesDateGroup[]>
@@ -25,9 +28,12 @@ export const useSupportChatStaffStore = defineStore(
 
     const _currentChatId = ref<number>()
     const currentChatId = computed(() => _currentChatId.value)
-    const changeChat = (newChatId: number) => {
+    const changeChat = async (newChatId: number) => {
       cacheCurrentChat()
-      restoreCachedChat(newChatId)
+      restoreCachedChatOrReset(newChatId)
+      if (newChatId in cachedChats.value) {
+        await loadMoreLater(true)
+      }
     }
 
     /** массивы списков id прочитанных сообщений по чатам:
@@ -75,6 +81,13 @@ export const useSupportChatStaffStore = defineStore(
     const chatsListTrigger = ref(0)
     const triggerChatsListRefresh = () => chatsListTrigger.value++
 
+    const { loadMoreLater } = useSupportChatLoading(
+      earliestMessageId,
+      latestMessageId,
+      messagesGroupedByDate,
+      currentChatId
+    )
+
     function cacheCurrentChat() {
       if (!_currentChatId.value) return
 
@@ -89,7 +102,8 @@ export const useSupportChatStaffStore = defineStore(
       }
     }
 
-    function restoreCachedChat(restoredChatId: number) {
+    /** Если чат есть в кэше - восстановит его. В ином случае сбросит все состояния */
+    function restoreCachedChatOrReset(restoredChatId: number) {
       _currentChatId.value = restoredChatId
       const foundCached: ICachedStaffSupportChat | undefined =
         cachedChats.value[_currentChatId.value]
@@ -153,6 +167,7 @@ export const useSupportChatStaffStore = defineStore(
     return {
       currentChatId,
       changeChat,
+      cachedChats,
       readMessage,
       messagesGroupedByDate,
       earliestMessageId,

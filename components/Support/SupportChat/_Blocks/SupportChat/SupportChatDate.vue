@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { getChatBodyElement } from '~/composables/useSupportChat'
+import { getChatBodyElement } from '~/domain/support/chat/utils'
 
 const props = defineProps<{
   date: string
