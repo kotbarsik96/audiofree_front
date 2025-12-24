@@ -9,6 +9,7 @@
         id="login"
         placeholder="Логин"
         :disabled="isLoading"
+        v-autofocus
       />
       <template v-if="loginError" #error>{{ loginError }}</template>
     </InputWrapper>
@@ -19,6 +20,7 @@
 </template>
 
 <script setup lang="ts">
+import { vAutofocus } from '~/directives/vAutofocus'
 import InputWrapper from '~/components/_UI/FormElements/InputWrapper.vue'
 import TextInput from '~/components/_UI/FormElements/TextInput.vue'
 import AFButton from '~/components/_UI/AFButton.vue'
