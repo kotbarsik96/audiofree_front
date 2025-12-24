@@ -89,7 +89,12 @@ export const useSupportChatStaffStore = defineStore(
     )
 
     function cacheCurrentChat() {
-      if (!_currentChatId.value) return
+      if (
+        !_currentChatId.value ||
+        !messagesGroupedByDate.value ||
+        !chatInfo.value
+      )
+        return
 
       const stringifiedMessages = JSON.stringify(messagesGroupedByDate.value)
       const stringifiedChatInfo = JSON.stringify(chatInfo.value)

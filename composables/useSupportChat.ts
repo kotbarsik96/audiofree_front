@@ -64,6 +64,8 @@ export async function useSupportChat(
     echo.leave(channelName)
   }
 
+  const { addNotification } = useNotifications()
+
   const onChatBodyScroll = debounce(() => {
     if (chatBodyElement.value)
       savedScrollPosition.value = chatBodyElement.value.scrollTop
@@ -193,6 +195,14 @@ export async function useSupportChat(
 
     if (chatInfoError.value && chatInfoError.value.statusCode !== 404)
       throw createError(chatInfoError.value)
+
+    if (
+      chat_id &&
+      chatInfoError.value?.statusCode === 404 &&
+      typeof window !== 'undefined'
+    ) {
+      addNotification('error', chatInfoError.value.data.message, 30000)
+    }
 
     messagesGroupedByDate.value = formatAndAppendMessages(
       messagesGroupedByDate.value,
