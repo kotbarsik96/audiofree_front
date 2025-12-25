@@ -63,8 +63,7 @@ export async function useSupportChat(
         '.support-chat-write-status',
         (data: ISupportChatWriteStatusChangeEvent) => {
           console.log(data)
-          if (data.sender !== currentSenderType.value)
-            isCompanionWriting.value = data.is_writing
+          if (data.sender !== currentSenderType.value) store.refetchChatInfo()
         }
       )
       .error((err: any) => console.error(err))
@@ -123,7 +122,6 @@ export async function useSupportChat(
     latestMessageId,
     chatInfo,
     savedScrollPosition,
-    isCompanionWriting,
   } = storeRefs
 
   const { loadMoreEarlier, loadMoreLater } = useSupportChatLoading(

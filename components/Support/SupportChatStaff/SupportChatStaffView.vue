@@ -3,7 +3,7 @@
     <SupportChatHeader
       :chat-info="chatInfo"
       :current-sender-type="ESupportChatSenderType.Staff"
-      :is-companion-writing="isCompanionWriting"
+      :is-companion-writing="chatInfo?.is_companion_writing ?? false"
     />
     <div class="chat-body" ref="chatBodyElement">
       <div class="inner">
@@ -45,8 +45,7 @@ const { onMessageWritten } = await useSupportChat(
 )
 
 const store = useSupportChatStaffStore()
-const { messagesGroupedByDate, chatInfo, isCompanionWriting } =
-  storeToRefs(store)
+const { messagesGroupedByDate, chatInfo } = storeToRefs(store)
 </script>
 
 <style lang="scss" scoped>

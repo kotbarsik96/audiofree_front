@@ -6,5 +6,7 @@ export interface ISupportChatListItem {
   user_name: string
   user_email?: string
   user_phone?: string
+  user_telegram?: string
   latest_message: string
+  is_writing?: boolean
 }

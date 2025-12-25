@@ -49,7 +49,7 @@ useBreadcrumbs(supportChatsListBreadcrumbs)
     grid-template-columns: 400px 1fr;
     overflow: hidden;
     height: 75svh;
-    min-height: 800px;
+    min-height: 500px;
   }
 
   .list {

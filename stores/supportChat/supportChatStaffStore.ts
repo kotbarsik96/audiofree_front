@@ -31,7 +31,6 @@ export const useSupportChatStaffStore = defineStore(
     const changeChat = async (newChatId: number) => {
       cacheCurrentChat()
       restoreCachedChatOrReset(newChatId)
-      isCompanionWriting.value = false
       if (newChatId in cachedChats.value) {
         await loadMoreLater(true)
       }
@@ -79,8 +78,6 @@ export const useSupportChatStaffStore = defineStore(
     const chatInfo = ref<ISupportChatInfo>()
 
     const chatsList = shallowRef<ISupportChatListItem[]>([])
-    const chatsListTrigger = ref(0)
-    const triggerChatsListRefresh = () => chatsListTrigger.value++
 
     const { loadMoreLater } = useSupportChatLoading(
       earliestMessageId,
@@ -88,8 +85,6 @@ export const useSupportChatStaffStore = defineStore(
       messagesGroupedByDate,
       currentChatId
     )
-
-    const isCompanionWriting = ref(false)
 
     function cacheCurrentChat() {
       if (
@@ -172,6 +167,30 @@ export const useSupportChatStaffStore = defineStore(
       }
     }
 
+    async function refetchChatInfo() {
+      const updatingChatId = toValue(currentChatId)
+
+      try {
+        await $afFetch('/support-chat', {
+          credentials: 'include',
+          query: {
+            chat_id: updatingChatId,
+          },
+          onResponse({ response }) {
+            if (response.ok) {
+              const updatedChatInfo = response._data.data
+
+              // проверка на то, что чат не сменился
+              if (updatingChatId === toValue(currentChatId))
+                chatInfo.value = updatedChatInfo
+            }
+          },
+        })
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
     return {
       currentChatId,
       changeChat,
@@ -183,9 +202,7 @@ export const useSupportChatStaffStore = defineStore(
       savedScrollPosition,
       chatInfo,
       chatsList,
-      chatsListTrigger,
-      triggerChatsListRefresh,
-      isCompanionWriting,
+      refetchChatInfo,
     }
   }
 )

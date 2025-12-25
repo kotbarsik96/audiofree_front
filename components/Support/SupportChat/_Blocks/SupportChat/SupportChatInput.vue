@@ -7,9 +7,11 @@
         maxlength="3000"
         placeholder="Сообщение"
         v-model="text"
+        :disabled="sending"
+        @input="onInput"
       />
     </div>
-    <button class="send-btn" type="submit">
+    <button class="send-btn" :disabled="sending" type="submit">
       <IconSend />
     </button>
   </form>
@@ -39,11 +41,51 @@ const store = props.chatId
   ? useSupportChatStaffStore()
   : useSupportChatUserStore()
 
+const sending = ref(false)
+
+let isWritingTimeout: ReturnType<typeof setTimeout> | undefined
+const didntWriteFor = 3000
+async function onInput() {
+  // запустить таймаут на сброс: отработает, когда пользователь не печатал уже didntWriteFor милисекунд
+  const launch = () =>
+    setTimeout(async () => {
+      await updateIsWritingStatus(false)
+      clearTimeout(isWritingTimeout)
+      isWritingTimeout = undefined
+    }, didntWriteFor)
+
+  // пользователь печатает - перезапустить таймаут
+  if (isWritingTimeout) {
+    clearTimeout(isWritingTimeout)
+    isWritingTimeout = launch()
+  }
+  // пользователь ещё не печатал - обновить состояние в true и запустить таймаут
+  else if (text.value.trim()) {
+    isWritingTimeout = launch()
+    await updateIsWritingStatus(true)
+  }
+}
+
+async function updateIsWritingStatus(is_writing: boolean) {
+  await $afFetch('/support-chat/update-writing-status', {
+    method: 'POST',
+    body: {
+      chat_id: props.chatId,
+      is_writing,
+    },
+    credentials: 'include',
+  })
+}
+
 async function onSubmit() {
   await send()
 }
 
 async function send() {
+  if (sending.value) return
+
+  sending.value = true
+
   try {
     await $afFetch('/support-chat/message', {
       method: 'POST',
@@ -53,8 +95,9 @@ async function send() {
         text: text.value,
       },
       onResponse({ response }) {
+        if (isWritingTimeout) clearTimeout(isWritingTimeout)
+        updateIsWritingStatus(false)
         text.value = ''
-        updateLastMessageInChatList()
         emit('message-written')
       },
       onResponseError({ response }) {
@@ -64,12 +107,8 @@ async function send() {
   } catch (err) {
     addNotification('error', 'Не удалось отправить сообщение')
   }
-}
 
-function updateLastMessageInChatList() {
-  if ('triggerChatsListRefresh' in store) {
-    store.triggerChatsListRefresh()
-  }
+  sending.value = false
 }
 </script>
 

@@ -5,11 +5,7 @@
       <Transition name="drop-down">
         <div v-if="isCompanionWriting" class="iw-inner">
           <div>печатает</div>
-          <div class="dots">
-            <span style="--i: 0"></span>
-            <span style="--i: 1"></span>
-            <span style="--i: 2"></span>
-          </div>
+          <SupportChatThreeDots />
         </div>
       </Transition>
     </div>
@@ -17,6 +13,7 @@
 </template>
 
 <script setup lang="ts">
+import SupportChatThreeDots from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatThreeDots.vue';
 import type { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 
@@ -50,41 +47,6 @@ const props = defineProps<{
       align-items: center;
       gap: 0.5rem;
     }
-
-    .dots {
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-
-      span {
-        --duration: 1.5s;
-
-        display: inline-block;
-        width: 0.5rem;
-        height: auto;
-        aspect-ratio: 1;
-        border-radius: 50%;
-        background: var(--primary);
-        animation-name: dotAnimation;
-        animation-timing-function: ease-in-out;
-        animation-duration: var(--duration);
-        animation-delay: calc(var(--i) * var(--duration) * 0.1);
-        animation-iteration-count: infinite;
-        opacity: 0.75;
-      }
-    }
-  }
-}
-
-@keyframes dotAnimation {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(0.5);
-  }
-  100% {
-    transform: scale(1);
   }
 }
 </style>

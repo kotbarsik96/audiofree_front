@@ -35,7 +35,7 @@ const echo = useEcho()
 const search = ref('')
 
 const supportChatStaffStore = useSupportChatStaffStore()
-const { chatsList, chatsListTrigger } = storeToRefs(supportChatStaffStore)
+const { chatsList, cachedChats } = storeToRefs(supportChatStaffStore)
 
 const { error, reset, fullRefresh } =
   await usePaginationLazyWrapper<ISupportChatListItem>(
@@ -58,7 +58,6 @@ if (error.value) {
 const refetch = debounce(reset, 500)
 
 watch(search, refetch)
-watch(chatsListTrigger, fullRefresh)
 
 const channelName = 'support-chats-list'
 
@@ -69,7 +68,9 @@ onMounted(() => {
     .listen(
       '.support-chat-write-status',
       (data: ISupportChatWriteStatusChangeEvent) => {
-        
+        fullRefresh()
+        const cachedChat = cachedChats.value[data.chat_info.chat_id]
+        if (cachedChat) cachedChat.chat_info = JSON.stringify(data.chat_info)
       }
     )
 })

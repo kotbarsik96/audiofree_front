@@ -1,5 +1,10 @@
 <template>
   <div class="sc-user support-chat">
+    <SupportChatHeader
+      :chat-info="chatInfo"
+      :current-sender-type="ESupportChatSenderType.User"
+      :is-companion-writing="chatInfo?.is_companion_writing ?? false"
+    />
     <div v-if="hasChat" class="chat-body" ref="chatBodyElement">
       <div class="inner">
         <div class="top-spy" ref="topSpyElement"></div>
@@ -29,6 +34,7 @@
 import { storeToRefs } from 'pinia'
 import SupportChatInput from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatInput.vue'
 import SupportChatDatedGroup from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatDatedGroup.vue'
+import SupportChatHeader from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatHeader.vue'
 import SupportIcon from '~/assets/images/icons/support.svg?component'
 import { useSupportChat } from '~/composables/useSupportChat'
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'

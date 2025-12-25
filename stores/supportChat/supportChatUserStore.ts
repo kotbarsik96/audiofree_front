@@ -30,8 +30,6 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     }
   }
 
-  const isCompanionWriting = ref(false)
-
   async function submitReadMessages(readMessagesIds: number[]) {
     if (readMessagesIds.length < 1) return
 
@@ -63,14 +61,30 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     _readMessagesIds.value = []
   }
 
+  async function refetchChatInfo() {
+    try {
+      await $afFetch('/support-chat', {
+        credentials: 'include',
+        onResponse({ response }) {
+          if (response.ok) {
+            const updatedChatInfo = response._data.data
+            chatInfo.value = updatedChatInfo
+          }
+        },
+      })
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   return {
     messagesGroupedByDate,
     earliestMessageId,
     latestMessageId,
     chatInfo,
     savedScrollPosition,
-    isCompanionWriting,
     readMessage,
     clear,
+    refetchChatInfo,
   }
 })
