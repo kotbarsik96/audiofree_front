@@ -11,6 +11,9 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
   const earliestMessageId = ref<number>()
   const latestMessageId = ref<number>()
   const chatInfo = ref<ISupportChatInfo>()
+  const updateChatInfo = (newInfo: ISupportChatInfo | undefined) => {
+    chatInfo.value = newInfo
+  }
   const savedScrollPosition = ref<number>()
 
   const _readMessagesIds = ref<number[]>([])
@@ -41,9 +44,10 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
           first_read_message_id: readMessagesIds[0],
           read_count: readMessagesIds.length,
         },
-        onResponse({ response }) {
+        async onResponse({ response }) {
           if (response.ok) {
             setReadAtToMessages(messagesGroupedByDate.value, readMessagesIds)
+            updateChatInfo(response._data.data.chat_info)
           }
         },
       })
@@ -82,6 +86,7 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     earliestMessageId,
     latestMessageId,
     chatInfo,
+    updateChatInfo,
     savedScrollPosition,
     readMessage,
     clear,

@@ -5,7 +5,7 @@
       :current-sender-type="ESupportChatSenderType.Staff"
       :is-companion-writing="chatInfo?.is_companion_writing ?? false"
     />
-    <div class="chat-body" ref="chatBodyElement">
+    <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
       <div class="inner">
         <div class="top-spy" ref="topSpyElement"></div>
         <SupportChatDatedGroup
@@ -16,12 +16,21 @@
         <div class="bottom-spy" ref="bottomSpyElement"></div>
       </div>
     </div>
+    <Transition name="fade-in">
+      <SupportChatBottomButton
+        v-if="chatInfo && isBtnVisible"
+        :chat-info="chatInfo"
+        :chat-body-element="chatBodyElement"
+        @click="onChatBottomBtnClick"
+      />
+    </Transition>
     <SupportChatInput :chat-id="chatId" @message-written="onMessageWritten" />
   </div>
 </template>
 
 <script setup lang="ts">
 import SupportChatHeader from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatHeader.vue'
+import SupportChatBottomButton from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatBottomButton.vue'
 import { storeToRefs } from 'pinia'
 import SupportChatInput from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatInput.vue'
 import SupportChatDatedGroup from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatDatedGroup.vue'
@@ -46,6 +55,9 @@ const { onMessageWritten } = await useSupportChat(
 
 const store = useSupportChatStaffStore()
 const { messagesGroupedByDate, chatInfo } = storeToRefs(store)
+
+const { isBtnVisible, onChatBodyScroll, onChatBottomBtnClick } =
+  useSupportChatBottomButton(chatBodyElement)
 </script>
 
 <style lang="scss" scoped>

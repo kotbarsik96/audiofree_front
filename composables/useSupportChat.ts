@@ -6,7 +6,9 @@ import { useNotifications } from '~/composables/useNotifications'
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
+import type { ISupportChatMessageCreatedEvent } from '~/domain/support/chat/interfaces/ISupportChatMessageCreatedEvent'
 import type { ISupportChatMessagesList } from '~/domain/support/chat/interfaces/ISupportChatMessagesList'
+import type { ISupportChatReadMessagesEvent } from '~/domain/support/chat/interfaces/ISupportChatReadMessagesEvent'
 import type { ISupportChatWriteStatusChangeEvent } from '~/domain/support/chat/interfaces/ISupportChatWriteStatusChangeEvent'
 import {
   formatAndAppendMessages,
@@ -47,22 +49,22 @@ export async function useSupportChat(
 
     echo
       .private(channelName)
+      // новые сообщения от собеседника
       .listen(
         '.support-chat-message-created',
-        ({ message }: { message: ISupportChatMessage }) => {
-          formatAndAppendMessages(messagesGroupedByDate.value, [message])
+        (data: ISupportChatMessageCreatedEvent) => {
+          formatAndAppendMessages(messagesGroupedByDate.value, [data.message])
+          updateChatInfo(data.chat_info)
         }
       )
-      .listen(
-        '.support-chat-read',
-        ({ readMessagesIds }: { readMessagesIds: number[] }) => {
-          setReadAtToMessages(messagesGroupedByDate.value, readMessagesIds)
-        }
-      )
+      // собеседник прочитал сообщения
+      .listen('.support-chat-read', (data: ISupportChatReadMessagesEvent) => {
+        setReadAtToMessages(messagesGroupedByDate.value, data.read_messages_ids)
+      })
+      // собеседник начал/прекратил печатать
       .listen(
         '.support-chat-write-status',
         (data: ISupportChatWriteStatusChangeEvent) => {
-          console.log(data)
           if (data.sender !== currentSenderType.value) store.refetchChatInfo()
         }
       )
@@ -115,6 +117,7 @@ export async function useSupportChat(
   const _OBSERVER_MARGIN_ = 100
 
   const store = chat_id ? useSupportChatStaffStore() : useSupportChatUserStore()
+  const { updateChatInfo } = store
   const storeRefs = storeToRefs(store)
   const {
     messagesGroupedByDate,
@@ -337,4 +340,32 @@ export function useSupportChatLoading(
   }
 
   return { loadMoreEarlier, loadMoreLater }
+}
+
+export function useSupportChatBottomButton(
+  chatBodyElement: Readonly<ShallowRef<HTMLElement | null>>
+) {
+  const isBtnVisible = ref(false)
+
+  const onChatBodyScroll = debounce(() => {
+    if (chatBodyElement.value) {
+      const chatBodyHeight = chatBodyElement.value.offsetHeight
+      const pos = chatBodyElement.value.scrollTop + chatBodyHeight
+      isBtnVisible.value = pos <= chatBodyElement.value.scrollHeight - 50
+    }
+  }, 100)
+
+  const onChatBottomBtnClick = () => {
+    isBtnVisible.value = false
+    chatBodyElement.value?.scrollTo({
+      top: chatBodyElement.value.scrollHeight,
+      behavior: 'smooth',
+    })
+  }
+
+  return {
+    isBtnVisible,
+    onChatBodyScroll,
+    onChatBottomBtnClick,
+  }
 }

@@ -126,7 +126,7 @@ function formatTime(time: string, withDate?: boolean) {
 .sc-message {
   border-radius: 8px;
   padding: 0.5rem 1rem;
-  background: var(--gray-50);
+  background: var(--gray-100);
   max-width: 100%;
   box-shadow: 0px 0px 90px rgba(0, 0, 0, 0.05);
 

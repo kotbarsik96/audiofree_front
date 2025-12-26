@@ -76,6 +76,17 @@ export const useSupportChatStaffStore = defineStore(
     const savedScrollPosition = ref<number>()
 
     const chatInfo = ref<ISupportChatInfo>()
+    /** обновляет текущий chatInfo если newInfo.id совпадает с chatInfo.id. Иначе ищет сохранённый чат в кэше и обновляет его там */
+    const updateChatInfo = (newInfo: ISupportChatInfo | undefined) => {
+      if (newInfo) {
+        if (chatInfo.value?.chat_id === newInfo.chat_id)
+          chatInfo.value = newInfo
+        else {
+          const cached = cachedChats.value[newInfo.chat_id]
+          if (cached) cached.chat_info = JSON.stringify(newInfo)
+        }
+      }
+    }
 
     const chatsList = shallowRef<ISupportChatListItem[]>([])
 
@@ -141,7 +152,7 @@ export const useSupportChatStaffStore = defineStore(
             first_read_message_id: readMessagesIds[0],
             read_count: readMessagesIds.length,
           },
-          onResponse({ response }) {
+          async onResponse({ response }) {
             if (response.ok) {
               // если чат не менялся - поменять значения read_at только локально
               if (chat_id === currentChatId.value) {
@@ -159,6 +170,8 @@ export const useSupportChatStaffStore = defineStore(
                 setReadAtToMessages(cachedChat, readMessagesIds)
                 foundCached.chat = JSON.stringify(cachedChat)
               }
+
+              updateChatInfo(response._data.data.chat_info)
             }
           },
         })
@@ -179,10 +192,7 @@ export const useSupportChatStaffStore = defineStore(
           onResponse({ response }) {
             if (response.ok) {
               const updatedChatInfo = response._data.data
-
-              // проверка на то, что чат не сменился
-              if (updatingChatId === toValue(currentChatId))
-                chatInfo.value = updatedChatInfo
+              updateChatInfo(updatedChatInfo)
             }
           },
         })
@@ -202,6 +212,7 @@ export const useSupportChatStaffStore = defineStore(
       savedScrollPosition,
       chatInfo,
       chatsList,
+      updateChatInfo,
       refetchChatInfo,
     }
   }

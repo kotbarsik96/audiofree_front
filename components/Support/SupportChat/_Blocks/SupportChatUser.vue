@@ -5,7 +5,12 @@
       :current-sender-type="ESupportChatSenderType.User"
       :is-companion-writing="chatInfo?.is_companion_writing ?? false"
     />
-    <div v-if="hasChat" class="chat-body" ref="chatBodyElement">
+    <div
+      v-if="hasChat"
+      class="chat-body"
+      ref="chatBodyElement"
+      @scroll="onChatBodyScroll"
+    >
       <div class="inner">
         <div class="top-spy" ref="topSpyElement"></div>
         <SupportChatDatedGroup
@@ -26,6 +31,14 @@
         свободный сотрудник
       </div>
     </div>
+    <Transition name="fade-in">
+      <SupportChatBottomButton
+        v-if="chatInfo && isBtnVisible"
+        :chat-info="chatInfo"
+        :chat-body-element="chatBodyElement"
+        @click="onChatBottomBtnClick"
+      />
+    </Transition>
     <SupportChatInput @message-written="onMessageWritten" />
   </div>
 </template>
@@ -39,6 +52,7 @@ import SupportIcon from '~/assets/images/icons/support.svg?component'
 import { useSupportChat } from '~/composables/useSupportChat'
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
+import SupportChatBottomButton from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatBottomButton.vue'
 
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 const topSpyElement = useTemplateRef<HTMLElement>('topSpyElement')
@@ -54,6 +68,9 @@ const store = useSupportChatUserStore()
 const { messagesGroupedByDate, chatInfo } = storeToRefs(store)
 
 const hasChat = computed(() => !!chatInfo.value)
+
+const { isBtnVisible, onChatBodyScroll, onChatBottomBtnClick } =
+  useSupportChatBottomButton(chatBodyElement)
 </script>
 
 <style lang="scss" scoped>
