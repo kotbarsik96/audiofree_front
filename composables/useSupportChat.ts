@@ -67,7 +67,11 @@ export async function useSupportChat(
       )
       // собеседник прочитал сообщения
       .listen('.support-chat-read', (data: ISupportChatReadMessagesEvent) => {
-        setReadAtToMessages(messagesGroupedByDate.value, data.read_messages_ids)
+        if (data.reader_id !== user.value?.id)
+          setReadAtToMessages(
+            messagesGroupedByDate.value,
+            data.read_messages_ids
+          )
       })
       // собеседник начал/прекратил печатать
       .listen(

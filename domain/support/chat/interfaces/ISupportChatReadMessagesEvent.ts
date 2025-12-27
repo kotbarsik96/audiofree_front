@@ -3,4 +3,5 @@ import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupport
 export interface ISupportChatReadMessagesEvent {
   read_messages_ids: number[]
   chat_info: ISupportChatInfo
+  reader_id: number
 }
