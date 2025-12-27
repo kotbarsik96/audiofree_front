@@ -3,6 +3,6 @@ import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupport
 
 export interface ISupportChatWriteStatusChangeEvent {
   is_writing: boolean
-  sender: ESupportChatSenderType
+  writer_id: number
   chat_info: ISupportChatInfo
 }

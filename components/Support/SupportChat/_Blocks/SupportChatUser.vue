@@ -33,7 +33,7 @@
     </div>
     <Transition name="fade-in">
       <SupportChatBottomButton
-        v-if="chatInfo && isBtnVisible"
+        v-if="chatInfo && (isBtnVisible || chatInfo.unread_messages > 0)"
         :chat-info="chatInfo"
         :chat-body-element="chatBodyElement"
         @click="onChatBottomBtnClick"
