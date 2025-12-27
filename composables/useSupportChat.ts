@@ -49,11 +49,19 @@ export async function useSupportChat(
 
     echo
       .private(channelName)
-      // новые сообщения от собеседника
+      // новые сообщения (как от собеседника, так и от себя)
       .listen(
         '.support-chat-message-created',
         (data: ISupportChatMessageCreatedEvent) => {
-          formatAndAppendMessages(messagesGroupedByDate.value, [data.message])
+          // обновлять список сообщений только при получении от собеседника/других сотрудников
+          if (data.message.author_id !== user.value?.id) {
+            formatAndAppendMessages(
+              messagesGroupedByDate.value,
+              [data.message],
+              latestMessageId
+            )
+          }
+
           updateChatInfo(data.chat_info)
         }
       )
@@ -139,11 +147,12 @@ export async function useSupportChat(
       earliestMessageId.value &&
       earliestMessageId.value <= (chatInfo.value?.first_message_id ?? 0)
   )
-  const allLaterMessagesLoaded = computed(
-    () =>
+  const allLaterMessagesLoaded = computed(() => {
+    return (
       latestMessageId.value &&
       latestMessageId.value >= (chatInfo.value?.last_message_id ?? 0)
-  )
+    )
+  })
 
   const currentSenderType = computed(() =>
     chat_id ? ESupportChatSenderType.Staff : ESupportChatSenderType.User
@@ -224,15 +233,15 @@ export async function useSupportChat(
 
     messagesGroupedByDate.value = formatAndAppendMessages(
       messagesGroupedByDate.value,
-      messagesData.value?.data.messages ?? []
+      messagesData.value?.data.messages ?? [],
+      latestMessageId
     )
     earliestMessageId.value = messagesData.value?.data.earliest_loaded_id
-    latestMessageId.value = messagesData.value?.data.latest_loaded_id
     chatInfo.value = chatInfoData.value?.data
   }
 
   async function _loadMoreTop() {
-    if (!earliestMessageId.value || allEarlierMessagesLoaded.value) return
+    if (allEarlierMessagesLoaded.value) return
 
     const heightBefore = chatBodyElement.value?.scrollHeight ?? 0
 
@@ -240,7 +249,7 @@ export async function useSupportChat(
     compensateHeight(heightBefore)
   }
   async function _loadMoreBottom(load_all?: boolean) {
-    if (!latestMessageId.value || allLaterMessagesLoaded.value) return
+    if (allLaterMessagesLoaded.value) return
 
     await loadMoreLater(load_all)
   }
@@ -305,7 +314,8 @@ export function useSupportChatLoading(
           earliestMessageId.value = earliest_loaded_id
           messagesGroupedByDate.value = formatAndPrependMessages(
             messagesGroupedByDate.value,
-            loadedMessages
+            loadedMessages,
+            earliestMessageId
           )
         },
       })
@@ -327,10 +337,10 @@ export function useSupportChatLoading(
           const { messages: loadedMessages, latest_loaded_id } =
             response._data.data
 
-          latestMessageId.value = latest_loaded_id
           messagesGroupedByDate.value = formatAndAppendMessages(
             messagesGroupedByDate.value,
-            loadedMessages
+            loadedMessages,
+            latestMessageId
           )
         },
       })

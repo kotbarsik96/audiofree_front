@@ -42,7 +42,7 @@ const store = props.chatId
   ? useSupportChatStaffStore()
   : useSupportChatUserStore()
 
-const { messagesGroupedByDate } = storeToRefs(store)
+const { messagesGroupedByDate, latestMessageId } = storeToRefs(store)
 
 const sending = ref(false)
 
@@ -98,12 +98,13 @@ async function send() {
         text: text.value,
       },
       onResponse({ response }) {
+        const message = response._data.data.message as ISupportChatMessage
+
         if (isWritingTimeout) clearTimeout(isWritingTimeout)
         updateIsWritingStatus(false)
         text.value = ''
-        formatAndAppendMessages(messagesGroupedByDate.value, [
-          response._data.data.message,
-        ])
+        formatAndAppendMessages(messagesGroupedByDate.value, [message], latestMessageId)
+        latestMessageId.value = message.id
         emit('message-written')
       },
       onResponseError({ response }) {

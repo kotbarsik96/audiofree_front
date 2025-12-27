@@ -2,11 +2,12 @@ import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupp
 
 export function formatAndPrependMessages(
   currentArray: ISupportChatMessagesDateGroup[],
-  messages: ISupportChatMessage[]
+  messages: ISupportChatMessage[],
+  earliestMessageId: Ref<number | undefined>
 ) {
   const arr: ISupportChatMessagesDateGroup[] = [...currentArray]
 
-  for (let message of messages.reverse()) {
+  for (let message of [...messages].reverse()) {
     let firstDateGroup: ISupportChatMessagesDateGroup | undefined = arr.at(0)
     if (
       !firstDateGroup ||
@@ -29,12 +30,15 @@ export function formatAndPrependMessages(
     firstSenderGroup.messages.unshift(message)
   }
 
+  earliestMessageId.value = messages.at(0)?.id
+
   return arr
 }
 
 export function formatAndAppendMessages(
   currentArray: ISupportChatMessagesDateGroup[],
-  messages: ISupportChatMessage[]
+  messages: ISupportChatMessage[],
+  latestMessageId: Ref<number | undefined>
 ) {
   const arr: ISupportChatMessagesDateGroup[] = [...currentArray]
 
@@ -62,6 +66,8 @@ export function formatAndAppendMessages(
 
     lastSenderGroup.messages.push(message)
   }
+
+  latestMessageId.value = messages.at(messages.length - 1)?.id
 
   return arr
 }
