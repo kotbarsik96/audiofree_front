@@ -8,8 +8,8 @@
     </div>
     <div class="latest-message">
       <Transition name="drop-down" mode="out-in">
-        <div v-if="chat.is_writing" class="is-writing">
-          (печатает
+        <div v-if="chat.writers_count > 0" class="is-writing">
+          ({{ writingStatusString }}
           <SupportChatThreeDots />
           )
         </div>
@@ -39,6 +39,13 @@ const contactsString = computed(() =>
     .filter((str) => !!str)
     .join(' / ')
 )
+
+const writingStatusString = computed(() => {
+  if (props.chat.writers_count < 1) return null
+  if (props.chat.writers_count === 1) return 'печатает'
+  if (props.chat.writers_count > 1)
+    return `${props.chat.writers_count} печатают`
+})
 </script>
 
 <style lang="scss" scoped>
