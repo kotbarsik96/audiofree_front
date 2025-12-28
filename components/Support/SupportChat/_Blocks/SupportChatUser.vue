@@ -3,7 +3,6 @@
     <SupportChatHeader
       :chat-info="chatInfo"
       :current-sender-type="ESupportChatSenderType.User"
-      :is-companion-writing="chatInfo?.is_companion_writing ?? false"
     />
     <div
       v-if="hasChat"

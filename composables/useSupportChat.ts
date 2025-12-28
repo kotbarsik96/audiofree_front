@@ -77,9 +77,7 @@ export async function useSupportChat(
       .listen(
         '.support-chat-write-status',
         (data: ISupportChatWriteStatusChangeEvent) => {
-          store.refetchChatInfo()
-          // todo: заменить рефетч на обновление напрямую из data.chat_info. Что-то не так на бэке: неправильно отправляет is_companion_writing
-          // updateChatInfo(data.chat_info)
+          updateChatInfo(data.chat_info)
         }
       )
       .error((err: any) => console.error(err))

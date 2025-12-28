@@ -3,8 +3,8 @@
     <div class="name">{{ chatInfo?.user_name ?? '' }}</div>
     <div class="is-writing">
       <Transition name="drop-down">
-        <div v-if="isCompanionWriting" class="iw-inner">
-          <div>печатает</div>
+        <div v-if="writersString" class="iw-inner">
+          <div>{{ writersString }}</div>
           <SupportChatThreeDots />
         </div>
       </Transition>
@@ -13,15 +13,40 @@
 </template>
 
 <script setup lang="ts">
-import SupportChatThreeDots from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatThreeDots.vue';
-import type { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
+import SupportChatThreeDots from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatThreeDots.vue'
+import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
+import type IUser from '~/domain/user/types/IUser'
+
+const user = useSanctumUser<IUser>()
 
 const props = defineProps<{
-  isCompanionWriting: boolean
   currentSenderType: ESupportChatSenderType
   chatInfo: ISupportChatInfo | undefined
 }>()
+
+const writers = computed(() => {
+  const arr = []
+
+  if (props.currentSenderType === ESupportChatSenderType.User) {
+    if (props.chatInfo?.staff_writing) arr.push('сотрудник')
+  } else {
+    if (props.chatInfo?.user_writing) arr.push(props.chatInfo.user_name)
+    const staffWriters = props.chatInfo?.staff_writers?.filter(
+      (writer) => writer !== user.value?.name
+    )
+    if (staffWriters && staffWriters.length > 0) arr.push(...staffWriters)
+  }
+
+  return arr
+})
+
+const writersString = computed(() => {
+  if (writers.value.length < 1) return null
+  return `${writers.value.join(', ')} ${
+    writers.value.length > 1 ? 'печатают' : 'печатает'
+  }`
+})
 </script>
 
 <style lang="scss" scoped>

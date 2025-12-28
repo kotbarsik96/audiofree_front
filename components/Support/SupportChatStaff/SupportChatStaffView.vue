@@ -3,7 +3,6 @@
     <SupportChatHeader
       :chat-info="chatInfo"
       :current-sender-type="ESupportChatSenderType.Staff"
-      :is-companion-writing="chatInfo?.is_companion_writing ?? false"
     />
     <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
       <div class="inner">

@@ -5,5 +5,7 @@ export interface ISupportChatInfo {
   first_message_id: number
   last_message_id: number
   user_name: string
-  is_companion_writing: boolean
+  user_writing: boolean
+  staff_writing: boolean
+  staff_writers?: string[]
 }
