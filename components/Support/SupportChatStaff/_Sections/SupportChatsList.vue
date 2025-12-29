@@ -2,12 +2,18 @@
   <div class="sc-list">
     <div class="search-block">
       <InputWrapper
-        class="input-wrapper"
+        class="sb-input"
         label="Поиск (email, телефон, ФИО)"
         input-id="search-filter"
       >
         <TextInput v-model="search" id="search-filter" />
       </InputWrapper>
+      <AFSelect
+        class="sb-select"
+        :options="supportChatStatusOptions"
+        placeholder="Статус"
+        v-model="_status"
+      />
     </div>
     <div class="list">
       <SupportChatStaffLink
@@ -21,9 +27,14 @@
 </template>
 
 <script setup lang="ts">
+import AFSelect from '~/components/_UI/AFSelect.vue'
 import InputWrapper from '~/components/_UI/FormElements/InputWrapper.vue'
 import TextInput from '~/components/_UI/FormElements/TextInput.vue'
 import SupportChatStaffLink from '~/components/Support/SupportChatStaff/_Blocks/SupportChatStaffLink.vue'
+import {
+  ESupportChatStatus,
+  supportChatStatusOptions,
+} from '~/domain/support/chat/interfaces/ESupportChatStatus'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
 import type { ISupportChatWriteStatusChangeEvent } from '~/domain/support/chat/interfaces/ISupportChatWriteStatusChangeEvent'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
@@ -32,6 +43,10 @@ const spyElement = useTemplateRef<HTMLElement>('spyElement')
 
 const echo = useEcho()
 
+const _status = ref<ESupportChatStatus | 'all'>('all')
+const status = computed(() =>
+  _status.value === 'all' ? undefined : _status.value
+)
 const search = ref('')
 
 const supportChatStaffStore = useSupportChatStaffStore()
@@ -47,6 +62,7 @@ const { error, reset, fullRefresh } =
       watch: false,
       query: {
         search,
+        status,
       },
     }
   )
@@ -56,8 +72,7 @@ if (error.value) {
 }
 
 const refetch = debounce(reset, 500)
-
-watch(search, refetch)
+watch(() => [search.value, status.value], refetch)
 
 const channelName = 'support-chats-list'
 
@@ -93,6 +108,9 @@ onUnmounted(() => {
     padding-inline: var(--padding-inline);
     padding-block: 1rem;
     border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .list {
