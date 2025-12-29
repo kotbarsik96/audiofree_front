@@ -54,6 +54,7 @@ const status = computed(() =>
 const search = ref('')
 
 const supportChatStaffStore = useSupportChatStaffStore()
+const { getCachedChat } = supportChatStaffStore
 const { chatsList, cachedChats } = storeToRefs(supportChatStaffStore)
 
 const { error, reset, fullRefresh, isLastPage } =
@@ -88,7 +89,7 @@ onMounted(() => {
       '.support-chat-write-status',
       (data: ISupportChatWriteStatusChangeEvent) => {
         fullRefresh()
-        const cachedChat = cachedChats.value[data.chat_info.chat_id]
+        const cachedChat = getCachedChat(data.chat_info.chat_id)
         if (cachedChat) cachedChat.chat_info = JSON.stringify(data.chat_info)
       }
     )
@@ -126,13 +127,13 @@ onUnmounted(() => {
     gap: 0.5rem;
   }
 
-  .sc-loader{ 
+  .sc-loader {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-block-start: 1rem;
 
-    .loader{ 
+    .loader {
       width: 30px;
       height: 30px;
     }
