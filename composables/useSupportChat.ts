@@ -58,6 +58,7 @@ export async function useSupportChat(
             formatAndAppendMessages(
               messagesGroupedByDate.value,
               [data.message],
+              chatInfo,
               latestMessageId
             )
           }
@@ -143,6 +144,7 @@ export async function useSupportChat(
     earliestMessageId,
     latestMessageId,
     messagesGroupedByDate,
+    chatInfo,
     chat_id
   )
 
@@ -204,6 +206,16 @@ export async function useSupportChat(
       bottomSpyObserver.observe(bottomSpyElement.value)
     }
   }
+  watch(
+    () => chatInfo.value?.chat_id,
+    () => {
+      if (topSpyObserver) topSpyObserver.disconnect()
+      if (bottomSpyObserver) bottomSpyObserver.disconnect()
+    },
+    {
+      once: true,
+    }
+  )
 
   async function _loadFirst() {
     const [
@@ -240,6 +252,7 @@ export async function useSupportChat(
     messagesGroupedByDate.value = formatAndAppendMessages(
       messagesGroupedByDate.value,
       messagesData.value?.data.messages ?? [],
+      chatInfo,
       latestMessageId
     )
     earliestMessageId.value = messagesData.value?.data.earliest_loaded_id
@@ -302,6 +315,7 @@ export function useSupportChatLoading(
   earliestMessageId: Ref<number | undefined>,
   latestMessageId: Ref<number | undefined>,
   messagesGroupedByDate: Ref<ISupportChatMessagesDateGroup[]>,
+  chatInfo: MaybeRefOrGetter<ISupportChatInfo | undefined>,
   chatId?: MaybeRefOrGetter<number | undefined>
 ) {
   const { addNotification } = useNotifications()
@@ -323,6 +337,7 @@ export function useSupportChatLoading(
           messagesGroupedByDate.value = formatAndPrependMessages(
             messagesGroupedByDate.value,
             loadedMessages,
+            chatInfo,
             earliestMessageId
           )
         },
@@ -348,6 +363,7 @@ export function useSupportChatLoading(
           messagesGroupedByDate.value = formatAndAppendMessages(
             messagesGroupedByDate.value,
             loadedMessages,
+            chatInfo,
             latestMessageId
           )
         },

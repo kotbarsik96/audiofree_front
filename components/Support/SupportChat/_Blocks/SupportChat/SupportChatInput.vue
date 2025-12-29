@@ -42,7 +42,7 @@ const store = props.chatId
   ? useSupportChatStaffStore()
   : useSupportChatUserStore()
 
-const { messagesGroupedByDate, latestMessageId } = storeToRefs(store)
+const { messagesGroupedByDate, latestMessageId, chatInfo } = storeToRefs(store)
 
 const sending = ref(false)
 
@@ -121,6 +121,7 @@ async function send() {
         formatAndAppendMessages(
           messagesGroupedByDate.value,
           [message],
+          chatInfo,
           latestMessageId
         )
         latestMessageId.value = message.id

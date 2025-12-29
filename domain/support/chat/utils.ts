@@ -1,11 +1,23 @@
+import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 
 export function formatAndPrependMessages(
   currentArray: ISupportChatMessagesDateGroup[],
   messages: ISupportChatMessage[],
+  chatInfo: MaybeRefOrGetter<ISupportChatInfo | undefined>,
   earliestMessageId: Ref<number | undefined>
 ) {
   const arr: ISupportChatMessagesDateGroup[] = [...currentArray]
+
+  const chatInfoValue = toValue(chatInfo)
+  const firstMessage = messages.at(0)
+  // если сообщения не принадлежат текущему чату - оставить всё как есть
+  if (
+    !chatInfoValue ||
+    !firstMessage ||
+    chatInfoValue.chat_id !== firstMessage.chat_id
+  )
+    return arr
 
   for (let message of [...messages].reverse()) {
     let firstDateGroup: ISupportChatMessagesDateGroup | undefined = arr.at(0)
@@ -38,9 +50,20 @@ export function formatAndPrependMessages(
 export function formatAndAppendMessages(
   currentArray: ISupportChatMessagesDateGroup[],
   messages: ISupportChatMessage[],
+  chatInfo: MaybeRefOrGetter<ISupportChatInfo | undefined>,
   latestMessageId: Ref<number | undefined>
 ) {
   const arr: ISupportChatMessagesDateGroup[] = [...currentArray]
+
+  const chatInfoValue = toValue(chatInfo)
+  const firstMessage = messages.at(0)
+  // если сообщения не принадлежат текущему чату - оставить всё как есть
+  if (
+    !chatInfoValue ||
+    !firstMessage ||
+    chatInfoValue.chat_id !== firstMessage.chat_id
+  )
+    return arr
 
   for (let message of messages) {
     let lastDateGroup: ISupportChatMessagesDateGroup | undefined = arr.at(

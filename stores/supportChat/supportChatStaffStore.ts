@@ -95,6 +95,7 @@ export const useSupportChatStaffStore = defineStore(
       earliestMessageId,
       latestMessageId,
       messagesGroupedByDate,
+      chatInfo,
       currentChatId
     )
 
