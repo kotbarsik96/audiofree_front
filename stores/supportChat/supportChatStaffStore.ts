@@ -31,8 +31,9 @@ export const useSupportChatStaffStore = defineStore(
     const changeChat = async (newChatId: number) => {
       cacheCurrentChat()
       restoreCachedChatOrReset(newChatId)
-      if (newChatId in cachedChats.value) {
+      if (newChatId in cachedChats.value && chatInfo.value) {
         await loadMoreLater(true)
+        await refetchChatInfo()
       }
     }
 
@@ -98,6 +99,8 @@ export const useSupportChatStaffStore = defineStore(
     )
 
     function cacheCurrentChat() {
+      // todo: добавить лимит на кэш и если превышает лимит - убирать самый старый кэшированный чат
+
       if (
         !_currentChatId.value ||
         !messagesGroupedByDate.value ||

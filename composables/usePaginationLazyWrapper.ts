@@ -167,5 +167,6 @@ export async function usePaginationLazyWrapper<T>(
     refresh,
     fullRefresh,
     error,
+    isLastPage,
   }
 }

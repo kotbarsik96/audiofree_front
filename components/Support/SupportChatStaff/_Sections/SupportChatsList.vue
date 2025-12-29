@@ -21,6 +21,9 @@
         :key="chat.id"
         :chat="chat"
       />
+      <div v-if="!isLastPage" class="sc-loader">
+        <SpinnerLoader />
+      </div>
       <div class="spy" ref="spyElement"></div>
     </div>
   </div>
@@ -30,6 +33,7 @@
 import AFSelect from '~/components/_UI/AFSelect.vue'
 import InputWrapper from '~/components/_UI/FormElements/InputWrapper.vue'
 import TextInput from '~/components/_UI/FormElements/TextInput.vue'
+import SpinnerLoader from '~/components/_UI/Loaders/SpinnerLoader.vue'
 import SupportChatStaffLink from '~/components/Support/SupportChatStaff/_Blocks/SupportChatStaffLink.vue'
 import {
   ESupportChatStatus,
@@ -52,7 +56,7 @@ const search = ref('')
 const supportChatStaffStore = useSupportChatStaffStore()
 const { chatsList, cachedChats } = storeToRefs(supportChatStaffStore)
 
-const { error, reset, fullRefresh } =
+const { error, reset, fullRefresh, isLastPage } =
   await usePaginationLazyWrapper<ISupportChatListItem>(
     chatsList,
     spyElement,
@@ -120,6 +124,18 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .sc-loader{ 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-block-start: 1rem;
+
+    .loader{ 
+      width: 30px;
+      height: 30px;
+    }
   }
 
   @include mixins.adaptive(tablet-small) {

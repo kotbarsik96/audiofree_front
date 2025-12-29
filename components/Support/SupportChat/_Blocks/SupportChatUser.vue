@@ -1,5 +1,5 @@
 <template>
-  <div class="sc-user support-chat">
+  <div class="sc-user support-chat" :class="classes">
     <SupportChatHeader
       :chat-info="chatInfo"
       :current-sender-type="ESupportChatSenderType.User"
@@ -11,6 +11,9 @@
       @scroll="onChatBodyScroll"
     >
       <div class="inner">
+        <div v-if="!allEarlierMessagesLoaded" class="chat-loader">
+          <SpinnerLoader />
+        </div>
         <div class="top-spy" ref="topSpyElement"></div>
         <SupportChatDatedGroup
           v-for="group in messagesGroupedByDate"
@@ -44,6 +47,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
+import SpinnerLoader from '~/components/_UI/Loaders/SpinnerLoader.vue'
 import SupportChatInput from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatInput.vue'
 import SupportChatDatedGroup from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatDatedGroup.vue'
 import SupportChatHeader from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatHeader.vue'
@@ -57,10 +61,11 @@ const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 const topSpyElement = useTemplateRef<HTMLElement>('topSpyElement')
 const bottomSpyElement = useTemplateRef<HTMLElement>('bottomSpyElement')
 
-const [{ data: pageData }, { onMessageWritten }] = await Promise.all([
-  useAPI<{ data: IPageSeo }>('page/contacts'),
-  useSupportChat(chatBodyElement, topSpyElement, bottomSpyElement),
-])
+const [{ data: pageData }, { onMessageWritten, allEarlierMessagesLoaded }] =
+  await Promise.all([
+    useAPI<{ data: IPageSeo }>('page/contacts'),
+    useSupportChat(chatBodyElement, topSpyElement, bottomSpyElement),
+  ])
 usePageMeta(pageData)
 
 const store = useSupportChatUserStore()
@@ -70,6 +75,10 @@ const hasChat = computed(() => !!chatInfo.value)
 
 const { isBtnVisible, onChatBodyScroll, onChatBottomBtnClick } =
   useSupportChatBottomButton(chatBodyElement)
+
+const classes = computed(() => ({
+  '--all-earlier-loaded': allEarlierMessagesLoaded.value,
+}))
 </script>
 
 <style lang="scss" scoped>

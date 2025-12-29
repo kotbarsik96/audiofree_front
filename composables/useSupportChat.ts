@@ -170,7 +170,9 @@ export async function useSupportChat(
     store.changeChat(toValue(chat_id))
   }
   // если чата в кэше по данному id нет - загрузить
-  if (!chatInfo.value) await _loadFirst()
+  if (!chatInfo.value) {
+    await _loadFirst()
+  }
 
   let topSpyObserver: IntersectionObserver
   let bottomSpyObserver: IntersectionObserver
@@ -291,6 +293,8 @@ export async function useSupportChat(
     earliestMessageId,
     latestMessageId,
     onMessageWritten,
+    allEarlierMessagesLoaded,
+    allLaterMessagesLoaded,
   }
 }
 

@@ -6,6 +6,9 @@
     />
     <div class="chat-body" ref="chatBodyElement" @scroll="onChatBodyScroll">
       <div class="inner">
+        <div v-if="!allEarlierMessagesLoaded" class="chat-loader">
+          <SpinnerLoader />
+        </div>
         <div class="top-spy" ref="topSpyElement"></div>
         <SupportChatDatedGroup
           v-for="group in messagesGroupedByDate"
@@ -28,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import SpinnerLoader from '~/components/_UI/Loaders/SpinnerLoader.vue'
 import SupportChatHeader from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatHeader.vue'
 import SupportChatBottomButton from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatBottomButton.vue'
 import { storeToRefs } from 'pinia'
@@ -45,7 +49,7 @@ const route = useRoute()
 
 const chatId = computed(() => Number(route.params.id ?? 0))
 
-const { onMessageWritten } = await useSupportChat(
+const { onMessageWritten, allEarlierMessagesLoaded } = await useSupportChat(
   chatBodyElement,
   topSpyElement,
   bottomSpyElement,

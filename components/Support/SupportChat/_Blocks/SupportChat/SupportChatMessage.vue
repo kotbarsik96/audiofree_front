@@ -1,6 +1,6 @@
 <template>
   <div class="sc-message" :class="classes" ref="element">
-    <div class="name">{{ name }}</div>
+    <div class="name">{{ name }} ({{ message.id }})</div>
     <div class="text" v-html="purifiedText"></div>
     <div class="time-block">
       <time class="time" :datetime="createdAt">{{ createdAt }}</time>

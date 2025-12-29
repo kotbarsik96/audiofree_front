@@ -1,6 +1,6 @@
 <template>
   <div class="sc-header">
-    <div class="name">{{ chatInfo?.user_name ?? '' }}</div>
+    <div class="name">{{ name }}</div>
     <div class="is-writing">
       <Transition name="drop-down">
         <div v-if="writersString" class="iw-inner">
@@ -46,6 +46,12 @@ const writersString = computed(() => {
   return `${writers.value.join(', ')} ${
     writers.value.length > 1 ? 'печатают' : 'печатает'
   }`
+})
+
+const name = computed(() => {
+  if (props.currentSenderType === ESupportChatSenderType.User)
+    return 'Техническая поддержка'
+  else return props.chatInfo?.user_name ?? 'Пользователь'
 })
 </script>
 
