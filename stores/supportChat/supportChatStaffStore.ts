@@ -9,6 +9,7 @@ import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISup
 import { setReadAtToMessages } from '~/domain/support/chat/utils'
 
 interface ICachedStaffSupportChat {
+  chat_id: number
   chat: string // JSON.stringify<ISupportChatMessagesDateGroup[]>
   chat_info: string // JSON.stringify<ISupportChatInfo>
   earliest_message_id: number | undefined
@@ -20,6 +21,8 @@ interface IReadMessageByChatData {
   messagesIds: number[]
   timeout: ReturnType<typeof setTimeout> | undefined
 }
+
+const __MAX_CACHED_CHATS__ = 4
 
 export const useSupportChatStaffStore = defineStore(
   'support-chat-staff',
@@ -73,7 +76,9 @@ export const useSupportChatStaffStore = defineStore(
     const messagesGroupedByDate = ref<ISupportChatMessagesDateGroup[]>([])
     const earliestMessageId = ref<number | undefined>()
     const latestMessageId = ref<number | undefined>()
-    const cachedChats = ref<Record<number, ICachedStaffSupportChat>>({})
+    const cachedChats = ref<ICachedStaffSupportChat[]>([])
+    const getCachedChat = (chatId: number) =>
+      cachedChats.value.find((cached) => cached.chat_id === chatId)
     const savedScrollPosition = ref<number>()
 
     const chatInfo = ref<ISupportChatInfo>()
@@ -83,7 +88,7 @@ export const useSupportChatStaffStore = defineStore(
         if (chatInfo.value?.chat_id === newInfo.chat_id)
           chatInfo.value = newInfo
         else {
-          const cached = cachedChats.value[newInfo.chat_id]
+          const cached = getCachedChat(newInfo.chat_id)
           if (cached) cached.chat_info = JSON.stringify(newInfo)
         }
       }
@@ -109,22 +114,42 @@ export const useSupportChatStaffStore = defineStore(
       )
         return
 
+      // подготовить кэш
       const stringifiedMessages = JSON.stringify(messagesGroupedByDate.value)
       const stringifiedChatInfo = JSON.stringify(chatInfo.value)
-      cachedChats.value[_currentChatId.value] = {
+      const data = {
+        chat_id: chatInfo.value.chat_id,
         chat: stringifiedMessages,
         chat_info: stringifiedChatInfo,
         earliest_message_id: earliestMessageId.value,
         latest_message_id: latestMessageId.value,
         scroll_position: savedScrollPosition.value,
       }
+
+      const cachedChatIndex = cachedChats.value.findIndex(
+        (cached) => cached.chat_id === _currentChatId.value
+      )
+      // если чат уже кэширован - перезаписать его
+      if (cachedChatIndex >= 0)
+        cachedChats.value.splice(cachedChatIndex, 1, data)
+      // иначе просто добавить в кэш
+      else cachedChats.value.push(data)
+
+      // количество кэшированных чатов не должно превышать лимит
+      if (cachedChats.value.length > __MAX_CACHED_CHATS__) {
+        const startIndex = cachedChats.value.length - __MAX_CACHED_CHATS__
+        cachedChats.value = cachedChats.value.slice(startIndex)
+      }
+
+      console.log(cachedChats.value.map((cached) => cached.chat_id))
     }
 
     /** Если чат есть в кэше - восстановит его. В ином случае сбросит все состояния */
     function restoreCachedChatOrReset(restoredChatId: number) {
       _currentChatId.value = restoredChatId
-      const foundCached: ICachedStaffSupportChat | undefined =
-        cachedChats.value[_currentChatId.value]
+      const foundCached: ICachedStaffSupportChat | undefined = getCachedChat(
+        _currentChatId.value
+      )
 
       if (foundCached) {
         chatInfo.value = JSON.parse(foundCached.chat_info)
@@ -167,12 +192,14 @@ export const useSupportChatStaffStore = defineStore(
               }
               // если чат менялся - поменять значения read_at внутри кэша
               else {
-                const foundCached = cachedChats.value[chat_id]
-                const cachedChat = JSON.parse(
-                  foundCached.chat
-                ) as ISupportChatMessagesDateGroup[]
-                setReadAtToMessages(cachedChat, readMessagesIds)
-                foundCached.chat = JSON.stringify(cachedChat)
+                const foundCached = getCachedChat(chat_id)
+                if (foundCached) {
+                  const cachedChat = JSON.parse(
+                    foundCached.chat
+                  ) as ISupportChatMessagesDateGroup[]
+                  setReadAtToMessages(cachedChat, readMessagesIds)
+                  foundCached.chat = JSON.stringify(cachedChat)
+                }
               }
 
               updateChatInfo(response._data.data.chat_info)
@@ -209,6 +236,7 @@ export const useSupportChatStaffStore = defineStore(
       currentChatId,
       changeChat,
       cachedChats,
+      getCachedChat,
       readMessage,
       messagesGroupedByDate,
       earliestMessageId,
