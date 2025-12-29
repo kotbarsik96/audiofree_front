@@ -69,7 +69,21 @@ async function onInput() {
   }
 }
 
-async function updateIsWritingStatus(is_writing: boolean) {
+onMounted(() => {
+  window.addEventListener('unload', onWindowUnload)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('unload', onWindowUnload)
+  onWindowUnload()
+})
+
+function onWindowUnload() {
+  if (isWritingTimeout) clearTimeout(isWritingTimeout)
+  updateIsWritingStatus(false, true)
+}
+
+async function updateIsWritingStatus(is_writing: boolean, keepalive = false) {
   await $afFetch('/support-chat/update-writing-status', {
     method: 'POST',
     body: {
@@ -77,6 +91,7 @@ async function updateIsWritingStatus(is_writing: boolean) {
       is_writing,
     },
     credentials: 'include',
+    keepalive,
   })
 }
 
@@ -103,7 +118,11 @@ async function send() {
         if (isWritingTimeout) clearTimeout(isWritingTimeout)
         updateIsWritingStatus(false)
         text.value = ''
-        formatAndAppendMessages(messagesGroupedByDate.value, [message], latestMessageId)
+        formatAndAppendMessages(
+          messagesGroupedByDate.value,
+          [message],
+          latestMessageId
+        )
         latestMessageId.value = message.id
         emit('message-written')
       },
