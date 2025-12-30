@@ -48,7 +48,10 @@ const isOpposite = computed(
 )
 
 const name = computed(() => {
-  let n = supportChatSenderTypeMap[props.message.sender_type]
+  let n =
+    supportChatSenderTypeMap[
+      props.message.sender_type as ESupportChatSenderType
+    ]
 
   if (
     props.message.sender_type === ESupportChatSenderType.User &&
@@ -124,10 +127,10 @@ function formatTime(time: string, withDate?: boolean) {
 @use '/css/mixins/mixins.scss';
 
 .sc-message {
+  max-width: var(--sc-max-message-width);
   border-radius: var(--sc-message-border-radius);
   padding: 0.5rem 1rem;
   background: var(--gray-100);
-  max-width: 100%;
   box-shadow: 0px 0px 90px rgba(0, 0, 0, 0.05);
 
   .time-block {

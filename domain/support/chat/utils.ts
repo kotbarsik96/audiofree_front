@@ -1,3 +1,4 @@
+import type { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 
@@ -35,7 +36,10 @@ export function formatAndPrependMessages(
       !firstSenderGroup ||
       firstSenderGroup.sender_type !== message.sender_type
     ) {
-      firstSenderGroup = { sender_type: message.sender_type, messages: [] }
+      firstSenderGroup = {
+        sender_type: message.sender_type as ESupportChatSenderType,
+        messages: [],
+      }
       firstDateGroup.groups.unshift(firstSenderGroup)
     }
 
@@ -83,7 +87,10 @@ export function formatAndAppendMessages(
       !lastSenderGroup ||
       lastSenderGroup.sender_type !== message.sender_type
     ) {
-      lastSenderGroup = { sender_type: message.sender_type, messages: [] }
+      lastSenderGroup = {
+        sender_type: message.sender_type as ESupportChatSenderType,
+        messages: [],
+      }
       lastDateGroup.groups.push(lastSenderGroup)
     }
 

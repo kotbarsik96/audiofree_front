@@ -4,18 +4,25 @@
       <component v-if="avatarIcon" :is="avatarIcon" />
     </div>
     <div class="list">
-      <SupportChatMessage
-        v-for="message in messagesGroup.messages"
-        :key="message.id"
-        :message="message"
-        :current-sender-type="currentSenderType"
-      />
+      <template v-for="message in messagesGroup.messages" :key="message.id">
+        <SupportChatMessage
+          v-if="message.sender_type !== 'system'"
+          :message="message"
+          :current-sender-type="currentSenderType"
+        />
+        <SupportChatSystemMessage
+          v-else
+          :message="message"
+          :current-sender-type="currentSenderType"
+        />
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import SupportChatMessage from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatMessage.vue'
+import SupportChatSystemMessage from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatSystemMessage.vue'
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import SupportIcon from '~/assets/images/icons/support.svg?component'
 import UserIcon from '~/assets/images/icons/user.svg?component'
@@ -62,7 +69,7 @@ const classes = computed(() => ({
   }
 
   .list {
-    width: var(--sc-list-width);
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -82,7 +89,7 @@ const classes = computed(() => ({
     }
   }
 
-  @include mixins.adaptive(tablet-big){
+  @include mixins.adaptive(tablet-big) {
     .list {
       width: 90%;
     }

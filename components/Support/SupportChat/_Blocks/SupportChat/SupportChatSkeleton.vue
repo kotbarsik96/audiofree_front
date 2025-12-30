@@ -47,7 +47,7 @@
 
     border-radius: var(--sc-message-border-radius);
     max-width: 100%;
-    width: var(--sc-list-width);
+    width: var(--sc-max-message-width);
     height: 5.5rem;
     background-color: var(--gray-400);
 
