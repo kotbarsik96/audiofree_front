@@ -10,7 +10,8 @@
       ref="chatBodyElement"
       @scroll="onChatBodyScroll"
     >
-      <div class="inner">
+      <SupportChatSkeleton v-if="isFirstLoading" />
+      <div v-else class="inner">
         <div v-if="!allEarlierMessagesLoaded" class="chat-loader">
           <SpinnerLoader />
         </div>
@@ -48,6 +49,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import SpinnerLoader from '~/components/_UI/Loaders/SpinnerLoader.vue'
+import SupportChatSkeleton from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatSkeleton.vue'
 import SupportChatInput from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatInput.vue'
 import SupportChatDatedGroup from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatDatedGroup.vue'
 import SupportChatHeader from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatHeader.vue'
@@ -69,7 +71,7 @@ const [{ data: pageData }, { onMessageWritten, allEarlierMessagesLoaded }] =
 usePageMeta(pageData)
 
 const store = useSupportChatUserStore()
-const { messagesGroupedByDate, chatInfo } = storeToRefs(store)
+const { messagesGroupedByDate, chatInfo, isFirstLoading } = storeToRefs(store)
 
 const hasChat = computed(() => !!chatInfo.value)
 

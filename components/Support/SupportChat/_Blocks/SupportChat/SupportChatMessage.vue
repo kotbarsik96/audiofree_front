@@ -124,7 +124,7 @@ function formatTime(time: string, withDate?: boolean) {
 @use '/css/mixins/mixins.scss';
 
 .sc-message {
-  border-radius: 8px;
+  border-radius: var(--sc-message-border-radius);
   padding: 0.5rem 1rem;
   background: var(--gray-100);
   max-width: 100%;

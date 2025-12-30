@@ -15,6 +15,7 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     chatInfo.value = newInfo
   }
   const savedScrollPosition = ref<number>()
+  const isFirstLoading = ref(false)
 
   const _readMessagesIds = ref<number[]>([])
   let _readMessagesSubmitTimeout: ReturnType<typeof setTimeout> | undefined =
@@ -91,5 +92,6 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     readMessage,
     clear,
     refetchChatInfo,
+    isFirstLoading
   }
 })

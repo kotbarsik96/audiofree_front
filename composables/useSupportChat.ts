@@ -138,6 +138,7 @@ export async function useSupportChat(
     latestMessageId,
     chatInfo,
     savedScrollPosition,
+    isFirstLoading,
   } = storeRefs
 
   const { loadMoreEarlier, loadMoreLater } = useSupportChatLoading(
@@ -218,6 +219,8 @@ export async function useSupportChat(
   )
 
   async function _loadFirst() {
+    isFirstLoading.value = true
+
     const [
       { data: chatInfoData, error: chatInfoError },
       { data: messagesData, error: messagesError },
@@ -238,8 +241,10 @@ export async function useSupportChat(
       }),
     ])
 
-    if (chatInfoError.value && chatInfoError.value.statusCode !== 404)
+    if (chatInfoError.value && chatInfoError.value.statusCode !== 404) {
+      isFirstLoading.value = false
       throw createError(chatInfoError.value)
+    }
 
     if (
       chat_id &&
@@ -249,6 +254,7 @@ export async function useSupportChat(
       addNotification('error', chatInfoError.value.data.message, 30000)
     }
 
+    chatInfo.value = chatInfoData.value?.data
     messagesGroupedByDate.value = formatAndAppendMessages(
       messagesGroupedByDate.value,
       messagesData.value?.data.messages ?? [],
@@ -256,7 +262,8 @@ export async function useSupportChat(
       latestMessageId
     )
     earliestMessageId.value = messagesData.value?.data.earliest_loaded_id
-    chatInfo.value = chatInfoData.value?.data
+
+    isFirstLoading.value = false
   }
 
   async function _loadMoreTop() {

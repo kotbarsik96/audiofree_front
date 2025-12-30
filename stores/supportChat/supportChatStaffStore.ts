@@ -40,6 +40,8 @@ export const useSupportChatStaffStore = defineStore(
       }
     }
 
+    const isFirstLoading = ref(false)
+
     /** массивы списков id прочитанных сообщений по чатам:
      * ключ number - chat_id,
      * значение number[] - список id прочитанных сообщений в этом чате
@@ -244,6 +246,7 @@ export const useSupportChatStaffStore = defineStore(
       chatsList,
       updateChatInfo,
       refetchChatInfo,
+      isFirstLoading,
     }
   }
 )

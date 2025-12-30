@@ -29,6 +29,6 @@ const props = defineProps<{
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: var(--sc-dated-group-gap);
 }
 </style>

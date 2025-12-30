@@ -62,11 +62,11 @@ const classes = computed(() => ({
   }
 
   .list {
-    width: 75%;
+    width: var(--sc-list-width);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: var(--sc-list-gap);
   }
 
   &.--right {

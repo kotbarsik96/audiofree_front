@@ -109,7 +109,7 @@ function removeScrollHandler() {
     color: var(--gray-800);
     font: var(--text-16);
     text-align: center;
-    border-radius: 4px;
+    border-radius: var(--sc-date-border-radius);
     padding: 0.25rem 0.5rem;
     font-weight: 500;
   }
