@@ -4,6 +4,7 @@ import type { ShallowRef } from 'vue'
 import { useAPI } from '~/composables/useAPI'
 import { useNotifications } from '~/composables/useNotifications'
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
+import type { ISupportChatChangedInfoEvent } from '~/domain/support/chat/interfaces/ISupportChatChangedInfoEvent'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import type { ISupportChatMessageCreatedEvent } from '~/domain/support/chat/interfaces/ISupportChatMessageCreatedEvent'
@@ -78,6 +79,13 @@ export async function useSupportChat(
       .listen(
         '.support-chat-write-status',
         (data: ISupportChatWriteStatusChangeEvent) => {
+          updateChatInfo(data.chat_info)
+        }
+      )
+      // был обновлён чат
+      .listen(
+        '.support-chat-changed-info',
+        (data: ISupportChatChangedInfoEvent) => {
           updateChatInfo(data.chat_info)
         }
       )

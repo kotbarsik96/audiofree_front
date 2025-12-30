@@ -28,6 +28,7 @@
       />
     </Transition>
     <SupportChatInput :chat-id="chatId" @message-written="onMessageWritten" />
+    <SupportChatStaffControls v-if="chatInfo" :chat-info="chatInfo" />
   </div>
 </template>
 
@@ -42,6 +43,7 @@ import SupportChatDatedGroup from '~/components/Support/SupportChat/_Blocks/Supp
 import { useSupportChat } from '~/composables/useSupportChat'
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
+import SupportChatStaffControls from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatStaffControls.vue'
 
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 const topSpyElement = useTemplateRef<HTMLElement>('topSpyElement')
@@ -51,8 +53,12 @@ const route = useRoute()
 
 const chatId = computed(() => Number(route.params.id ?? 0))
 
-const { onMessageWritten, allEarlierMessagesLoaded } =
-  await useSupportChat(chatBodyElement, topSpyElement, bottomSpyElement, chatId)
+const { onMessageWritten, allEarlierMessagesLoaded } = await useSupportChat(
+  chatBodyElement,
+  topSpyElement,
+  bottomSpyElement,
+  chatId
+)
 
 const store = useSupportChatStaffStore()
 const { messagesGroupedByDate, chatInfo, isFirstLoading } = storeToRefs(store)
@@ -64,4 +70,10 @@ const { isBtnVisible, onChatBodyScroll, onChatBottomBtnClick } =
 <style lang="scss" scoped>
 @use '/css/mixins/mixins.scss';
 @use '/css/components/SupportChat.scss';
+
+.sc-staff {
+  .sc-bottom-btn {
+    bottom: 7.5rem;
+  }
+}
 </style>

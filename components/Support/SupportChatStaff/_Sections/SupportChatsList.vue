@@ -86,6 +86,7 @@ onMounted(() => {
     .private(channelName)
     .listen('.support-chat-message-created', fullRefresh)
     .listen('.support-chat-read', fullRefresh)
+    .listen('.support-chat-changed-info', fullRefresh)
     .listen(
       '.support-chat-write-status',
       (data: ISupportChatWriteStatusChangeEvent) => {
