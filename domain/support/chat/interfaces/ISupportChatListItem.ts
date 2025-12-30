@@ -1,6 +1,8 @@
+import type { ESupportChatStatus } from '~/domain/support/chat/interfaces/ESupportChatStatus'
+
 export interface ISupportChatListItem {
   id: number
-  status: string
+  status: ESupportChatStatus
   created_at: string
   updated_at: string
   user_name: string
@@ -9,4 +11,5 @@ export interface ISupportChatListItem {
   user_telegram?: string
   latest_message: string
   writers_count: number
+  unread_messages: number
 }

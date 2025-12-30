@@ -55,7 +55,7 @@ const search = ref('')
 
 const supportChatStaffStore = useSupportChatStaffStore()
 const { getCachedChat } = supportChatStaffStore
-const { chatsList, cachedChats } = storeToRefs(supportChatStaffStore)
+const { chatsList } = storeToRefs(supportChatStaffStore)
 
 const { error, reset, fullRefresh, isLastPage } =
   await usePaginationLazyWrapper<ISupportChatListItem>(
@@ -85,6 +85,7 @@ onMounted(() => {
   echo
     .private(channelName)
     .listen('.support-chat-message-created', fullRefresh)
+    .listen('.support-chat-read', fullRefresh)
     .listen(
       '.support-chat-write-status',
       (data: ISupportChatWriteStatusChangeEvent) => {

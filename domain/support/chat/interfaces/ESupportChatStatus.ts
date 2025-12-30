@@ -3,6 +3,11 @@ export enum ESupportChatStatus {
   Closed = 'closed',
 }
 
+export const supportChatStatusMap: Record<ESupportChatStatus, string> = {
+  [ESupportChatStatus.Closed]: 'Закрыт',
+  [ESupportChatStatus.Open]: 'Открыт',
+}
+
 export const supportChatStatusOptions: Array<{
   value: ESupportChatStatus | 'all'
   label: string

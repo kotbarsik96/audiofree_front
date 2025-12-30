@@ -34,7 +34,7 @@ export const useSupportChatStaffStore = defineStore(
     const changeChat = async (newChatId: number) => {
       cacheCurrentChat()
       restoreCachedChatOrReset(newChatId)
-      if (newChatId in cachedChats.value && chatInfo.value) {
+      if (!!getCachedChat(newChatId) && chatInfo.value) {
         await loadMoreLater(true)
         await refetchChatInfo()
       }
