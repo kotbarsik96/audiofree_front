@@ -13,7 +13,7 @@
           <SupportChatThreeDots />
           )
         </div>
-        <div v-else>{{ chat.latest_message?.slice(0, 250) }}</div>
+        <div v-else>{{ chat.latest_message?.text.slice(0, 250) }}</div>
       </Transition>
     </div>
     <div class="status">
@@ -62,7 +62,8 @@ const status = computed(() => supportChatStatusMap[props.chat.status])
 
 const unreadMessagesString = computed(() => {
   let str = ''
-  if (props.chat.unread_messages > 0) str = `(непр.: ${props.chat.unread_messages})`
+  if (props.chat.unread_messages > 0)
+    str = `(непр.: ${props.chat.unread_messages})`
   return str
 })
 
