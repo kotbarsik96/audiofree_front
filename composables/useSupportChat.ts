@@ -55,11 +55,12 @@ export async function useSupportChat(
         '.support-chat-message-created',
         (data: ISupportChatMessageCreatedEvent) => {
           // обновлять список сообщений только при получении от собеседника/других сотрудников
+          console.log(data)
           if (
             data.message.author_id !== user.value?.id ||
             data.message.sender_type === 'system'
           ) {
-            formatAndAppendMessages(
+            messagesGroupedByDate.value = formatAndAppendMessages(
               messagesGroupedByDate.value,
               [data.message],
               chatInfo,

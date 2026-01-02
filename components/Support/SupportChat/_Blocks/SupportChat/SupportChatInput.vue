@@ -118,13 +118,12 @@ async function send() {
         if (isWritingTimeout) clearTimeout(isWritingTimeout)
         updateIsWritingStatus(false)
         text.value = ''
-        formatAndAppendMessages(
+        messagesGroupedByDate.value = formatAndAppendMessages(
           messagesGroupedByDate.value,
           [message],
           chatInfo,
           latestMessageId
         )
-        latestMessageId.value = message.id
         emit('message-written')
       },
       onResponseError({ response }) {
