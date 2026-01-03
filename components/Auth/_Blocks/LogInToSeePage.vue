@@ -8,7 +8,7 @@
       или
       <button class="_link" type="button" @click="openSignupDialog">
         зарегистрируйтесь</button
-      >, чтобы увидеть содержимое страницы
+      >, чтобы увидеть содержимое
     </div>
   </div>
 </template>

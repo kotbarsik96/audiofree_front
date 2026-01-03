@@ -1,11 +1,18 @@
-export default [
+export const bottomLinks = [
   {
-    title: "Главная",
+    title: 'Главная',
     bold: true,
-    to: { name: 'HomePage' }
+    to: { name: 'HomePage' },
   },
   {
-    title: "Ваши заказы",
-    to: { name: 'OrdersPage' }
+    title: 'Ваши заказы',
+    to: { name: 'OrdersPage' },
+  },
+]
+
+export const supportStaffLinks = [
+  {
+    title: 'Чаты тех.поддержки',
+    to: { name: 'SupportChatsListPage' },
   },
 ]

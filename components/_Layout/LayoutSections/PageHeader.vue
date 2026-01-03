@@ -47,7 +47,7 @@
             </NuxtLink>
           </div>
           <ul class="header__bottom-links">
-            <li v-for="link in bottomLinks">
+            <li v-for="link in bottomLinksComputed">
               <NuxtLink
                 :to="link.to"
                 class="header__bottom-link"
@@ -169,13 +169,15 @@ import AFIcon from '~/components/_UI/AFIcon.vue'
 import LogoText from '~/components/_UI/LogoText.vue'
 import topLinks from '@/enums/header/top-links'
 import FreeCall from '~/components/_UI/FreeCall.vue'
-import bottomLinks from '@/enums/header/bottom-links'
+import { bottomLinks, supportStaffLinks } from '@/enums/header/bottom-links'
 import { computed, ref } from 'vue'
 import ButtonIcon from '~/components/_UI/ButtonIcon.vue'
 import HeaderAuthBlock from '~/components/_Layout/LayoutSections/HeaderAuthBlock.vue'
 import vClickAway from '@/directives/vClickAway'
 import HeartIcon from '@/assets/images/icons/heart.svg'
 import CartIcon from '@/assets/images/icons/cart.svg'
+import type IUser from '~/domain/user/types/IUser'
+import { EUserPermissions } from '~/domain/user/types/EUserPermissions'
 
 const { favoritesCount, cartCount } = storeToRefs(useProductCollectionsStore())
 const route = useRoute()
@@ -193,10 +195,19 @@ const iconLinks = computed(() => [
   },
 ])
 
-const searchValue = ref('')
+const user = useSanctumUser<IUser>()
+
+const bottomLinksComputed = computed(() => {
+  const links = [...bottomLinks]
+
+  if (user.value?.permissions_list[EUserPermissions.Support])
+    links.push(...supportStaffLinks)
+
+  return links
+})
 
 const bottomLinksMobile = computed(() =>
-  bottomLinks.filter((item) => item.to.name !== 'HomePage')
+  bottomLinksComputed.value.filter((item) => item.to.name !== 'HomePage')
 )
 
 const isMobileShown = ref(false)

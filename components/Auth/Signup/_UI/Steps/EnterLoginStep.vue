@@ -1,7 +1,12 @@
 <template>
   <form @submit.prevent="onSubmit">
     <InputWrapper label="Ваше имя" inputId="name">
-      <TextInput v-model="name" placeholder="Имя" id="name" :disabled="isLoading" />
+      <TextInput
+        v-model="name"
+        placeholder="Имя"
+        id="name"
+        :disabled="isLoading"
+      />
       <template v-if="nameError" #error>
         {{ nameError }}
       </template>

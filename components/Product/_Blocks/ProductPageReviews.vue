@@ -76,10 +76,11 @@ const noReviews = computed(
   () => !reviews.value.length && !currentUserReview.value
 )
 
+const reviews = shallowRef<IProductReview[]>([])
+
 // запрос всех отзывов + запрос отзыва от текущего пользователя
 const [
   {
-    list: reviews,
     paginationData: reviewsData,
     isLoading: isLoadingReviews,
     refresh: loadReviews,
@@ -87,6 +88,7 @@ const [
   },
 ] = await Promise.all([
   usePaginationLazyWrapper<IProductReview>(
+    reviews,
     intersectionEl,
     `/products/${productSlug.value}/reviews`,
     {

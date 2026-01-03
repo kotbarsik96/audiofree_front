@@ -7,6 +7,7 @@
         v-model="code"
         id="code"
         maxlength="6"
+        v-autofocus
       />
       <template v-if="codeError" #error>{{ codeError }}</template>
     </InputWrapper>
@@ -18,6 +19,7 @@
 </template>
 
 <script setup lang="ts">
+import { vAutofocus } from '~/directives/vAutofocus'
 import AFButton from '~/components/_UI/AFButton.vue'
 import InputWrapper from '~/components/_UI/FormElements/InputWrapper.vue'
 import TextInput from '~/components/_UI/FormElements/TextInput.vue'
