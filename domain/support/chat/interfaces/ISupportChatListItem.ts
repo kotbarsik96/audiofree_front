@@ -11,6 +11,5 @@ export interface ISupportChatListItem {
   user_phone?: string
   user_telegram?: string
   latest_message?: ISupportChatMessage
-  writers_count: number
   unread_messages: number
 }
