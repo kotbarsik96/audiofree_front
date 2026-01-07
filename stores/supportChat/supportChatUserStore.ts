@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { ISupportChatMessagesDateGroup } from '~/composables/useSupportChat'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
+import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
 import { setReadAtToMessages } from '~/domain/support/chat/utils'
 
 export const useSupportChatUserStore = defineStore('support-chat-user', () => {
@@ -31,6 +32,19 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
         _readMessagesIds.value = []
         _readMessagesSubmitTimeout = undefined
       }, 250)
+    }
+  }
+
+  const currentWriters = ref<ISupportChatWriter[]>([])
+  const isCurrentUserWriting = ref(false)
+  const updateWritingStatus = (data: ISupportChatWriter) => {
+    if (data.is_writing) {
+      if (!currentWriters.value.find((wr) => wr.id === data.id))
+        currentWriters.value.push(data)
+    } else {
+      currentWriters.value = currentWriters.value.filter(
+        (wr) => wr.id !== data.id
+      )
     }
   }
 
@@ -92,6 +106,9 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     readMessage,
     clear,
     refetchChatInfo,
-    isFirstLoading
+    isFirstLoading,
+    currentWriters,
+    isCurrentUserWriting,
+    updateWritingStatus,
   }
 })
