@@ -38,7 +38,7 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
   const currentWriters = ref<ISupportChatWriter[]>([])
   const isCurrentUserWriting = ref(false)
   const updateWritingStatus = (data: ISupportChatWriter) => {
-    if (data.is_writing) {
+    if (data.is_writing && chatInfo.value?.chat_id === data.chat_id) {
       if (!currentWriters.value.find((wr) => wr.id === data.id))
         currentWriters.value.push(data)
     } else {

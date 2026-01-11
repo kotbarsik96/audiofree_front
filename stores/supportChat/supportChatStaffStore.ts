@@ -107,20 +107,22 @@ export const useSupportChatStaffStore = defineStore(
         const isInCurrentWriters = currentWriters.value.find(
           (wr) => wr.id === data.id
         )
-        if (!isInCurrentWriters) currentWriters.value.push(data)
+        if (!isInCurrentWriters && data.chat_id === currentChatId.value)
+          currentWriters.value.push(data)
 
         const isInChatsListWriters = chatsListWriters.value.find(
-          (wr) => wr.id === data.id && wr.chat_id === data.chat_id
+          (wr) => wr.id === data.id
         )
-        if (!isInChatsListWriters) chatsListWriters.value = [...chatsListWriters.value, data]
+        if (!isInChatsListWriters) chatsListWriters.value.push(data)
       } else {
         currentWriters.value = currentWriters.value.filter(
           (wr) => wr.id !== data.id
         )
-        
-        chatsListWriters.value = chatsListWriters.value.filter(
-          (wr) => wr.id !== data.id && wr.chat_id !== data.chat_id
+
+        const i = chatsListWriters.value.findIndex(
+          (wr) => wr.chat_id === data.chat_id && wr.id === data.id
         )
+        if (i >= 0) chatsListWriters.value.splice(i, 1)
       }
     }
 

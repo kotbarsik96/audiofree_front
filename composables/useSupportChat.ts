@@ -58,6 +58,7 @@ export async function useSupportChat(
           presenceChannel.whisper('typing-status', {
             id: user.value?.id,
             name: user.value?.name,
+            chat_id: chatInfo.value?.chat_id,
             is_writing: true,
           })
       })

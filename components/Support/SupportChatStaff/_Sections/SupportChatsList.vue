@@ -87,9 +87,9 @@ onMounted(() => {
     .listen('.support-chat-message-created', fullRefresh)
     .listen('.support-chat-read', fullRefresh)
     .listen('.support-chat-changed-info', fullRefresh)
-    .listen('.support-chat-writing-status', (data: ISupportChatWriter) =>
+    .listen('.support-chat-writing-status', (data: ISupportChatWriter) => {
       updateWritingStatus(data)
-    )
+    })
 })
 
 onUnmounted(() => {

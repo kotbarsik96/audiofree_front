@@ -35,12 +35,14 @@ const store =
 const writers = computed(() => {
   let arr = []
 
+  const writers = store.currentWriters.filter(
+    (wr) => wr.chat_id === props.chatInfo?.chat_id && wr.id !== user.value?.id
+  )
+
   if (props.currentSenderType === ESupportChatSenderType.User) {
-    if (store.currentWriters.length > 0) arr.push('сотрудник')
+    if (writers.length > 0) arr.push('сотрудник')
   } else {
-    arr = store.currentWriters
-      .filter((wr) => wr.id !== user.value?.id)
-      .map((wr) => wr.name)
+    arr = writers.map((wr) => wr.name)
   }
 
   return arr
