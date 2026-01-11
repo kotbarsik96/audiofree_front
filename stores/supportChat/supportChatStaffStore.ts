@@ -6,6 +6,7 @@ import {
 } from '~/composables/useSupportChat'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
+import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
 import { setReadAtToMessages } from '~/domain/support/chat/utils'
 
 interface ICachedStaffSupportChat {
@@ -97,6 +98,33 @@ export const useSupportChatStaffStore = defineStore(
     }
 
     const chatsList = shallowRef<ISupportChatListItem[]>([])
+
+    const currentWriters = ref<ISupportChatWriter[]>([])
+    const isCurrentUserWriting = ref(false)
+    const chatsListWriters = ref<ISupportChatWriter[]>([])
+    const updateWritingStatus = (data: ISupportChatWriter) => {
+      if (data.is_writing) {
+        const isInCurrentWriters = currentWriters.value.find(
+          (wr) => wr.id === data.id
+        )
+        if (!isInCurrentWriters && data.chat_id === currentChatId.value)
+          currentWriters.value.push(data)
+
+        const isInChatsListWriters = chatsListWriters.value.find(
+          (wr) => wr.id === data.id
+        )
+        if (!isInChatsListWriters) chatsListWriters.value.push(data)
+      } else {
+        currentWriters.value = currentWriters.value.filter(
+          (wr) => wr.id !== data.id
+        )
+
+        const i = chatsListWriters.value.findIndex(
+          (wr) => wr.chat_id === data.chat_id && wr.id === data.id
+        )
+        if (i >= 0) chatsListWriters.value.splice(i, 1)
+      }
+    }
 
     const { loadMoreLater } = useSupportChatLoading(
       earliestMessageId,
@@ -245,6 +273,10 @@ export const useSupportChatStaffStore = defineStore(
       updateChatInfo,
       refetchChatInfo,
       isFirstLoading,
+      currentWriters,
+      isCurrentUserWriting,
+      chatsListWriters,
+      updateWritingStatus,
     }
   }
 )

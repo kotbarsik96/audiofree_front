@@ -17,6 +17,8 @@ import SupportChatThreeDots from '~/components/Support/SupportChat/_Blocks/Suppo
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type IUser from '~/domain/user/types/IUser'
+import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
+import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
 
 const user = useSanctumUser<IUser>()
 
@@ -25,17 +27,22 @@ const props = defineProps<{
   chatInfo: ISupportChatInfo | undefined
 }>()
 
+const store =
+  props.currentSenderType === ESupportChatSenderType.User
+    ? useSupportChatUserStore()
+    : useSupportChatStaffStore()
+
 const writers = computed(() => {
-  const arr = []
+  let arr = []
+
+  const writers = store.currentWriters.filter(
+    (wr) => wr.chat_id === props.chatInfo?.chat_id && wr.id !== user.value?.id
+  )
 
   if (props.currentSenderType === ESupportChatSenderType.User) {
-    if (props.chatInfo?.staff_writing) arr.push('сотрудник')
+    if (writers.length > 0) arr.push('сотрудник')
   } else {
-    if (props.chatInfo?.user_writing) arr.push(props.chatInfo.user_name)
-    const staffWriters = props.chatInfo?.staff_writers?.filter(
-      (writer) => writer !== user.value?.name
-    )
-    if (staffWriters && staffWriters.length > 0) arr.push(...staffWriters)
+    arr = writers.map((wr) => wr.name)
   }
 
   return arr

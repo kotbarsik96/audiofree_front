@@ -40,7 +40,7 @@ import {
   supportChatStatusOptions,
 } from '~/domain/support/chat/interfaces/ESupportChatStatus'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
-import type { ISupportChatWriteStatusChangeEvent } from '~/domain/support/chat/interfaces/ISupportChatWriteStatusChangeEvent'
+import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 
 const spyElement = useTemplateRef<HTMLElement>('spyElement')
@@ -54,7 +54,7 @@ const status = computed(() =>
 const search = ref('')
 
 const supportChatStaffStore = useSupportChatStaffStore()
-const { getCachedChat } = supportChatStaffStore
+const { updateWritingStatus } = supportChatStaffStore
 const { chatsList } = storeToRefs(supportChatStaffStore)
 
 const { error, reset, fullRefresh, isLastPage } =
@@ -87,14 +87,9 @@ onMounted(() => {
     .listen('.support-chat-message-created', fullRefresh)
     .listen('.support-chat-read', fullRefresh)
     .listen('.support-chat-changed-info', fullRefresh)
-    .listen(
-      '.support-chat-write-status',
-      (data: ISupportChatWriteStatusChangeEvent) => {
-        fullRefresh()
-        const cachedChat = getCachedChat(data.chat_info.chat_id)
-        if (cachedChat) cachedChat.chat_info = JSON.stringify(data.chat_info)
-      }
-    )
+    .listen('.support-chat-writing-status', (data: ISupportChatWriter) => {
+      updateWritingStatus(data)
+    })
 })
 
 onUnmounted(() => {

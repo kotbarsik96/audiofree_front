@@ -10,7 +10,7 @@ import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupp
 import type { ISupportChatMessageCreatedEvent } from '~/domain/support/chat/interfaces/ISupportChatMessageCreatedEvent'
 import type { ISupportChatMessagesList } from '~/domain/support/chat/interfaces/ISupportChatMessagesList'
 import type { ISupportChatReadMessagesEvent } from '~/domain/support/chat/interfaces/ISupportChatReadMessagesEvent'
-import type { ISupportChatWriteStatusChangeEvent } from '~/domain/support/chat/interfaces/ISupportChatWriteStatusChangeEvent'
+import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
 import {
   formatAndAppendMessages,
   formatAndPrependMessages,
@@ -39,17 +39,38 @@ export async function useSupportChat(
   const user = useSanctumUser<IUser>()
 
   const echo = useEcho()
-  const channelName = chat_id
-    ? `support-chat-staff.${toValue(chat_id)}`
-    : `support-chat-user.${user.value?.id}`
+  let presenceChannel: ReturnType<typeof echo.join>
+  let privateChannel: ReturnType<typeof echo.private>
+
   const echoSubscribe = () => {
     if (!chatInfo.value) {
       console.warn('Chat was not found')
       return
     }
 
-    echo
-      .private(channelName)
+    presenceChannel = echo.join(presenceChannelName)
+    privateChannel = echo.private(channelName)
+
+    presenceChannel
+      // кто-то присоединился к чату
+      .joining(() => {
+        if (isCurrentUserWriting.value)
+          presenceChannel.whisper('typing-status', {
+            id: user.value?.id,
+            name: user.value?.name,
+            chat_id: chatInfo.value?.chat_id,
+            is_writing: true,
+          })
+      })
+      .listenForWhisper('typing-status', (data: ISupportChatWriter) => {
+        updateWritingStatus(data)
+      })
+      // собеседник начал/прекратил печатать
+      .listen('.support-chat-writing-status', (data: ISupportChatWriter) => {
+        updateWritingStatus(data)
+      })
+
+    privateChannel
       // новые сообщения (как от собеседника, так и от себя)
       .listen(
         '.support-chat-message-created',
@@ -78,13 +99,6 @@ export async function useSupportChat(
             data.read_messages_ids
           )
       })
-      // собеседник начал/прекратил печатать
-      .listen(
-        '.support-chat-write-status',
-        (data: ISupportChatWriteStatusChangeEvent) => {
-          updateChatInfo(data.chat_info)
-        }
-      )
       // был обновлён чат
       .listen(
         '.support-chat-changed-info',
@@ -95,7 +109,15 @@ export async function useSupportChat(
       .error((err: any) => console.error(err))
   }
   const echoLeave = () => {
+    if (presenceChannel)
+      presenceChannel.whisper('typing-status', {
+        id: user.value?.id,
+        name: user.value?.name,
+        is_writing: false,
+      })
+
     echo.leave(channelName)
+    echo.leave(presenceChannelName)
   }
 
   const { addNotification } = useNotifications()
@@ -141,7 +163,7 @@ export async function useSupportChat(
   const _OBSERVER_MARGIN_ = 100
 
   const store = chat_id ? useSupportChatStaffStore() : useSupportChatUserStore()
-  const { updateChatInfo } = store
+  const { updateChatInfo, updateWritingStatus } = store
   const storeRefs = storeToRefs(store)
   const {
     messagesGroupedByDate,
@@ -150,6 +172,7 @@ export async function useSupportChat(
     chatInfo,
     savedScrollPosition,
     isFirstLoading,
+    isCurrentUserWriting,
   } = storeRefs
 
   const { loadMoreEarlier, loadMoreLater } = useSupportChatLoading(
@@ -187,6 +210,11 @@ export async function useSupportChat(
   if (!chatInfo.value) {
     await _loadFirst()
   }
+
+  const channelName = chat_id
+    ? `support-chat-staff.${toValue(chat_id)}`
+    : `support-chat-user.${user.value?.id}`
+  const presenceChannelName = `support-chat.${chatInfo.value?.chat_id}`
 
   let topSpyObserver: IntersectionObserver
   let bottomSpyObserver: IntersectionObserver

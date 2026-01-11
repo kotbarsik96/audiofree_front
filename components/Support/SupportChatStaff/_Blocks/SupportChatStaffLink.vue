@@ -8,7 +8,7 @@
     </div>
     <div class="latest-message">
       <Transition name="drop-down" mode="out-in">
-        <div v-if="chat.writers_count > 0" class="is-writing">
+        <div v-if="writingStatusString" class="is-writing">
           ({{ writingStatusString }}
           <SupportChatThreeDots />
           )
@@ -33,10 +33,17 @@ import {
   supportChatStatusMap,
 } from '~/domain/support/chat/interfaces/ESupportChatStatus'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
+import type IUser from '~/domain/user/types/IUser'
+import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 
 const props = defineProps<{
   chat: ISupportChatListItem
 }>()
+
+const user = useSanctumUser<IUser>()
+
+const store = useSupportChatStaffStore()
+const { chatsListWriters } = storeToRefs(store)
 
 const link = computed(() => ({
   name: 'SupportChatStaffPage',
@@ -52,10 +59,12 @@ const contactsString = computed(() =>
 )
 
 const writingStatusString = computed(() => {
-  if (props.chat.writers_count < 1) return null
-  if (props.chat.writers_count === 1) return 'печатает'
-  if (props.chat.writers_count > 1)
-    return `${props.chat.writers_count} печатают`
+  const writers = chatsListWriters.value.filter(
+    (wr) => wr.chat_id === props.chat.id && wr.id !== user.value?.id
+  )
+  if (writers.length < 1) return null
+  if (writers.length === 1) return 'печатает'
+  if (writers.length > 1) return `${writers.length} печатают`
 })
 
 const status = computed(() => supportChatStatusMap[props.chat.status])

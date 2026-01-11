@@ -8,7 +8,4 @@ export interface ISupportChatInfo {
   last_message_id: number
   user_name: string
   status: ESupportChatStatus
-  user_writing: boolean
-  staff_writing: boolean
-  staff_writers?: string[]
 }

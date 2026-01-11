@@ -42,7 +42,12 @@ const store = props.chatId
   ? useSupportChatStaffStore()
   : useSupportChatUserStore()
 
-const { messagesGroupedByDate, latestMessageId, chatInfo } = storeToRefs(store)
+const {
+  messagesGroupedByDate,
+  latestMessageId,
+  chatInfo,
+  isCurrentUserWriting,
+} = storeToRefs(store)
 
 const sending = ref(false)
 
@@ -84,6 +89,7 @@ function onWindowUnload() {
 }
 
 async function updateIsWritingStatus(is_writing: boolean, keepalive = false) {
+  isCurrentUserWriting.value = is_writing
   await $afFetch('/support-chat/update-writing-status', {
     method: 'POST',
     body: {
