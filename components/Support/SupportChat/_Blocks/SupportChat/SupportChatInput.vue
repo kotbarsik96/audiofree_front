@@ -20,8 +20,7 @@
 <script setup lang="ts">
 import IconSend from '~/assets/images/icons/send.svg?component'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
-import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
-import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
+import { useSupportChatStore } from '~/stores/supportChat/useSupportChatStore'
 
 const props = defineProps<{
   chatId?: number
@@ -37,10 +36,7 @@ const { $afFetch } = useNuxtApp()
 
 const text = ref('')
 
-const store = props.chatId
-  ? useSupportChatStaffStore()
-  : useSupportChatUserStore()
-
+const store = useSupportChatStore(props.chatId)
 const { isCurrentUserWriting } = storeToRefs(store)
 
 const sending = ref(false)

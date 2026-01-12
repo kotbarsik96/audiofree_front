@@ -2,6 +2,8 @@ import { toValue, type ShallowRef } from 'vue'
 import type { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
+import type { ISupportChatMessagesDateGroup } from '~/domain/support/chat/interfaces/ISupportChatMessagesDateGroup'
+import type { ISupportChatMessagesSenderGroup } from '~/domain/support/chat/interfaces/ISupportChatMessagesSenderGroup'
 
 export function prependSupportChatMessages(
   currentMessages: ShallowRef<ISupportChatMessage[]>,
@@ -88,13 +90,12 @@ export function getChatBodyElement(element: HTMLElement | null) {
 
 /** @param readMessagesIds - список id сообщений, которым выставляется "прочитано". Если список не передан - отметка выставляется всем сообщениям в messages */
 export function setReadAtToMessages(
-  messages: Ref<ISupportChatMessage[]>,
+  messages: ISupportChatMessage[],
   readMessagesIds?: number[]
 ) {
-  messages.value = messages.value.map((msg) => {
+  messages.forEach((msg) => {
     if (!readMessagesIds || readMessagesIds.includes(msg.id)) {
       msg.read_at = new Date().toLocaleString()
     }
-    return msg
   })
 }

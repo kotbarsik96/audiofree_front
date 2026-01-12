@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { computed, ref, shallowRef } from 'vue'
-import type { ISupportChatMessagesDateGroup } from '~/composables/useSupportChat'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
@@ -21,13 +20,24 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
   const savedScrollPosition = ref<number>()
   const isFirstLoading = ref(false)
 
-  const _messages = ref<ISupportChatMessage[]>([])
+  const messages = ref<ISupportChatMessage[]>([])
   const messagesGroupedByDate = computed(() =>
-    groupMessages(_messages, chatInfo)
+    groupMessages(messages, chatInfo)
   )
-  const earliestMessageId = computed(() => _messages.value.at(0)?.id)
+  const earliestMessageId = computed(() => messages.value.at(0)?.id)
   const latestMessageId = computed(
-    () => _messages.value.at(_messages.value.length - 1)?.id
+    () => messages.value.at(messages.value.length - 1)?.id
+  )
+
+  const allEarlierMessagesLoaded = computed(
+    () =>
+      earliestMessageId.value &&
+      earliestMessageId.value <= (chatInfo.value?.first_message_id ?? 0)
+  )
+  const allLaterMessagesLoaded = computed(
+    () =>
+      latestMessageId.value &&
+      latestMessageId.value >= (chatInfo.value?.last_message_id ?? 0)
   )
 
   const _readMessagesIds = ref<number[]>([])
@@ -60,16 +70,16 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     }
   }
 
-  function prependMessages(messages: ISupportChatMessage[]) {
-    prependSupportChatMessages(_messages, messages, chatInfo.value)
+  function prependMessages(newMessages: ISupportChatMessage[]) {
+    prependSupportChatMessages(messages, newMessages, chatInfo.value)
   }
-  function appendMessages(messages: ISupportChatMessage[]) {
-    appendSupportChatMessages(_messages, messages, chatInfo.value)
+  function appendMessages(newMessages: ISupportChatMessage[]) {
+    appendSupportChatMessages(messages, newMessages, chatInfo.value)
   }
 
   /** @param readMessagesIds - список id сообщений, которым выставляется "прочитано". Если список не передан - отметка выставляется всем сообщениям в messages */
   function setReadAt(readMessagesIds?: number[]) {
-    setReadAtToMessages(_messages, readMessagesIds)
+    setReadAtToMessages(messages.value, readMessagesIds)
   }
 
   async function submitReadMessages(readMessagesIds: number[]) {
@@ -96,26 +106,10 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
   }
 
   function clear() {
-    _messages.value = []
+    messages.value = []
     chatInfo.value = undefined
     savedScrollPosition.value = undefined
     _readMessagesIds.value = []
-  }
-
-  async function refetchChatInfo() {
-    try {
-      await $afFetch('/support-chat', {
-        credentials: 'include',
-        onResponse({ response }) {
-          if (response.ok) {
-            const updatedChatInfo = response._data.data
-            chatInfo.value = updatedChatInfo
-          }
-        },
-      })
-    } catch (err) {
-      console.error(err)
-    }
   }
 
   return {
@@ -128,12 +122,14 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     readMessage,
     clear,
     setReadAt,
-    refetchChatInfo,
     isFirstLoading,
     currentWriters,
     isCurrentUserWriting,
     updateWritingStatus,
     prependMessages,
     appendMessages,
+    messages,
+    allEarlierMessagesLoaded,
+    allLaterMessagesLoaded,
   }
 })

@@ -55,24 +55,29 @@ import SupportChatInput from '~/components/Support/SupportChat/_Blocks/SupportCh
 import SupportChatDatedGroup from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatDatedGroup.vue'
 import SupportChatHeader from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatHeader.vue'
 import SupportIcon from '~/assets/images/icons/support.svg?component'
-import { useSupportChat } from '~/composables/useSupportChat'
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
 import SupportChatBottomButton from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatBottomButton.vue'
+import { useSupportChatBottomButton } from '~/domain/support/chat/composeables/useSupportChatBottomButton'
+import { useSupportChatGeneral } from '~/domain/support/chat/composeables/useSupportChatGeneral'
 
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 const topSpyElement = useTemplateRef<HTMLElement>('topSpyElement')
 const bottomSpyElement = useTemplateRef<HTMLElement>('bottomSpyElement')
 
-const [{ data: pageData }, { onMessageWritten, allEarlierMessagesLoaded }] =
-  await Promise.all([
-    useAPI<{ data: IPageSeo }>('page/contacts'),
-    useSupportChat(chatBodyElement, topSpyElement, bottomSpyElement),
-  ])
+const [{ data: pageData }, { onMessageWritten }] = await Promise.all([
+  useAPI<{ data: IPageSeo }>('page/contacts'),
+  useSupportChatGeneral(chatBodyElement, topSpyElement, bottomSpyElement),
+])
 usePageMeta(pageData)
 
 const store = useSupportChatUserStore()
-const { messagesGroupedByDate, chatInfo, isFirstLoading } = storeToRefs(store)
+const {
+  messagesGroupedByDate,
+  chatInfo,
+  isFirstLoading,
+  allEarlierMessagesLoaded,
+} = storeToRefs(store)
 
 const hasChat = computed(() => !!chatInfo.value)
 
