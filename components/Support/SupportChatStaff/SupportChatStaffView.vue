@@ -13,6 +13,7 @@
         <div class="top-spy" ref="topSpyElement"></div>
         <SupportChatDatedGroup
           v-for="group in messagesGroupedByDate"
+          :key="group.date"
           :group="group"
           :current-sender-type="ESupportChatSenderType.Staff"
         />

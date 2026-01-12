@@ -1,22 +1,34 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref, shallowRef } from 'vue'
 import type { ISupportChatMessagesDateGroup } from '~/composables/useSupportChat'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
+import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
-import { setReadAtToMessages } from '~/domain/support/chat/utils'
+import {
+  appendSupportChatMessages,
+  groupMessages,
+  prependSupportChatMessages,
+  setReadAtToMessages,
+} from '~/domain/support/chat/utils'
 
 export const useSupportChatUserStore = defineStore('support-chat-user', () => {
   const { $afFetch } = useNuxtApp()
 
-  const messagesGroupedByDate = ref<ISupportChatMessagesDateGroup[]>([])
-  const earliestMessageId = ref<number>()
-  const latestMessageId = ref<number>()
   const chatInfo = ref<ISupportChatInfo>()
   const updateChatInfo = (newInfo: ISupportChatInfo | undefined) => {
     chatInfo.value = newInfo
   }
   const savedScrollPosition = ref<number>()
   const isFirstLoading = ref(false)
+
+  const _messages = ref<ISupportChatMessage[]>([])
+  const messagesGroupedByDate = computed(() =>
+    groupMessages(_messages, chatInfo)
+  )
+  const earliestMessageId = computed(() => _messages.value.at(0)?.id)
+  const latestMessageId = computed(
+    () => _messages.value.at(_messages.value.length - 1)?.id
+  )
 
   const _readMessagesIds = ref<number[]>([])
   let _readMessagesSubmitTimeout: ReturnType<typeof setTimeout> | undefined =
@@ -48,6 +60,18 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     }
   }
 
+  function prependMessages(messages: ISupportChatMessage[]) {
+    prependSupportChatMessages(_messages, messages, chatInfo.value)
+  }
+  function appendMessages(messages: ISupportChatMessage[]) {
+    appendSupportChatMessages(_messages, messages, chatInfo.value)
+  }
+
+  /** @param readMessagesIds - список id сообщений, которым выставляется "прочитано". Если список не передан - отметка выставляется всем сообщениям в messages */
+  function setReadAt(readMessagesIds?: number[]) {
+    setReadAtToMessages(_messages, readMessagesIds)
+  }
+
   async function submitReadMessages(readMessagesIds: number[]) {
     if (readMessagesIds.length < 1) return
 
@@ -61,7 +85,7 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
         },
         async onResponse({ response }) {
           if (response.ok) {
-            setReadAtToMessages(messagesGroupedByDate.value, readMessagesIds)
+            setReadAt(readMessagesIds)
             updateChatInfo(response._data.data.chat_info)
           }
         },
@@ -72,9 +96,7 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
   }
 
   function clear() {
-    messagesGroupedByDate.value = []
-    earliestMessageId.value = undefined
-    latestMessageId.value = undefined
+    _messages.value = []
     chatInfo.value = undefined
     savedScrollPosition.value = undefined
     _readMessagesIds.value = []
@@ -105,10 +127,13 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     savedScrollPosition,
     readMessage,
     clear,
+    setReadAt,
     refetchChatInfo,
     isFirstLoading,
     currentWriters,
     isCurrentUserWriting,
     updateWritingStatus,
+    prependMessages,
+    appendMessages,
   }
 })

@@ -11,11 +11,6 @@ import type { ISupportChatMessageCreatedEvent } from '~/domain/support/chat/inte
 import type { ISupportChatMessagesList } from '~/domain/support/chat/interfaces/ISupportChatMessagesList'
 import type { ISupportChatReadMessagesEvent } from '~/domain/support/chat/interfaces/ISupportChatReadMessagesEvent'
 import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
-import {
-  formatAndAppendMessages,
-  formatAndPrependMessages,
-  setReadAtToMessages,
-} from '~/domain/support/chat/utils'
 import type IUser from '~/domain/user/types/IUser'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
@@ -80,12 +75,7 @@ export async function useSupportChat(
             data.message.author_id !== user.value?.id ||
             data.message.sender_type === 'system'
           ) {
-            messagesGroupedByDate.value = formatAndAppendMessages(
-              messagesGroupedByDate.value,
-              [data.message],
-              chatInfo,
-              latestMessageId
-            )
+            appendMessages([data.message])
           }
 
           updateChatInfo(data.chat_info)
@@ -93,11 +83,7 @@ export async function useSupportChat(
       )
       // собеседник прочитал сообщения
       .listen('.support-chat-read', (data: ISupportChatReadMessagesEvent) => {
-        if (data.reader_id !== user.value?.id)
-          setReadAtToMessages(
-            messagesGroupedByDate.value,
-            data.read_messages_ids
-          )
+        if (data.reader_id !== user.value?.id) setReadAt(data.read_messages_ids)
       })
       // был обновлён чат
       .listen(
@@ -163,7 +149,13 @@ export async function useSupportChat(
   const _OBSERVER_MARGIN_ = 100
 
   const store = chat_id ? useSupportChatStaffStore() : useSupportChatUserStore()
-  const { updateChatInfo, updateWritingStatus } = store
+  const {
+    updateChatInfo,
+    updateWritingStatus,
+    setReadAt,
+    prependMessages,
+    appendMessages,
+  } = store
   const storeRefs = storeToRefs(store)
   const {
     messagesGroupedByDate,
@@ -178,8 +170,8 @@ export async function useSupportChat(
   const { loadMoreEarlier, loadMoreLater } = useSupportChatLoading(
     earliestMessageId,
     latestMessageId,
-    messagesGroupedByDate,
-    chatInfo,
+    prependMessages,
+    appendMessages,
     chat_id
   )
 
@@ -294,13 +286,7 @@ export async function useSupportChat(
     }
 
     chatInfo.value = chatInfoData.value?.data
-    messagesGroupedByDate.value = formatAndAppendMessages(
-      messagesGroupedByDate.value,
-      messagesData.value?.data.messages ?? [],
-      chatInfo,
-      latestMessageId
-    )
-    earliestMessageId.value = messagesData.value?.data.earliest_loaded_id
+    appendMessages(messagesData.value?.data.messages ?? [])
 
     isFirstLoading.value = false
   }
@@ -339,7 +325,7 @@ export async function useSupportChat(
 
     // если загружены не все последние сообщения - дозагрузить и выставить всем текущим прочитанное состояние
     if (!allLaterMessagesLoaded.value) {
-      setReadAtToMessages(messagesGroupedByDate.value)
+      setReadAt()
       await _loadMoreBottom(true)
     }
 
@@ -360,8 +346,8 @@ export async function useSupportChat(
 export function useSupportChatLoading(
   earliestMessageId: Ref<number | undefined>,
   latestMessageId: Ref<number | undefined>,
-  messagesGroupedByDate: Ref<ISupportChatMessagesDateGroup[]>,
-  chatInfo: MaybeRefOrGetter<ISupportChatInfo | undefined>,
+  prependMessages: any,
+  appendMessages: any,
   chatId?: MaybeRefOrGetter<number | undefined>
 ) {
   const { addNotification } = useNotifications()
@@ -376,16 +362,9 @@ export function useSupportChatLoading(
         },
         credentials: 'include',
         onResponse({ response }) {
-          const { messages: loadedMessages, earliest_loaded_id } =
-            response._data.data
+          const { messages: loadedMessages } = response._data.data
 
-          earliestMessageId.value = earliest_loaded_id
-          messagesGroupedByDate.value = formatAndPrependMessages(
-            messagesGroupedByDate.value,
-            loadedMessages,
-            chatInfo,
-            earliestMessageId
-          )
+          prependMessages(loadedMessages)
         },
       })
     } catch (err) {
@@ -403,15 +382,9 @@ export function useSupportChatLoading(
         },
         credentials: 'include',
         onResponse({ response }) {
-          const { messages: loadedMessages, latest_loaded_id } =
-            response._data.data
+          const { messages: loadedMessages } = response._data.data
 
-          messagesGroupedByDate.value = formatAndAppendMessages(
-            messagesGroupedByDate.value,
-            loadedMessages,
-            chatInfo,
-            latestMessageId
-          )
+          appendMessages(loadedMessages)
         },
       })
     } catch (err) {

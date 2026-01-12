@@ -22,7 +22,6 @@ import IconSend from '~/assets/images/icons/send.svg?component'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
-import { formatAndAppendMessages } from '~/domain/support/chat/utils'
 
 const props = defineProps<{
   chatId?: number
@@ -42,12 +41,7 @@ const store = props.chatId
   ? useSupportChatStaffStore()
   : useSupportChatUserStore()
 
-const {
-  messagesGroupedByDate,
-  latestMessageId,
-  chatInfo,
-  isCurrentUserWriting,
-} = storeToRefs(store)
+const { isCurrentUserWriting } = storeToRefs(store)
 
 const sending = ref(false)
 
@@ -124,12 +118,7 @@ async function send() {
         if (isWritingTimeout) clearTimeout(isWritingTimeout)
         updateIsWritingStatus(false)
         text.value = ''
-        messagesGroupedByDate.value = formatAndAppendMessages(
-          messagesGroupedByDate.value,
-          [message],
-          chatInfo,
-          latestMessageId
-        )
+        store.appendMessages([message])
         emit('message-written')
       },
       onResponseError({ response }) {

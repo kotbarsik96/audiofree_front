@@ -6,8 +6,14 @@ import {
 } from '~/composables/useSupportChat'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
+import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
-import { setReadAtToMessages } from '~/domain/support/chat/utils'
+import {
+  appendSupportChatMessages,
+  groupMessages,
+  prependSupportChatMessages,
+  setReadAtToMessages,
+} from '~/domain/support/chat/utils'
 
 interface ICachedStaffSupportChat {
   chat_id: number
@@ -76,13 +82,19 @@ export const useSupportChatStaffStore = defineStore(
       }
     }
 
-    const messagesGroupedByDate = ref<ISupportChatMessagesDateGroup[]>([])
-    const earliestMessageId = ref<number | undefined>()
-    const latestMessageId = ref<number | undefined>()
     const cachedChats = ref<ICachedStaffSupportChat[]>([])
     const getCachedChat = (chatId: number) =>
       cachedChats.value.find((cached) => cached.chat_id === chatId)
     const savedScrollPosition = ref<number>()
+
+    const _messages = ref<ISupportChatMessage[]>([])
+    const messagesGroupedByDate = computed(() =>
+      groupMessages(_messages, chatInfo)
+    )
+    const earliestMessageId = computed(() => _messages.value.at(0)?.id)
+    const latestMessageId = computed(
+      () => _messages.value.at(_messages.value.length - 1)?.id
+    )
 
     const chatInfo = ref<ISupportChatInfo>()
     /** обновляет текущий chatInfo если newInfo.id совпадает с chatInfo.id. Иначе ищет сохранённый чат в кэше и обновляет его там */
@@ -129,8 +141,8 @@ export const useSupportChatStaffStore = defineStore(
     const { loadMoreLater } = useSupportChatLoading(
       earliestMessageId,
       latestMessageId,
-      messagesGroupedByDate,
-      chatInfo,
+      prependMessages,
+      appendMessages,
       currentChatId
     )
 
@@ -170,26 +182,36 @@ export const useSupportChatStaffStore = defineStore(
       }
     }
 
+    function prependMessages(messages: ISupportChatMessage[]) {
+      prependSupportChatMessages(_messages, messages, chatInfo.value)
+    }
+    function appendMessages(messages: ISupportChatMessage[]) {
+      appendSupportChatMessages(_messages, messages, chatInfo.value)
+    }
+
     /** Если чат есть в кэше - восстановит его. В ином случае сбросит все состояния */
     function restoreCachedChatOrReset(restoredChatId: number) {
       _currentChatId.value = restoredChatId
-      const foundCached: ICachedStaffSupportChat | undefined = getCachedChat(
-        _currentChatId.value
-      )
+      // const foundCached: ICachedStaffSupportChat | undefined = getCachedChat(
+      //   _currentChatId.value
+      // )
 
-      if (foundCached) {
-        chatInfo.value = JSON.parse(foundCached.chat_info)
-        messagesGroupedByDate.value = JSON.parse(foundCached.chat)
-        earliestMessageId.value = foundCached.earliest_message_id
-        latestMessageId.value = foundCached.latest_message_id
-        savedScrollPosition.value = foundCached.scroll_position
-      } else {
-        chatInfo.value = undefined
-        messagesGroupedByDate.value = []
-        earliestMessageId.value = undefined
-        latestMessageId.value = undefined
-        savedScrollPosition.value = undefined
-      }
+      // if (foundCached) {
+      //   chatInfo.value = JSON.parse(foundCached.chat_info)
+      //   messagesGroupedByDate.value = JSON.parse(foundCached.chat)
+      //   earliestMessageId.value = foundCached.earliest_message_id
+      //   latestMessageId.value = foundCached.latest_message_id
+      //   savedScrollPosition.value = foundCached.scroll_position
+      // } else {
+      chatInfo.value = undefined
+      _messages.value = []
+      savedScrollPosition.value = undefined
+      // }
+    }
+
+    /** @param readMessagesIds - список id сообщений, которым выставляется "прочитано". Если список не передан - отметка выставляется всем сообщениям в messages */
+    function setReadAt(readMessagesIds?: number[]) {
+      setReadAtToMessages(_messages, readMessagesIds)
     }
 
     async function submitReadMessages(
@@ -211,21 +233,18 @@ export const useSupportChatStaffStore = defineStore(
             if (response.ok) {
               // если чат не менялся - поменять значения read_at только локально
               if (chat_id === currentChatId.value) {
-                setReadAtToMessages(
-                  messagesGroupedByDate.value,
-                  readMessagesIds
-                )
+                setReadAt(readMessagesIds)
               }
               // если чат менялся - поменять значения read_at внутри кэша
               else {
-                const foundCached = getCachedChat(chat_id)
-                if (foundCached) {
-                  const cachedChat = JSON.parse(
-                    foundCached.chat
-                  ) as ISupportChatMessagesDateGroup[]
-                  setReadAtToMessages(cachedChat, readMessagesIds)
-                  foundCached.chat = JSON.stringify(cachedChat)
-                }
+                // const foundCached = getCachedChat(chat_id)
+                // if (foundCached) {
+                //   const cachedChat = JSON.parse(
+                //     foundCached.chat
+                //   ) as ISupportChatMessagesDateGroup[]
+                //   setReadAtToMessages(cachedChat, readMessagesIds)
+                //   foundCached.chat = JSON.stringify(cachedChat)
+                // }
               }
 
               updateChatInfo(response._data.data.chat_info)
@@ -271,12 +290,16 @@ export const useSupportChatStaffStore = defineStore(
       chatInfo,
       chatsList,
       updateChatInfo,
+      setReadAt,
       refetchChatInfo,
       isFirstLoading,
       currentWriters,
       isCurrentUserWriting,
       chatsListWriters,
       updateWritingStatus,
+      prependMessages,
+      appendMessages,
+      _messages,
     }
   }
 )
