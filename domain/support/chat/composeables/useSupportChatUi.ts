@@ -20,10 +20,11 @@ export function useSupportChatUi(
 
   const { loadMoreEarlier, loadMoreLater } = useSupportChatLoading(chat_id)
 
-  const onChatBodyScroll = debounce(() => {
-    if (chatBodyElement.value)
-      savedScrollPosition.value = chatBodyElement.value.scrollTop
-  }, 500)
+  const { fn: onChatBodyScroll, cancel: cancelChatBodyScrollHandler } =
+    debounce(() => {
+      if (chatBodyElement.value)
+        savedScrollPosition.value = chatBodyElement.value.scrollTop
+    }, 500)
 
   onMounted(async () => {
     chatBodyElement.value?.addEventListener('scroll', onChatBodyScroll)
@@ -50,6 +51,8 @@ export function useSupportChatUi(
   })
 
   onUnmounted(() => {
+    cancelChatBodyScrollHandler()
+    console.log(savedScrollPosition.value, 'on leave');
     if (topSpyObserver) topSpyObserver.disconnect()
     if (bottomSpyObserver) bottomSpyObserver.disconnect()
     chatBodyElement.value?.removeEventListener('scroll', onChatBodyScroll)

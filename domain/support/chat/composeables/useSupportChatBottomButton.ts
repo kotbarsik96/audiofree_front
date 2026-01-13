@@ -1,11 +1,11 @@
-import type { ShallowRef } from "vue"
+import type { ShallowRef } from 'vue'
 
 export function useSupportChatBottomButton(
   chatBodyElement: Readonly<ShallowRef<HTMLElement | null>>
 ) {
   const isBtnVisible = ref(false)
 
-  const onChatBodyScroll = debounce(() => {
+  const { fn: onChatBodyScroll } = debounce(() => {
     if (chatBodyElement.value) {
       const chatBodyHeight = chatBodyElement.value.offsetHeight
       const pos = chatBodyElement.value.scrollTop + chatBodyHeight

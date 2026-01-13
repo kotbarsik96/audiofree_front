@@ -76,7 +76,7 @@ if (error.value) {
   throw createError(error.value)
 }
 
-const refetch = debounce(reset, 500)
+const { fn: refetch } = debounce(reset, 500)
 watch(() => [search.value, status.value], refetch)
 
 const channelName = 'support-chats-list'

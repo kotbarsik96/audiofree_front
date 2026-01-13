@@ -1,6 +1,6 @@
-import type ISimplePagination from "~/dataAccess/api/ISimplePagination"
-import type { IProductSearchResult } from "~/domain/product_search/IProductSearchResult"
-import type { TProductSearchType } from "~/domain/product_search/TProductSearchType"
+import type ISimplePagination from '~/dataAccess/api/ISimplePagination'
+import type { IProductSearchResult } from '~/domain/product_search/IProductSearchResult'
+import type { TProductSearchType } from '~/domain/product_search/TProductSearchType'
 
 export const useProductsSearch = (
   searchValue: MaybeRefOrGetter<string>,
@@ -9,9 +9,9 @@ export const useProductsSearch = (
 ) => {
   const lastSearchedValue = ref(toValue(searchValue))
   const _page = computed(() => {
-    if (!page || type === 'searchbar') return 1;
-    return toValue(page);
-  });
+    if (!page || type === 'searchbar') return 1
+    return toValue(page)
+  })
 
   const {
     data: resultsData,
@@ -21,13 +21,13 @@ export const useProductsSearch = (
     params: {
       value: searchValue,
       type,
-      page: _page
+      page: _page,
     },
     watch: false,
     immediate: false,
   })
   const results = computed(() => resultsData.value?.data)
-  const executeSearchWithDelay = debounce(async () => {
+  const { fn: executeSearchWithDelay } = debounce(async () => {
     await execute()
     lastSearchedValue.value = toValue(searchValue)
   }, 500)
@@ -44,6 +44,6 @@ export const useProductsSearch = (
     resultsData,
     executeSearchWithDelay,
     execute,
-    pagination
+    pagination,
   }
 }

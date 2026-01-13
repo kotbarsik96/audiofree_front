@@ -47,7 +47,7 @@ export async function useSupportChatGeneral(
   let cachedChat = supportChatCache.getChat(chat_id ? toValue(chat_id) : 'user')
   if (cachedChat) {
     messages.value = cachedChat.messages
-    // savedScrollPosition.value = cachedChat.savedScrollPosition
+    savedScrollPosition.value = cachedChat.savedScrollPosition
     await Promise.all([loadMoreBottom(), loadChatInfo()])
   }
   // если в кэше нет - загрузить
