@@ -1,22 +1,23 @@
-import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 
 export type TCacheChatKey = number | 'user'
 
+export interface ISupportChatCacheData {
+  messages: ISupportChatMessage[]
+  savedScrollPosition: number | undefined
+}
+
 class SupportChatCache {
   private max = 4
 
-  private cachedChats = new Map<
-    TCacheChatKey,
-    { messages: ISupportChatMessage[] }
-  >()
+  private cachedChats = new Map<TCacheChatKey, ISupportChatCacheData>()
 
-  storeChat(key: TCacheChatKey, messages: ISupportChatMessage[]) {
+  storeChat(key: TCacheChatKey, data: ISupportChatCacheData) {
     while (this.cachedChats.size > this.max) {
       this.cachedChats.delete(this.cachedChats.keys().next().value!)
     }
 
-    this.cachedChats.set(key, { messages })
+    this.cachedChats.set(key, data)
   }
 
   getChat(key: TCacheChatKey) {

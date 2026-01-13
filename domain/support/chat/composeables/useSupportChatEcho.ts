@@ -17,7 +17,7 @@ export function useSupportChatEcho(chat_id?: MaybeRefOrGetter<number>) {
   const user = useSanctumUser<IUser>()
 
   const store = useSupportChatStore(chat_id)
-  const { updateWritingStatus, appendMessages, updateChatInfo, setReadAt } =
+  const { updateWritingStatus, appendMessages, setReadAt, updateChatInfo } =
     store
   const { chatInfo, isCurrentUserWriting } = storeToRefs(store)
 
@@ -25,7 +25,9 @@ export function useSupportChatEcho(chat_id?: MaybeRefOrGetter<number>) {
   const channelName = chat_id
     ? `support-chat-staff.${toValue(chat_id)}`
     : `support-chat-user.${user.value?.id}`
-  const presenceChannelName = `support-chat.${chatInfo.value?.chat_id}`
+  const presenceChannelName = `support-chat.${
+    chat_id ? toValue(chat_id) : user.value?.support_chat_id
+  }`
 
   const echo = useEcho()
 

@@ -13,15 +13,6 @@ import {
   setReadAtToMessages,
 } from '~/domain/support/chat/utils'
 
-interface ICachedStaffSupportChat {
-  chat_id: number
-  chat: string // JSON.stringify<ISupportChatMessagesDateGroup[]>
-  chat_info: string // JSON.stringify<ISupportChatInfo>
-  earliest_message_id: number | undefined
-  latest_message_id: number | undefined
-  scroll_position: number | undefined
-}
-
 interface IReadMessageByChatData {
   messagesIds: number[]
   timeout: ReturnType<typeof setTimeout> | undefined
@@ -33,6 +24,39 @@ export const useSupportChatStaffStore = defineStore(
     const { $afFetch } = useNuxtApp()
 
     const isFirstLoading = ref(false)
+
+    const savedScrollPosition = ref<number>()
+
+    const messages = ref<ISupportChatMessage[]>([])
+    const messagesGroupedByDate = computed(() => groupMessages(messages))
+
+    const earliestMessageId = computed(() => messages.value.at(0)?.id)
+    const latestMessageId = computed(
+      () => messages.value.at(messages.value.length - 1)?.id
+    )
+
+    const chatInfo = ref<ISupportChatInfo>()
+    const currentChatId = computed(() => chatInfo.value?.chat_id)
+    /** обновляет текущий chatInfo если newInfo.id совпадает с chatInfo.id. Иначе ищет сохранённый чат в кэше и обновляет его там */
+    const updateChatInfo = (newInfo: ISupportChatInfo | undefined) => {
+      if (newInfo) {
+        if (chatInfo.value?.chat_id === newInfo.chat_id)
+          chatInfo.value = newInfo
+      }
+    }
+
+    const allEarlierMessagesLoaded = computed(
+      () =>
+        earliestMessageId.value &&
+        earliestMessageId.value <= (chatInfo.value?.first_message_id ?? 0)
+    )
+    const allLaterMessagesLoaded = computed(
+      () =>
+        latestMessageId.value &&
+        latestMessageId.value >= (chatInfo.value?.last_message_id ?? 0)
+    )
+
+    const chatsList = shallowRef<ISupportChatListItem[]>([])
 
     /** массивы списков id прочитанных сообщений по чатам:
      * ключ number - chat_id,
@@ -66,47 +90,6 @@ export const useSupportChatStaffStore = defineStore(
         }
       }
     }
-
-    const cachedChats = ref<ICachedStaffSupportChat[]>([])
-    const getCachedChat = (chatId: number) =>
-      cachedChats.value.find((cached) => cached.chat_id === chatId)
-    const savedScrollPosition = ref<number>()
-
-    const messages = ref<ISupportChatMessage[]>([])
-    const messagesGroupedByDate = computed(() =>
-      groupMessages(messages, chatInfo)
-    )
-    const earliestMessageId = computed(() => messages.value.at(0)?.id)
-    const latestMessageId = computed(
-      () => messages.value.at(messages.value.length - 1)?.id
-    )
-
-    const allEarlierMessagesLoaded = computed(
-      () =>
-        earliestMessageId.value &&
-        earliestMessageId.value <= (chatInfo.value?.first_message_id ?? 0)
-    )
-    const allLaterMessagesLoaded = computed(
-      () =>
-        latestMessageId.value &&
-        latestMessageId.value >= (chatInfo.value?.last_message_id ?? 0)
-    )
-
-    const chatInfo = ref<ISupportChatInfo>()
-    const currentChatId = computed(() => chatInfo.value?.chat_id)
-    /** обновляет текущий chatInfo если newInfo.id совпадает с chatInfo.id. Иначе ищет сохранённый чат в кэше и обновляет его там */
-    const updateChatInfo = (newInfo: ISupportChatInfo | undefined) => {
-      if (newInfo) {
-        if (chatInfo.value?.chat_id === newInfo.chat_id)
-          chatInfo.value = newInfo
-        else {
-          const cached = getCachedChat(newInfo.chat_id)
-          if (cached) cached.chat_info = JSON.stringify(newInfo)
-        }
-      }
-    }
-
-    const chatsList = shallowRef<ISupportChatListItem[]>([])
 
     const currentWriters = ref<ISupportChatWriter[]>([])
     const isCurrentUserWriting = ref(false)
@@ -186,8 +169,6 @@ export const useSupportChatStaffStore = defineStore(
 
     return {
       currentChatId,
-      cachedChats,
-      getCachedChat,
       readMessage,
       messagesGroupedByDate,
       earliestMessageId,

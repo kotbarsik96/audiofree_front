@@ -15,12 +15,17 @@ export async function useSupportChatGeneral(
 ) {
   const store = useSupportChatStore(chat_id)
   const { setReadAt, appendMessages } = store
-  const { chatInfo, allLaterMessagesLoaded, isFirstLoading, messages } =
-    storeToRefs(store)
+  const {
+    chatInfo,
+    allLaterMessagesLoaded,
+    isFirstLoading,
+    messages,
+    savedScrollPosition,
+  } = storeToRefs(store)
 
   const { addNotification } = useNotifications()
 
-  const { refetchChatInfo } = useSupportChatLoading()
+  const { loadChatInfo } = useSupportChatLoading(chat_id)
   const { echoSubscribe } = useSupportChatEcho(chat_id)
   const { loadMoreBottom } = useSupportChatUi(
     chatBodyElement,
@@ -31,17 +36,19 @@ export async function useSupportChatGeneral(
 
   // кэшировать предыдущий чат, если есть
   if (chatInfo.value) {
-    supportChatCache.storeChat(
-      chat_id ? chatInfo.value.chat_id : 'user',
-      messages.value
-    )
+    const key = chat_id ? chatInfo.value.chat_id : 'user'
+    supportChatCache.storeChat(key, {
+      messages: messages.value,
+      savedScrollPosition: savedScrollPosition.value,
+    })
   }
 
   // попытаться достать из кэша
   let cachedChat = supportChatCache.getChat(chat_id ? toValue(chat_id) : 'user')
   if (cachedChat) {
     messages.value = cachedChat.messages
-    await Promise.all([loadMoreBottom(), refetchChatInfo()])
+    // savedScrollPosition.value = cachedChat.savedScrollPosition
+    await Promise.all([loadMoreBottom(), loadChatInfo()])
   }
   // если в кэше нет - загрузить
   else await initialLoad()

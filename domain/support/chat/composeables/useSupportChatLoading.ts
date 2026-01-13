@@ -6,9 +6,8 @@ export function useSupportChatLoading(chat_id?: MaybeRefOrGetter<number>) {
   const { $afFetch } = useNuxtApp()
 
   const store = useSupportChatStore(chat_id)
-  const { prependMessages, appendMessages, updateChatInfo } = store
-  const storeRefs = storeToRefs(store)
-  const { earliestMessageId, latestMessageId, chatInfo } = storeRefs
+  const { prependMessages, appendMessages } = store
+  const { earliestMessageId, latestMessageId, chatInfo } = storeToRefs(store)
 
   async function loadMoreEarlier() {
     try {
@@ -49,8 +48,8 @@ export function useSupportChatLoading(chat_id?: MaybeRefOrGetter<number>) {
     }
   }
 
-  async function refetchChatInfo() {
-    const updatingChatId = chatInfo.value?.chat_id
+  async function loadChatInfo() {
+    const updatingChatId = toValue(chat_id)
 
     try {
       await $afFetch('/support-chat', {
@@ -60,8 +59,7 @@ export function useSupportChatLoading(chat_id?: MaybeRefOrGetter<number>) {
         },
         onResponse({ response }) {
           if (response.ok) {
-            const updatedChatInfo = response._data.data
-            updateChatInfo(updatedChatInfo)
+            chatInfo.value = response._data.data
           }
         },
       })
@@ -73,6 +71,6 @@ export function useSupportChatLoading(chat_id?: MaybeRefOrGetter<number>) {
   return {
     loadMoreEarlier,
     loadMoreLater,
-    refetchChatInfo,
+    loadChatInfo,
   }
 }

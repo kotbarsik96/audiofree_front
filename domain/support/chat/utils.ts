@@ -31,45 +31,36 @@ export function appendSupportChatMessages(
   }
 }
 
-export function groupMessages(
-  messages: ShallowRef<ISupportChatMessage[]>,
-  chatInfo: MaybeRefOrGetter<ISupportChatInfo | undefined>
-) {
+export function groupMessages(messages: ShallowRef<ISupportChatMessage[]>) {
   const arr: ISupportChatMessagesDateGroup[] = []
 
-  const chatInfoValue = toValue(chatInfo)
+  messages.value.forEach((message) => {
+    let lastDateGroup: ISupportChatMessagesDateGroup | undefined = arr.at(
+      arr.length - 1
+    )
+    if (
+      !lastDateGroup ||
+      !checkSameDate(lastDateGroup.date, message.created_at)
+    ) {
+      lastDateGroup = { date: message.created_at, groups: [] }
+      arr.push(lastDateGroup)
+    }
 
-  if (chatInfoValue) {
-    messages.value
-      .filter((msg) => msg.chat_id === chatInfoValue.chat_id)
-      .forEach((message) => {
-        let lastDateGroup: ISupportChatMessagesDateGroup | undefined = arr.at(
-          arr.length - 1
-        )
-        if (
-          !lastDateGroup ||
-          !checkSameDate(lastDateGroup.date, message.created_at)
-        ) {
-          lastDateGroup = { date: message.created_at, groups: [] }
-          arr.push(lastDateGroup)
-        }
+    let lastSenderGroup: ISupportChatMessagesSenderGroup | undefined =
+      lastDateGroup.groups.at(lastDateGroup.groups.length - 1)
+    if (
+      !lastSenderGroup ||
+      lastSenderGroup.sender_type !== message.sender_type
+    ) {
+      lastSenderGroup = {
+        sender_type: message.sender_type as ESupportChatSenderType,
+        messages: [],
+      }
+      lastDateGroup.groups.push(lastSenderGroup)
+    }
 
-        let lastSenderGroup: ISupportChatMessagesSenderGroup | undefined =
-          lastDateGroup.groups.at(lastDateGroup.groups.length - 1)
-        if (
-          !lastSenderGroup ||
-          lastSenderGroup.sender_type !== message.sender_type
-        ) {
-          lastSenderGroup = {
-            sender_type: message.sender_type as ESupportChatSenderType,
-            messages: [],
-          }
-          lastDateGroup.groups.push(lastSenderGroup)
-        }
-
-        lastSenderGroup.messages.push(message)
-      })
-  }
+    lastSenderGroup.messages.push(message)
+  })
 
   return arr
 }

@@ -13,21 +13,22 @@ import {
 export const useSupportChatUserStore = defineStore('support-chat-user', () => {
   const { $afFetch } = useNuxtApp()
 
-  const chatInfo = ref<ISupportChatInfo>()
-  const updateChatInfo = (newInfo: ISupportChatInfo | undefined) => {
-    chatInfo.value = newInfo
-  }
-  const savedScrollPosition = ref<number>()
   const isFirstLoading = ref(false)
 
+  const savedScrollPosition = ref<number>()
+
   const messages = ref<ISupportChatMessage[]>([])
-  const messagesGroupedByDate = computed(() =>
-    groupMessages(messages, chatInfo)
-  )
+  const messagesGroupedByDate = computed(() => groupMessages(messages))
+
   const earliestMessageId = computed(() => messages.value.at(0)?.id)
   const latestMessageId = computed(
     () => messages.value.at(messages.value.length - 1)?.id
   )
+
+  const chatInfo = ref<ISupportChatInfo>()
+  const updateChatInfo = (newInfo: ISupportChatInfo | undefined) => {
+    chatInfo.value = newInfo
+  }
 
   const allEarlierMessagesLoaded = computed(
     () =>
