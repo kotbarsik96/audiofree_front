@@ -26,13 +26,21 @@ export async function useSupportChatGeneral(
   const { addNotification } = useNotifications()
 
   const { loadChatInfo } = useSupportChatLoading(chat_id)
-  const { echoSubscribe } = useSupportChatEcho(chat_id)
+  const { echoSubscribe, echoLeave } = useSupportChatEcho(chat_id)
   const { loadMoreBottom } = useSupportChatUi(
     chatBodyElement,
     topSpyElement,
     bottomSpyElement,
     chat_id
   )
+
+  onMounted(() => {
+    echoSubscribe()
+  })
+
+  onUnmounted(() => {
+    echoLeave()
+  })
 
   // кэшировать предыдущий чат, если есть
   if (chatInfo.value) {

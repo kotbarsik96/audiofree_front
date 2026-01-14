@@ -1,5 +1,8 @@
-import { onMounted, onUnmounted, type MaybeRefOrGetter } from 'vue'
-import type { EchoPresenceChannel, EchoPrivateChannel } from '~/domain/echo/interfaces/EchoInterfaces'
+import { type MaybeRefOrGetter } from 'vue'
+import type {
+  EchoPresenceChannel,
+  EchoPrivateChannel,
+} from '~/domain/echo/interfaces/EchoInterfaces'
 import type { ISupportChatChangedInfoEvent } from '~/domain/support/chat/interfaces/ISupportChatChangedInfoEvent'
 import type { ISupportChatMessageCreatedEvent } from '~/domain/support/chat/interfaces/ISupportChatMessageCreatedEvent'
 import type { ISupportChatReadMessagesEvent } from '~/domain/support/chat/interfaces/ISupportChatReadMessagesEvent'
@@ -29,6 +32,8 @@ export function useSupportChatEcho(chat_id?: MaybeRefOrGetter<number>) {
   const presenceChannelName = `support-chat.${
     chat_id ? toValue(chat_id) : user.value?.support_chat_id
   }`
+
+  const getChannel = () => channelsList.get(channelKey)
 
   const echo = useEcho()
 
@@ -94,7 +99,7 @@ export function useSupportChatEcho(chat_id?: MaybeRefOrGetter<number>) {
   }
 
   const echoLeave = () => {
-    const channel = channelsList.get(channelKey)
+    const channel = getChannel()
 
     if (channel?.presenceChannel)
       channel.presenceChannel.whisper('typing-status', {
@@ -107,16 +112,9 @@ export function useSupportChatEcho(chat_id?: MaybeRefOrGetter<number>) {
     echo.leave(presenceChannelName)
   }
 
-  onMounted(() => {
-    echoSubscribe()
-  })
-
-  onUnmounted(() => {
-    echoLeave()
-  })
-
   return {
     echoSubscribe,
     echoLeave,
+    getChannel,
   }
 }
