@@ -1,4 +1,5 @@
 import { onMounted, onUnmounted, type MaybeRefOrGetter } from 'vue'
+import type { EchoPresenceChannel, EchoPrivateChannel } from '~/domain/echo/interfaces/EchoInterfaces'
 import type { ISupportChatChangedInfoEvent } from '~/domain/support/chat/interfaces/ISupportChatChangedInfoEvent'
 import type { ISupportChatMessageCreatedEvent } from '~/domain/support/chat/interfaces/ISupportChatMessageCreatedEvent'
 import type { ISupportChatReadMessagesEvent } from '~/domain/support/chat/interfaces/ISupportChatReadMessagesEvent'
@@ -7,8 +8,8 @@ import type IUser from '~/domain/user/types/IUser'
 import { useSupportChatStore } from '~/stores/supportChat/useSupportChatStore'
 
 export interface ISupportChatChannels {
-  presenceChannel: any
-  privateChannel: any
+  presenceChannel: EchoPresenceChannel
+  privateChannel: EchoPrivateChannel
 }
 
 export const channelsList = new Map<number | 'user', ISupportChatChannels>()
