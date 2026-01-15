@@ -1,17 +1,20 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import type { EchoPresenceChannel } from '~/domain/echo/interfaces/EchoInterfaces'
 
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
 import { supportChatCache } from '~/domain/support/chat/SupportChatCache'
+import { supportChatPresenceChannels } from '~/domain/support/chat/SupportChatPresenceChannels'
 import {
   appendSupportChatMessages,
   groupMessages,
   prependSupportChatMessages,
   setReadAtToMessages,
 } from '~/domain/support/chat/utils'
+import type IUser from '~/domain/user/types/IUser'
 
 interface IReadMessageByChatData {
   messagesIds: number[]
@@ -22,6 +25,10 @@ export const useSupportChatStaffStore = defineStore(
   'support-chat-staff',
   () => {
     const { $afFetch } = useNuxtApp()
+
+    const user = useSanctumUser<IUser>()
+
+    const echo = useEcho()
 
     const isFirstLoading = ref(false)
 
@@ -91,38 +98,67 @@ export const useSupportChatStaffStore = defineStore(
       }
     }
 
-    const currentWriters = ref<ISupportChatWriter[]>([])
-    const isCurrentUserWriting = ref(false)
-    const chatsListWriters = ref<ISupportChatWriter[]>([])
-    const updateWritingStatus = (data: ISupportChatWriter) => {
-      if (data.is_writing) {
-        const isInCurrentWriters = currentWriters.value.find(
-          (wr) => wr.id === data.id
+    const writersList = ref<ISupportChatWriter[]>([])
+    const updateWriters = (writer: ISupportChatWriter) => {
+      if (writer.is_writing) writersList.value.push(writer)
+      else
+        writersList.value = writersList.value.filter(
+          (wr) => wr.id === writer.id
         )
-        if (!isInCurrentWriters && data.chat_id === currentChatId.value)
-          currentWriters.value.push(data)
-
-        const isInChatsListWriters = chatsListWriters.value.find(
-          (wr) => wr.id === data.id
-        )
-        if (!isInChatsListWriters) chatsListWriters.value.push(data)
-      } else {
-        currentWriters.value = currentWriters.value.filter(
-          (wr) => wr.id !== data.id
-        )
-
-        const i = chatsListWriters.value.findIndex(
-          (wr) => wr.chat_id === data.chat_id && wr.id === data.id
-        )
-        if (i >= 0) chatsListWriters.value.splice(i, 1)
-      }
     }
+
+    const isCurrentUserWriting = ref(false)
+    const whisperWritingStatus = (
+      is_writing: boolean,
+      channel: EchoPresenceChannel
+    ) => {
+      channel.whisper('typing-status', {
+        id: user.value?.id,
+        chat_id: currentChatId.value,
+        name: user.value?.name,
+        is_writing: true,
+      })
+    }
+    watch(isCurrentUserWriting, () => {
+      if (!currentChatId.value) return
+
+      const channel = supportChatPresenceChannels.getChannel(
+        currentChatId.value
+      )
+      if (channel) {
+        whisperWritingStatus(true, channel)
+      }
+    })
 
     function prependMessages(newMessages: ISupportChatMessage[]) {
       prependSupportChatMessages(messages, newMessages, chatInfo.value)
     }
     function appendMessages(newMessages: ISupportChatMessage[]) {
       appendSupportChatMessages(messages, newMessages, chatInfo.value)
+    }
+
+    function joinStaffPresenceChannelIfNot(chatId: number) {
+      if (!supportChatPresenceChannels.hasChannel(chatId)) {
+        // регистрирует presence channel на данный чат
+        const presenceChannel = supportChatPresenceChannels.register(
+          chatId,
+          echo
+        )
+
+        presenceChannel
+          // если кто-то присоединился в этот чат
+          .joining(() => {
+            // при этом этот чат открыт текущим пользователем сейчас (+ текущий пользователь в данный момент печатает)
+            if (isCurrentUserWriting.value && chatId === currentChatId.value)
+              // оповестить всех в чате о том, что текущий пользователь печатает
+              whisperWritingStatus(true, presenceChannel)
+          })
+          // кто-то другой оповещает о том, что начал печатать
+          .listenForWhisper('typing-status', (data: ISupportChatWriter) => {
+            console.log(data)
+            updateWriters(data)
+          })
+      }
     }
 
     /** @param readMessagesIds - список id сообщений, которым выставляется "прочитано". Если список не передан - отметка выставляется всем сообщениям в messages */
@@ -179,15 +215,15 @@ export const useSupportChatStaffStore = defineStore(
       updateChatInfo,
       setReadAt,
       isFirstLoading,
-      currentWriters,
-      isCurrentUserWriting,
-      chatsListWriters,
-      updateWritingStatus,
+      writersList,
+      updateWriters,
       prependMessages,
       appendMessages,
       messages,
       allEarlierMessagesLoaded,
       allLaterMessagesLoaded,
+      joinStaffPresenceChannelIfNot,
+      isCurrentUserWriting,
     }
   }
 )

@@ -75,20 +75,11 @@ onUnmounted(() => {
 
 function onWindowUnload() {
   if (isWritingTimeout) clearTimeout(isWritingTimeout)
-  updateIsWritingStatus(false, true)
+  updateIsWritingStatus(false)
 }
 
-async function updateIsWritingStatus(is_writing: boolean, keepalive = false) {
+async function updateIsWritingStatus(is_writing: boolean) {
   isCurrentUserWriting.value = is_writing
-  await $afFetch('/support-chat/update-writing-status', {
-    method: 'POST',
-    body: {
-      chat_id: props.chatId,
-      is_writing,
-    },
-    credentials: 'include',
-    keepalive,
-  })
 }
 
 async function onSubmit() {

@@ -1,29 +1,31 @@
 <template>
-  <NuxtLink class="scs-link" :class="classes" :to="link">
-    <div class="credentials">
-      <div class="name">
-        {{ chat.user_name }}
-      </div>
-      <div class="contacts">({{ contactsString }})</div>
-    </div>
-    <div class="latest-message">
-      <Transition name="drop-down" mode="out-in">
-        <div v-if="writingStatusString" class="is-writing">
-          ({{ writingStatusString }}
-          <SupportChatThreeDots />
-          )
+  <div ref="element">
+    <NuxtLink class="scs-link" :class="classes" :to="link">
+      <div class="credentials">
+        <div class="name">
+          {{ chat.user_name }}
         </div>
-        <div v-else>{{ chat.latest_message?.text.slice(0, 250) }}</div>
-      </Transition>
-    </div>
-    <div class="status">
-      <div class="s-dot"></div>
-      <div class="s-text">
-        {{ status }}
-        {{ unreadMessagesString }}
+        <div class="contacts">({{ contactsString }})</div>
       </div>
-    </div>
-  </NuxtLink>
+      <div class="latest-message">
+        <Transition name="drop-down" mode="out-in">
+          <div v-if="writingStatusString" class="is-writing">
+            ({{ writingStatusString }}
+            <SupportChatThreeDots />
+            )
+          </div>
+          <div v-else>{{ chat.latest_message?.text.slice(0, 250) }}</div>
+        </Transition>
+      </div>
+      <div class="status">
+        <div class="s-dot"></div>
+        <div class="s-text">
+          {{ status }}
+          {{ unreadMessagesString }}
+        </div>
+      </div>
+    </NuxtLink>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -33,17 +35,19 @@ import {
   supportChatStatusMap,
 } from '~/domain/support/chat/interfaces/ESupportChatStatus'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
-import type IUser from '~/domain/user/types/IUser'
-import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
+import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
+import { useSupportChatStore } from '~/stores/supportChat/useSupportChatStore'
 
 const props = defineProps<{
   chat: ISupportChatListItem
 }>()
 
-const user = useSanctumUser<IUser>()
+const store = useSupportChatStore(props.chat.id)
+const { chatInfo } = storeToRefs(store)
 
-const store = useSupportChatStaffStore()
-const { chatsListWriters } = storeToRefs(store)
+const element = useTemplateRef<HTMLElement>('element')
+
+const writers = ref<ISupportChatWriter[]>([])
 
 const link = computed(() => ({
   name: 'SupportChatStaffPage',
@@ -59,12 +63,9 @@ const contactsString = computed(() =>
 )
 
 const writingStatusString = computed(() => {
-  const writers = chatsListWriters.value.filter(
-    (wr) => wr.chat_id === props.chat.id && wr.id !== user.value?.id
-  )
-  if (writers.length < 1) return null
-  if (writers.length === 1) return 'печатает'
-  if (writers.length > 1) return `${writers.length} печатают`
+  if (writers.value.length < 1) return null
+  if (writers.value.length === 1) return 'печатает'
+  if (writers.value.length > 1) return `${writers.value.length} печатают`
 })
 
 const status = computed(() => supportChatStatusMap[props.chat.status])
@@ -80,6 +81,28 @@ const classes = computed(() => ({
   '--closed': props.chat.status === ESupportChatStatus.Closed,
   '--open': props.chat.status === ESupportChatStatus.Open,
 }))
+
+let observer: IntersectionObserver | undefined
+
+onMounted(() => {
+  if (element.value) {
+    observer = new IntersectionObserver((entries) => {
+      if (entries.find((e) => e.isIntersecting)) {
+        joinChannel()
+        observer?.disconnect()
+      }
+    })
+    observer.observe(element.value)
+  }
+})
+
+onUnmounted(() => {
+  observer?.disconnect()
+})
+
+function joinChannel() {
+  
+}
 </script>
 
 <style lang="scss" scoped>

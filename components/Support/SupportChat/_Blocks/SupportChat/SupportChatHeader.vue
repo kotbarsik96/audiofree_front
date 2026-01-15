@@ -35,7 +35,7 @@ const store =
 const writers = computed(() => {
   let arr = []
 
-  const writers = store.currentWriters.filter(
+  const writers = store.writersList.filter(
     (wr) => wr.chat_id === props.chatInfo?.chat_id && wr.id !== user.value?.id
   )
 

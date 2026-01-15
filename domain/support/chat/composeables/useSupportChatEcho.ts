@@ -1,41 +1,21 @@
 import { type MaybeRefOrGetter } from 'vue'
-import type {
-  EchoPresenceChannel,
-  EchoPrivateChannel,
-} from '~/domain/echo/interfaces/EchoInterfaces'
 import type { ISupportChatChangedInfoEvent } from '~/domain/support/chat/interfaces/ISupportChatChangedInfoEvent'
 import type { ISupportChatMessageCreatedEvent } from '~/domain/support/chat/interfaces/ISupportChatMessageCreatedEvent'
 import type { ISupportChatReadMessagesEvent } from '~/domain/support/chat/interfaces/ISupportChatReadMessagesEvent'
-import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
 import type IUser from '~/domain/user/types/IUser'
 import { useSupportChatStore } from '~/stores/supportChat/useSupportChatStore'
-
-export interface ISupportChatChannels {
-  presenceChannel: EchoPresenceChannel
-  privateChannel: EchoPrivateChannel
-}
-
-export const channelsList = new Map<number | 'user', ISupportChatChannels>()
 
 export function useSupportChatEcho(chat_id?: MaybeRefOrGetter<number>) {
   const user = useSanctumUser<IUser>()
 
   const store = useSupportChatStore(chat_id)
-  const { updateWritingStatus, appendMessages, setReadAt, updateChatInfo } =
-    store
-  const { chatInfo, isCurrentUserWriting } = storeToRefs(store)
-
-  const channelKey = chat_id ? toValue(chat_id) : 'user'
-  const channelName = chat_id
-    ? `support-chat-staff.${toValue(chat_id)}`
-    : `support-chat-user.${user.value?.id}`
-  const presenceChannelName = `support-chat.${
-    chat_id ? toValue(chat_id) : user.value?.support_chat_id
-  }`
-
-  const getChannel = () => channelsList.get(channelKey)
+  const { appendMessages, setReadAt, updateChatInfo } = store
+  const { chatInfo } = storeToRefs(store)
 
   const echo = useEcho()
+  const privateChannelName = chat_id
+    ? `support-chat-staff.${toValue(chat_id)}`
+    : `support-chat-user.${user.value?.id}`
 
   const echoSubscribe = () => {
     if (!chatInfo.value) {
@@ -43,32 +23,8 @@ export function useSupportChatEcho(chat_id?: MaybeRefOrGetter<number>) {
       return
     }
 
-    const channel = {
-      presenceChannel: echo.join(presenceChannelName),
-      privateChannel: echo.private(channelName),
-    }
-    channelsList.set(channelKey, channel)
-
-    channel.presenceChannel
-      // кто-то присоединился к чату
-      .joining(() => {
-        if (isCurrentUserWriting.value)
-          channel.presenceChannel.whisper('typing-status', {
-            id: user.value?.id,
-            name: user.value?.name,
-            chat_id: chatInfo.value?.chat_id,
-            is_writing: true,
-          })
-      })
-      .listenForWhisper('typing-status', (data: ISupportChatWriter) => {
-        updateWritingStatus(data)
-      })
-      // собеседник начал/прекратил печатать
-      .listen('.support-chat-writing-status', (data: ISupportChatWriter) => {
-        updateWritingStatus(data)
-      })
-
-    channel.privateChannel
+    echo
+      .private(privateChannelName)
       // новые сообщения (как от собеседника, так и от себя)
       .listen(
         '.support-chat-message-created',
@@ -99,22 +55,11 @@ export function useSupportChatEcho(chat_id?: MaybeRefOrGetter<number>) {
   }
 
   const echoLeave = () => {
-    const channel = getChannel()
-
-    if (channel?.presenceChannel)
-      channel.presenceChannel.whisper('typing-status', {
-        id: user.value?.id,
-        name: user.value?.name,
-        is_writing: false,
-      })
-
-    echo.leave(channelName)
-    echo.leave(presenceChannelName)
+    echo.leave(privateChannelName)
   }
 
   return {
     echoSubscribe,
     echoLeave,
-    getChannel,
   }
 }

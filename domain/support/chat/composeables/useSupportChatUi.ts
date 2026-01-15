@@ -52,7 +52,6 @@ export function useSupportChatUi(
 
   onUnmounted(() => {
     cancelChatBodyScrollHandler()
-    console.log(savedScrollPosition.value, 'on leave');
     if (topSpyObserver) topSpyObserver.disconnect()
     if (bottomSpyObserver) bottomSpyObserver.disconnect()
     chatBodyElement.value?.removeEventListener('scroll', onChatBodyScroll)

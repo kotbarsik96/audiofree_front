@@ -60,10 +60,13 @@ import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserSto
 import SupportChatBottomButton from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatBottomButton.vue'
 import { useSupportChatBottomButton } from '~/domain/support/chat/composeables/useSupportChatBottomButton'
 import { useSupportChatGeneral } from '~/domain/support/chat/composeables/useSupportChatGeneral'
+import { supportChatPresenceChannels } from '~/domain/support/chat/SupportChatPresenceChannels'
 
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 const topSpyElement = useTemplateRef<HTMLElement>('topSpyElement')
 const bottomSpyElement = useTemplateRef<HTMLElement>('bottomSpyElement')
+
+const echo = useEcho()
 
 const [{ data: pageData }, { onMessageWritten }] = await Promise.all([
   useAPI<{ data: IPageSeo }>('page/contacts'),
@@ -87,6 +90,10 @@ const { isBtnVisible, onChatBodyScroll, onChatBottomBtnClick } =
 const classes = computed(() => ({
   '--all-earlier-loaded': allEarlierMessagesLoaded.value,
 }))
+
+onUnmounted(() => {
+  supportChatPresenceChannels.leaveAll(echo)
+})
 </script>
 
 <style lang="scss" scoped>

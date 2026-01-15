@@ -34,8 +34,16 @@ export async function useSupportChatGeneral(
     chat_id
   )
 
+  const _joinPresenceChannel = () => {
+    if (chat_id && 'joinStaffPresenceChannelIfNot' in store)
+      store.joinStaffPresenceChannelIfNot(toValue(chat_id))
+    else if ('joinUserPresenceChannelIfNot' in store)
+      store.joinUserPresenceChannelIfNot()
+  }
+
   onMounted(() => {
     echoSubscribe()
+    _joinPresenceChannel()
   })
 
   onUnmounted(() => {
