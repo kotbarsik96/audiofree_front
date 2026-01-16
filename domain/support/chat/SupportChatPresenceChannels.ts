@@ -25,10 +25,10 @@ class SupportChatPresenceChannels {
 
   /** вызывается, когда пользователь совсем уходит со страницы чата/списка чатов */
   leaveAll(echo: EchoInstance) {
-    for (let chatId of this.list.keys()) {
-      echo.leave(`${this.channelName}.${chatId}`)
-    }
-    this.list.clear()
+    // for (let chatId of this.list.keys()) {
+    //   echo.leave(`${this.channelName}.${chatId}`)
+    // }
+    // this.list.clear()
   }
 }
 

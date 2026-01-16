@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref, shallowRef } from 'vue'
+import type { EchoPresenceChannel } from '~/domain/echo/interfaces/EchoInterfaces'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
@@ -71,11 +72,24 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     if (writer.chat_id === chatInfo.value?.chat_id && writer.is_writing)
       writersList.value.push(writer)
     else
-      writersList.value = writersList.value.filter((wr) => wr.id === writer.id)
+      writersList.value = writersList.value.filter((wr) => wr.id !== writer.id)
   }
 
   const isCurrentUserWriting = ref(false)
-  
+  const whisperWritingStatus = (is_writing: boolean) => {
+    if (currentChatId.value) {
+      const channel = supportChatPresenceChannels.getChannel(
+        currentChatId.value
+      )
+
+      channel?.whisper('typing-status', {
+        id: user.value?.id,
+        chat_id: currentChatId.value,
+        name: user.value?.name,
+        is_writing: is_writing,
+      })
+    }
+  }
 
   function prependMessages(newMessages: ISupportChatMessage[]) {
     prependSupportChatMessages(messages, newMessages, chatInfo.value)
@@ -106,12 +120,7 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
           // при этом текущий пользователь в данный момент пишет
           if (isCurrentUserWriting.value)
             // оповестить всех в чате о том, что текущий пользователь печатает
-            presenceChannel.whisper('typing-status', {
-              id: user.value?.id,
-              chat_id: currentChatId.value,
-              name: user.value?.name,
-              is_writing: true,
-            })
+            whisperWritingStatus(true)
         })
         // кто-то оповещает о том, что начал печатать
         .listenForWhisper('typing-status', (data: ISupportChatWriter) => {
@@ -171,5 +180,6 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     allLaterMessagesLoaded,
     joinUserPresenceChannelIfNot,
     isCurrentUserWriting,
+    whisperWritingStatus,
   }
 })

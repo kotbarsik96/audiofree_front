@@ -20,6 +20,8 @@
 <script setup lang="ts">
 import IconSend from '~/assets/images/icons/send.svg?component'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
+import { supportChatPresenceChannels } from '~/domain/support/chat/SupportChatPresenceChannels'
+import type IUser from '~/domain/user/types/IUser'
 import { useSupportChatStore } from '~/stores/supportChat/useSupportChatStore'
 
 const props = defineProps<{
@@ -30,6 +32,8 @@ const emit = defineEmits<{
   (e: 'message-written'): void
 }>()
 
+const user = useSanctumUser<IUser>()
+
 const { addNotification } = useNotifications()
 
 const { $afFetch } = useNuxtApp()
@@ -37,6 +41,7 @@ const { $afFetch } = useNuxtApp()
 const text = ref('')
 
 const store = useSupportChatStore(props.chatId)
+const { whisperWritingStatus } = store
 const { isCurrentUserWriting } = storeToRefs(store)
 
 const sending = ref(false)
@@ -80,6 +85,7 @@ function onWindowUnload() {
 
 async function updateIsWritingStatus(is_writing: boolean) {
   isCurrentUserWriting.value = is_writing
+  whisperWritingStatus(isCurrentUserWriting.value, props.chatId)
 }
 
 async function onSubmit() {

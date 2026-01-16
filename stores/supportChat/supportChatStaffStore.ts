@@ -103,32 +103,26 @@ export const useSupportChatStaffStore = defineStore(
       if (writer.is_writing) writersList.value.push(writer)
       else
         writersList.value = writersList.value.filter(
-          (wr) => wr.id === writer.id
+          (wr) => wr.id !== writer.id
         )
     }
 
     const isCurrentUserWriting = ref(false)
     const whisperWritingStatus = (
       is_writing: boolean,
-      channel: EchoPresenceChannel
+      chat_id: number | undefined
     ) => {
-      channel.whisper('typing-status', {
-        id: user.value?.id,
-        chat_id: currentChatId.value,
-        name: user.value?.name,
-        is_writing: true,
-      })
-    }
-    watch(isCurrentUserWriting, () => {
-      if (!currentChatId.value) return
+      if (chat_id) {
+        const channel = supportChatPresenceChannels.getChannel(chat_id)
 
-      const channel = supportChatPresenceChannels.getChannel(
-        currentChatId.value
-      )
-      if (channel) {
-        whisperWritingStatus(true, channel)
+        channel?.whisper('typing-status', {
+          id: user.value?.id,
+          chat_id,
+          name: user.value?.name,
+          is_writing,
+        })
       }
-    })
+    }
 
     function prependMessages(newMessages: ISupportChatMessage[]) {
       prependSupportChatMessages(messages, newMessages, chatInfo.value)
@@ -151,11 +145,10 @@ export const useSupportChatStaffStore = defineStore(
             // при этом этот чат открыт текущим пользователем сейчас (+ текущий пользователь в данный момент печатает)
             if (isCurrentUserWriting.value && chatId === currentChatId.value)
               // оповестить всех в чате о том, что текущий пользователь печатает
-              whisperWritingStatus(true, presenceChannel)
+              whisperWritingStatus(true, chatId)
           })
           // кто-то другой оповещает о том, что начал печатать
           .listenForWhisper('typing-status', (data: ISupportChatWriter) => {
-            console.log(data)
             updateWriters(data)
           })
       }
@@ -224,6 +217,7 @@ export const useSupportChatStaffStore = defineStore(
       allLaterMessagesLoaded,
       joinStaffPresenceChannelIfNot,
       isCurrentUserWriting,
+      whisperWritingStatus,
     }
   }
 )
