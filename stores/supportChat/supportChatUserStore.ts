@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref, shallowRef } from 'vue'
-import type { EchoPresenceChannel } from '~/domain/echo/interfaces/EchoInterfaces'
+import { useWritersList } from '~/domain/support/chat/composeables/useWritersList'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
@@ -17,6 +17,8 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
   const { $afFetch } = useNuxtApp()
 
   const user = useSanctumUser<IUser>()
+
+  const { writersList, updateWriters } = useWritersList()
 
   const echo = useEcho()
 
@@ -67,14 +69,6 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     }
   }
 
-  const writersList = ref<ISupportChatWriter[]>([])
-  const updateWriters = (writer: ISupportChatWriter) => {
-    if (writer.chat_id === chatInfo.value?.chat_id && writer.is_writing)
-      writersList.value.push(writer)
-    else
-      writersList.value = writersList.value.filter((wr) => wr.id !== writer.id)
-  }
-
   const isCurrentUserWriting = ref(false)
   const whisperWritingStatus = (is_writing: boolean) => {
     if (currentChatId.value) {
@@ -86,7 +80,7 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
         id: user.value?.id,
         chat_id: currentChatId.value,
         name: user.value?.name,
-        is_writing: is_writing,
+        started_writing_at: is_writing ? Date.now() : false,
       })
     }
   }
@@ -152,13 +146,6 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     }
   }
 
-  function clear() {
-    messages.value = []
-    chatInfo.value = undefined
-    savedScrollPosition.value = undefined
-    _readMessagesIds.value = []
-  }
-
   return {
     currentChatId,
     messagesGroupedByDate,
@@ -168,7 +155,6 @@ export const useSupportChatUserStore = defineStore('support-chat-user', () => {
     updateChatInfo,
     savedScrollPosition,
     readMessage,
-    clear,
     setReadAt,
     isFirstLoading,
     writersList,

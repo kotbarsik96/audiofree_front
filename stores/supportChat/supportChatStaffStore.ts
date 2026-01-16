@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { EchoPresenceChannel } from '~/domain/echo/interfaces/EchoInterfaces'
-
+import { useWritersList } from '~/domain/support/chat/composeables/useWritersList'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
@@ -29,6 +28,8 @@ export const useSupportChatStaffStore = defineStore(
     const user = useSanctumUser<IUser>()
 
     const echo = useEcho()
+
+    const { writersList, updateWriters } = useWritersList()
 
     const isFirstLoading = ref(false)
 
@@ -98,15 +99,6 @@ export const useSupportChatStaffStore = defineStore(
       }
     }
 
-    const writersList = ref<ISupportChatWriter[]>([])
-    const updateWriters = (writer: ISupportChatWriter) => {
-      if (writer.is_writing) writersList.value.push(writer)
-      else
-        writersList.value = writersList.value.filter(
-          (wr) => wr.id !== writer.id
-        )
-    }
-
     const isCurrentUserWriting = ref(false)
     const whisperWritingStatus = (
       is_writing: boolean,
@@ -119,7 +111,7 @@ export const useSupportChatStaffStore = defineStore(
           id: user.value?.id,
           chat_id,
           name: user.value?.name,
-          is_writing,
+          started_writing_at: is_writing ? Date.now() : false,
         })
       }
     }

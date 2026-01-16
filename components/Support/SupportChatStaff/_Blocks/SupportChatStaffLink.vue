@@ -43,11 +43,9 @@ const props = defineProps<{
 }>()
 
 const store = useSupportChatStore(props.chat.id)
-const { chatInfo } = storeToRefs(store)
+const { writersList } = storeToRefs(store)
 
 const element = useTemplateRef<HTMLElement>('element')
-
-const writers = ref<ISupportChatWriter[]>([])
 
 const link = computed(() => ({
   name: 'SupportChatStaffPage',
@@ -62,10 +60,16 @@ const contactsString = computed(() =>
     .join(' / ')
 )
 
+const currentChatWriters = computed(() =>
+  writersList.value.filter((wr) => wr.chat_id === props.chat.id)
+)
+
 const writingStatusString = computed(() => {
-  if (writers.value.length < 1) return null
-  if (writers.value.length === 1) return 'печатает'
-  if (writers.value.length > 1) return `${writers.value.length} печатают`
+  if (currentChatWriters.value.length < 1) return null
+  if (currentChatWriters.value.length === 1)
+    return `${currentChatWriters.value[0].name} печатает`
+  if (currentChatWriters.value.length > 1)
+    return `${currentChatWriters.value.length} печатают`
 })
 
 const status = computed(() => supportChatStatusMap[props.chat.status])
@@ -88,7 +92,8 @@ onMounted(() => {
   if (element.value) {
     observer = new IntersectionObserver((entries) => {
       if (entries.find((e) => e.isIntersecting)) {
-        joinChannel()
+        if ('joinStaffPresenceChannelIfNot' in store && props.chat.id)
+          store.joinStaffPresenceChannelIfNot(props.chat.id)
         observer?.disconnect()
       }
     })
@@ -99,10 +104,6 @@ onMounted(() => {
 onUnmounted(() => {
   observer?.disconnect()
 })
-
-function joinChannel() {
-  
-}
 </script>
 
 <style lang="scss" scoped>
