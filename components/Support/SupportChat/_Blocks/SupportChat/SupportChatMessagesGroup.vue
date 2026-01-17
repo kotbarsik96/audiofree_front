@@ -26,7 +26,7 @@ import SupportChatSystemMessage from '~/components/Support/SupportChat/_Blocks/S
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import SupportIcon from '~/assets/images/icons/support.svg?component'
 import UserIcon from '~/assets/images/icons/user.svg?component'
-import type { ISupportChatMessagesSenderGroup } from '~/composables/useSupportChat'
+import type { ISupportChatMessagesSenderGroup } from '~/domain/support/chat/interfaces/ISupportChatMessagesSenderGroup'
 import type { Component } from 'vue'
 
 const props = defineProps<{

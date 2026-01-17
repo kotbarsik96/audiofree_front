@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import SupportChatDate from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatDate.vue'
 import SupportChatMessagesGroup from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatMessagesGroup.vue'
-import type { ISupportChatMessagesDateGroup } from '~/composables/useSupportChat';
+import type { ISupportChatMessagesDateGroup } from '~/domain/support/chat/interfaces/ISupportChatMessagesDateGroup';
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 
 const props = defineProps<{
