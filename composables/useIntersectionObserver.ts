@@ -6,30 +6,53 @@ export function useIntersectionObserver(
   callback: (
     entries: IntersectionObserverEntry[],
     observer: IntersectionObserver,
-  ) => boolean | void,
+  ) => boolean | void | Promise<void>,
+  /** опции должны быть сгенерированы при onMounted (потому, как, например, нужно передать в root какой-то элемент)
+   *
+   * в связи с этим опции передаются callback'ом
+   */
+  getObserverOptions?: () => IntersectionObserverInit,
+  /** если true - нужно инициализировать через метод init. Иначе автоматически инициализируется при onMounted
+   * 
+   * полезно, если нужно отложить инициализацию
+   */
+  initManually?: boolean,
 ) {
   let observer: IntersectionObserver | undefined
 
-  onMounted(() => {
+  const init = () => {
     if (element.value) {
-      observer = new IntersectionObserver((entries, o) => {
+      const observerCallback: IntersectionObserverCallback = (entries, o) => {
         const result = callback(entries, o)
         if (result === true) disconnect()
-      })
+      }
+
+      const observerOptions =
+        typeof getObserverOptions === 'function'
+          ? getObserverOptions()
+          : undefined
+
+      observer = new IntersectionObserver(observerCallback, observerOptions)
       observer.observe(element.value)
     }
+  }
+
+  const disconnect = () => {
+    observer?.disconnect()
+    observer = undefined
+  }
+
+  onMounted(() => {
+    if (!initManually) init()
   })
 
   onUnmounted(() => {
     disconnect()
   })
 
-  function disconnect() {
-    observer?.disconnect()
-    observer = undefined
-  }
-
   return {
     observer,
+    init,
+    disconnect,
   }
 }

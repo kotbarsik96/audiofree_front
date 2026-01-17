@@ -12,9 +12,9 @@ type TLoadMoreResponse<T> = { data: IPagination<T> } | null
 
 export async function usePaginationLazyWrapper<T>(
   listRef: Ref<T[]> | ShallowRef<T[]>,
-  intersectionEl: Ref<HTMLElement | undefined | null>,
+  intersectionEl: ShallowRef<Readonly<HTMLElement | null>>,
   url: string,
-  options: PaginationLazyWrapperOptions<T>
+  options: PaginationLazyWrapperOptions<T>,
 ) {
   const { $afFetch } = useNuxtApp()
 
@@ -28,22 +28,13 @@ export async function usePaginationLazyWrapper<T>(
   const isLastPage = computed(
     () =>
       !paginationData.value?.last_page ||
-      page.value >= paginationData.value?.last_page
+      page.value >= paginationData.value?.last_page,
   )
 
-  let observer: IntersectionObserver
-  onMounted(() => {
-    if (intersectionEl.value) {
-      observer = new IntersectionObserver(_intersectionCallback, {
-        rootMargin: '0px 0px 100px 0px',
-        threshold: 1,
-      })
-      observer.observe(intersectionEl.value)
-    }
-  })
-  onUnmounted(() => {
-    if (observer) observer.disconnect()
-  })
+  useIntersectionObserver(intersectionEl, _intersectionCallback, () => ({
+    rootMargin: '0px 0px 100px 0px',
+    threshold: 1,
+  }))
 
   const queryWithDefaults: Record<string, any> = {
     ...options.query,
@@ -99,7 +90,7 @@ export async function usePaginationLazyWrapper<T>(
           if (typeof options.onResponseError === 'function')
             options.onResponseError(responseData)
         },
-      })
+      }),
     )
 
     try {
@@ -142,7 +133,7 @@ export async function usePaginationLazyWrapper<T>(
           if (typeof options.onResponseError === 'function')
             options.onResponseError(responseData)
         },
-      })
+      }),
     )
 
     // если данные уже подгружаются - подождать их и только после подгрузки полностью перезапросить

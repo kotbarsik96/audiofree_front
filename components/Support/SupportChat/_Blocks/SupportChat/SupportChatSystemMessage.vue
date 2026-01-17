@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
-import { getChatBodyElement } from '~/domain/support/chat/utils';
+import { getChatBodyElement } from '~/domain/support/chat/utils'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
 
@@ -18,40 +18,26 @@ const props = defineProps<{
 
 const element = useTemplateRef<HTMLElement>('element')
 
-let intersectionObserver: IntersectionObserver | undefined
-
 const store =
   props.currentSenderType === ESupportChatSenderType.User
     ? useSupportChatUserStore()
     : useSupportChatStaffStore()
 const { readMessage } = store
 
-onMounted(() => {
-  setIntersectionObserver()
-})
-
-onUnmounted(() => {
-  intersectionObserver?.disconnect()
-})
-
-function setIntersectionObserver() {
-  if (element.value && !props.message.read_at) {
-    intersectionObserver = new IntersectionObserver(
-      (entries) => {
-        if (entries.find((entry) => entry.isIntersecting)) {
-          readMessage(props.message.id)
-          intersectionObserver?.disconnect
-          intersectionObserver = undefined
-        }
-      },
-      {
-        root: getChatBodyElement(element.value),
-        threshold: 0.75,
-      }
-    )
-    intersectionObserver.observe(element.value)
-  }
-}
+useIntersectionObserver(
+  element,
+  (entries) => {
+    if (entries.find((entry) => entry.isIntersecting)) {
+      readMessage(props.message.id)
+      /** отключить observer */
+      return true
+    }
+  },
+  () => ({
+    root: getChatBodyElement(element.value),
+    threshold: 0.75,
+  }),
+)
 </script>
 
 <style lang="scss" scoped>

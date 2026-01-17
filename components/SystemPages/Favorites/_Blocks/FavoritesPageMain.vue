@@ -41,7 +41,7 @@ import type ISelectOption from '~/interfaces/components/ISelectOption'
 import type IVariationProduct from '~/domain/product/types/IVariationProduct'
 import { useRouteQuery } from '@vueuse/router'
 
-const intersectionEl = ref<HTMLElement>()
+const intersectionEl = useTemplateRef<HTMLElement>('intersectionEl')
 
 const { data: sortData } = await useAPI<{ data: ISelectOption[] }>(
   '/product/favorites/sorts',

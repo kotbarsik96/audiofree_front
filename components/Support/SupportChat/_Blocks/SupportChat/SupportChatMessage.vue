@@ -44,7 +44,7 @@ const { readMessage } = store
 const { chatInfo } = storeToRefs(store)
 
 const isOpposite = computed(
-  () => props.currentSenderType !== props.message.sender_type
+  () => props.currentSenderType !== props.message.sender_type,
 )
 
 const name = computed(() => {
@@ -65,7 +65,7 @@ const name = computed(() => {
 const purifiedText = computed(() =>
   typeof window !== 'undefined'
     ? DOMPurify.sanitize(props.message.text)
-    : props.message.text
+    : props.message.text,
 )
 
 const createdAt = computed(() => formatTime(props.message.created_at))
@@ -79,34 +79,20 @@ const classes = computed(() => ({
   '--is-read': !!props.message.read_at,
 }))
 
-let intersectionObserver: IntersectionObserver | undefined
-
-onMounted(() => {
-  setIntersectionObserver()
-})
-
-onUnmounted(() => {
-  intersectionObserver?.disconnect()
-})
-
-function setIntersectionObserver() {
-  if (isOpposite.value && element.value && !props.message.read_at) {
-    intersectionObserver = new IntersectionObserver(
-      (entries) => {
-        if (entries.find((entry) => entry.isIntersecting)) {
-          readMessage(props.message.id)
-          intersectionObserver?.disconnect
-          intersectionObserver = undefined
-        }
-      },
-      {
-        root: getChatBodyElement(element.value),
-        threshold: 0.75,
-      }
-    )
-    intersectionObserver.observe(element.value)
-  }
-}
+useIntersectionObserver(
+  element,
+  (entries) => {
+    if (entries.find((entry) => entry.isIntersecting)) {
+      readMessage(props.message.id)
+      /** отключить observer */
+      return true
+    }
+  },
+  () => ({
+    root: getChatBodyElement(element.value),
+    threshold: 0.75,
+  }),
+)
 
 function formatTime(time: string, withDate?: boolean) {
   const date = new Date(time)

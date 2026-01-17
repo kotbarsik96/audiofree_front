@@ -43,16 +43,14 @@ import ReviewComment from '~/components/Review/_UI/ReviewComment.vue'
 import SmallPreloader from '~/components/_UI/SmallPreloader.vue'
 import CurrentUserReview from '~/components/Review/_UI/CurrentUserReview.vue'
 import type { IProductReview } from '~/domain/product/types/IProductData'
-import {
-  type IReviewInjection,
-} from '~/domain/reviews/types/IReviewInjection'
+import { type IReviewInjection } from '~/domain/reviews/types/IReviewInjection'
 import { ReviewInjection } from '~/enums/injections'
 import type IUser from '~/domain/user/types/IUser'
 
 const user = useSanctumUser<IUser>()
 const route = useRoute()
 
-const intersectionEl = ref<HTMLElement>()
+const intersectionEl = useTemplateRef<HTMLElement>('intersectionEl')
 
 const productSlug = computed(() => route.params.product as string)
 const page = ref(1)
@@ -60,7 +58,7 @@ const isUpdatingReviews = ref(false)
 
 const isWritingReview = ref(false)
 const isEditingReview = computed(
-  () => isWritingReview.value && !!currentUserReview.value
+  () => isWritingReview.value && !!currentUserReview.value,
 )
 
 // подготовка запроса отзыва от текущего пользователя
@@ -73,7 +71,7 @@ const { data: currentUserReviewData, execute: loadUserReview } = useAPI<{
 })
 const currentUserReview = computed(() => currentUserReviewData.value?.data)
 const noReviews = computed(
-  () => !reviews.value.length && !currentUserReview.value
+  () => !reviews.value.length && !currentUserReview.value,
 )
 
 const reviews = shallowRef<IProductReview[]>([])
@@ -84,7 +82,7 @@ const [
     paginationData: reviewsData,
     isLoading: isLoadingReviews,
     refresh: loadReviews,
-    reset: resetAndLoadReviews
+    reset: resetAndLoadReviews,
   },
 ] = await Promise.all([
   usePaginationLazyWrapper<IProductReview>(
@@ -96,12 +94,12 @@ const [
         page,
         per_page: 5,
       },
-    }
+    },
   ),
   loadUserReview(),
 ])
 const otherUsersReviews = computed(() =>
-  reviews.value.filter((review) => review.user_id !== user.value?.id)
+  reviews.value.filter((review) => review.user_id !== user.value?.id),
 )
 
 watch(user, async () => {

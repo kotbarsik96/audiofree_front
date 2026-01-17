@@ -23,7 +23,7 @@ const dateFormatted = computed(() =>
     year: undefined,
     month: 'long',
     day: 'numeric',
-  })
+  }),
 )
 
 const classes = computed(() => ({
@@ -31,43 +31,40 @@ const classes = computed(() => ({
   '--sticky': sticky.value,
 }))
 
-let intersectionObserver: IntersectionObserver
+useIntersectionObserver(
+  element,
+  (entries) => {
+    const entry = entries.at(0)
+    if (!entry) {
+      sticky.value = false
+      return
+    }
+
+    const entryRootTop = entry.rootBounds?.top ?? 0
+    const diff = entryRootTop - entry.boundingClientRect.top
+
+    const notSticky =
+      (entry.intersectionRatio === 0 && !entry.isIntersecting) ||
+      diff < 0 ||
+      diff > 10 + (element.value?.offsetHeight ?? 0)
+    sticky.value = !notSticky
+
+    sticky.value ? addScrollHandler() : removeScrollHandler()
+  },
+  () => ({
+    root: getChatBodyElement(element.value),
+    rootMargin: '-1px 0px 0px 0px',
+    threshold: [0, 1],
+  }),
+)
 
 onMounted(() => {
   if (element.value) {
-    intersectionObserver = new IntersectionObserver(
-      (entries) => {
-        const entry = entries.at(0)
-        if (!entry) {
-          sticky.value = false
-          return
-        }
-
-        const entryRootTop = entry.rootBounds?.top ?? 0
-        const diff = entryRootTop - entry.boundingClientRect.top
-
-        const notSticky =
-          (entry.intersectionRatio === 0 && !entry.isIntersecting) ||
-          diff < 0 ||
-          diff > 10 + (element.value?.offsetHeight ?? 0)
-        sticky.value = !notSticky
-
-        sticky.value ? addScrollHandler() : removeScrollHandler()
-      },
-      {
-        root: getChatBodyElement(element.value),
-        rootMargin: '-1px 0px 0px 0px',
-        threshold: [0, 1],
-      }
-    )
-    intersectionObserver.observe(element.value)
-
     onScroll()
   }
 })
 
 onUnmounted(() => {
-  if (intersectionObserver) intersectionObserver.disconnect()
   removeScrollHandler()
 })
 

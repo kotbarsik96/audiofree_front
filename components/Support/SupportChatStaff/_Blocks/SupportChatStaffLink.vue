@@ -57,11 +57,11 @@ const link = computed(() => ({
 const contactsString = computed(() =>
   [props.chat.user_email, props.chat.user_telegram, props.chat.user_phone]
     .filter((str) => !!str)
-    .join(' / ')
+    .join(' / '),
 )
 
 const currentChatWriters = computed(() =>
-  writersList.value.filter((wr) => wr.chat_id === props.chat.id)
+  writersList.value.filter((wr) => wr.chat_id === props.chat.id),
 )
 
 const writingStatusString = computed(() => {
@@ -86,23 +86,14 @@ const classes = computed(() => ({
   '--open': props.chat.status === ESupportChatStatus.Open,
 }))
 
-let observer: IntersectionObserver | undefined
+useIntersectionObserver(element, (entries) => {
+  if (entries.find((e) => e.isIntersecting)) {
+    if ('joinStaffPresenceChannelIfNot' in store && props.chat.id)
+      store.joinStaffPresenceChannelIfNot(props.chat.id)
 
-onMounted(() => {
-  if (element.value) {
-    observer = new IntersectionObserver((entries) => {
-      if (entries.find((e) => e.isIntersecting)) {
-        if ('joinStaffPresenceChannelIfNot' in store && props.chat.id)
-          store.joinStaffPresenceChannelIfNot(props.chat.id)
-        observer?.disconnect()
-      }
-    })
-    observer.observe(element.value)
+    /** отключить observer */
+    return true
   }
-})
-
-onUnmounted(() => {
-  observer?.disconnect()
 })
 </script>
 

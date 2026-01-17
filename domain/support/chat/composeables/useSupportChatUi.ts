@@ -8,7 +8,7 @@ export function useSupportChatUi(
   chatBodyElement: ShallowRef<HTMLElement | null>,
   topSpyElement: ShallowRef<HTMLElement | null>,
   bottomSpyElement: ShallowRef<HTMLElement | null>,
-  chat_id?: MaybeRefOrGetter<number>
+  chat_id?: MaybeRefOrGetter<number>,
 ) {
   const store = useSupportChatStore(chat_id)
   const {
@@ -52,41 +52,35 @@ export function useSupportChatUi(
 
   onUnmounted(() => {
     cancelChatBodyScrollHandler()
-    if (topSpyObserver) topSpyObserver.disconnect()
     if (bottomSpyObserver) bottomSpyObserver.disconnect()
     chatBodyElement.value?.removeEventListener('scroll', onChatBodyScroll)
   })
 
-  let topSpyObserver: IntersectionObserver
-  let bottomSpyObserver: IntersectionObserver
-  const initTopObserver = () => {
-    if (topSpyElement.value && chatBodyElement.value) {
-      topSpyObserver = new IntersectionObserver(
-        (entries: IntersectionObserverEntry[]) => {
-          if (entries.find((entry) => entry.isIntersecting)) loadMoreTop()
-        },
-        {
-          root: chatBodyElement.value,
-          rootMargin: `${_OBSERVER_MARGIN_}px 0px 0px 0px`,
-        }
-      )
-      topSpyObserver.observe(topSpyElement.value)
-    }
-  }
-  const initBottomObserver = () => {
-    if (bottomSpyElement.value) {
-      bottomSpyObserver = new IntersectionObserver(
-        (entries: IntersectionObserverEntry[]) => {
-          if (entries.find((entry) => entry.isIntersecting)) loadMoreBottom()
-        },
-        {
-          root: chatBodyElement.value,
-          rootMargin: `0px 0px ${_OBSERVER_MARGIN_}px 0px`,
-        }
-      )
-      bottomSpyObserver.observe(bottomSpyElement.value)
-    }
-  }
+  const { observer: topSpyObserver, init: initTopObserver } =
+    useIntersectionObserver(
+      topSpyElement,
+      (entries: IntersectionObserverEntry[]) => {
+        if (entries.find((entry) => entry.isIntersecting)) loadMoreTop()
+      },
+      () => ({
+        root: chatBodyElement.value,
+        rootMargin: `${_OBSERVER_MARGIN_}px 0px 0px 0px`,
+      }),
+      true,
+    )
+  const { observer: bottomSpyObserver, init: initBottomObserver } =
+    useIntersectionObserver(
+      bottomSpyElement,
+      (entries: IntersectionObserverEntry[]) => {
+        if (entries.find((entry) => entry.isIntersecting)) loadMoreBottom()
+      },
+      () => ({
+        root: chatBodyElement.value,
+        rootMargin: `0px 0px ${_OBSERVER_MARGIN_}px 0px`,
+      }),
+      true,
+    )
+
   watch(
     () => chatInfo.value?.chat_id,
     () => {
@@ -95,7 +89,7 @@ export function useSupportChatUi(
     },
     {
       once: true,
-    }
+    },
   )
 
   async function loadMoreTop() {

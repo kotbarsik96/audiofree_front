@@ -43,7 +43,7 @@ import { ordersListBreadcrumbs } from '~/domain/breadcrumbs/pages/order'
 
 useBreadcrumbs(ordersListBreadcrumbs)
 
-const intersectionEl = ref<HTMLElement>()
+const intersectionEl = useTemplateRef<HTMLElement>('intersectionEl')
 
 const searchString = ref('')
 
