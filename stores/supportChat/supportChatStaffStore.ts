@@ -1,47 +1,70 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import {
-  useSupportChatLoading,
-  type ISupportChatMessagesDateGroup,
-} from '~/composables/useSupportChat'
+import { useWritersList } from '~/domain/support/chat/composeables/useWritersList'
 import type { ISupportChatInfo } from '~/domain/support/chat/interfaces/ISupportChatInfo'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
+import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
 import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
-import { setReadAtToMessages } from '~/domain/support/chat/utils'
-
-interface ICachedStaffSupportChat {
-  chat_id: number
-  chat: string // JSON.stringify<ISupportChatMessagesDateGroup[]>
-  chat_info: string // JSON.stringify<ISupportChatInfo>
-  earliest_message_id: number | undefined
-  latest_message_id: number | undefined
-  scroll_position: number | undefined
-}
+import { supportChatCache } from '~/domain/support/chat/SupportChatCache'
+import { supportChatPresenceChannels } from '~/domain/support/chat/SupportChatPresenceChannels'
+import {
+  appendSupportChatMessages,
+  groupMessages,
+  prependSupportChatMessages,
+  setReadAtToMessages,
+} from '~/domain/support/chat/utils'
+import type IUser from '~/domain/user/types/IUser'
 
 interface IReadMessageByChatData {
   messagesIds: number[]
   timeout: ReturnType<typeof setTimeout> | undefined
 }
 
-const __MAX_CACHED_CHATS__ = 4
-
 export const useSupportChatStaffStore = defineStore(
   'support-chat-staff',
   () => {
     const { $afFetch } = useNuxtApp()
 
-    const _currentChatId = ref<number>()
-    const currentChatId = computed(() => _currentChatId.value)
-    const changeChat = async (newChatId: number) => {
-      cacheCurrentChat()
-      restoreCachedChatOrReset(newChatId)
-      if (!!getCachedChat(newChatId) && chatInfo.value) {
-        await loadMoreLater(true)
-        await refetchChatInfo()
+    const user = useSanctumUser<IUser>()
+
+    const echo = useEcho()
+
+    const { writersList, updateWriters } = useWritersList()
+
+    const isFirstLoading = ref(false)
+
+    const savedScrollPosition = ref<number>()
+
+    const messages = ref<ISupportChatMessage[]>([])
+    const messagesGroupedByDate = computed(() => groupMessages(messages))
+
+    const earliestMessageId = computed(() => messages.value.at(0)?.id)
+    const latestMessageId = computed(
+      () => messages.value.at(messages.value.length - 1)?.id
+    )
+
+    const chatInfo = ref<ISupportChatInfo>()
+    const currentChatId = computed(() => chatInfo.value?.chat_id)
+    /** обновляет текущий chatInfo если newInfo.id совпадает с chatInfo.id. Иначе ищет сохранённый чат в кэше и обновляет его там */
+    const updateChatInfo = (newInfo: ISupportChatInfo | undefined) => {
+      if (newInfo) {
+        if (chatInfo.value?.chat_id === newInfo.chat_id)
+          chatInfo.value = newInfo
       }
     }
 
-    const isFirstLoading = ref(false)
+    const allEarlierMessagesLoaded = computed(
+      () =>
+        earliestMessageId.value &&
+        earliestMessageId.value <= (chatInfo.value?.first_message_id ?? 0)
+    )
+    const allLaterMessagesLoaded = computed(
+      () =>
+        latestMessageId.value &&
+        latestMessageId.value >= (chatInfo.value?.last_message_id ?? 0)
+    )
+
+    const chatsList = shallowRef<ISupportChatListItem[]>([])
 
     /** массивы списков id прочитанных сообщений по чатам:
      * ключ number - chat_id,
@@ -76,120 +99,56 @@ export const useSupportChatStaffStore = defineStore(
       }
     }
 
-    const messagesGroupedByDate = ref<ISupportChatMessagesDateGroup[]>([])
-    const earliestMessageId = ref<number | undefined>()
-    const latestMessageId = ref<number | undefined>()
-    const cachedChats = ref<ICachedStaffSupportChat[]>([])
-    const getCachedChat = (chatId: number) =>
-      cachedChats.value.find((cached) => cached.chat_id === chatId)
-    const savedScrollPosition = ref<number>()
-
-    const chatInfo = ref<ISupportChatInfo>()
-    /** обновляет текущий chatInfo если newInfo.id совпадает с chatInfo.id. Иначе ищет сохранённый чат в кэше и обновляет его там */
-    const updateChatInfo = (newInfo: ISupportChatInfo | undefined) => {
-      if (newInfo) {
-        if (chatInfo.value?.chat_id === newInfo.chat_id)
-          chatInfo.value = newInfo
-        else {
-          const cached = getCachedChat(newInfo.chat_id)
-          if (cached) cached.chat_info = JSON.stringify(newInfo)
-        }
-      }
-    }
-
-    const chatsList = shallowRef<ISupportChatListItem[]>([])
-
-    const currentWriters = ref<ISupportChatWriter[]>([])
     const isCurrentUserWriting = ref(false)
-    const chatsListWriters = ref<ISupportChatWriter[]>([])
-    const updateWritingStatus = (data: ISupportChatWriter) => {
-      if (data.is_writing) {
-        const isInCurrentWriters = currentWriters.value.find(
-          (wr) => wr.id === data.id
-        )
-        if (!isInCurrentWriters && data.chat_id === currentChatId.value)
-          currentWriters.value.push(data)
+    const whisperWritingStatus = (
+      is_writing: boolean,
+      chat_id: number | undefined
+    ) => {
+      if (chat_id) {
+        const channel = supportChatPresenceChannels.getChannel(chat_id)
 
-        const isInChatsListWriters = chatsListWriters.value.find(
-          (wr) => wr.id === data.id
-        )
-        if (!isInChatsListWriters) chatsListWriters.value.push(data)
-      } else {
-        currentWriters.value = currentWriters.value.filter(
-          (wr) => wr.id !== data.id
-        )
-
-        const i = chatsListWriters.value.findIndex(
-          (wr) => wr.chat_id === data.chat_id && wr.id === data.id
-        )
-        if (i >= 0) chatsListWriters.value.splice(i, 1)
+        channel?.whisper('typing-status', {
+          id: user.value?.id,
+          chat_id,
+          name: user.value?.name,
+          started_writing_at: is_writing ? Date.now() : false,
+        })
       }
     }
 
-    const { loadMoreLater } = useSupportChatLoading(
-      earliestMessageId,
-      latestMessageId,
-      messagesGroupedByDate,
-      chatInfo,
-      currentChatId
-    )
+    function prependMessages(newMessages: ISupportChatMessage[]) {
+      prependSupportChatMessages(messages, newMessages, chatInfo.value)
+    }
+    function appendMessages(newMessages: ISupportChatMessage[]) {
+      appendSupportChatMessages(messages, newMessages, chatInfo.value)
+    }
 
-    function cacheCurrentChat() {
-      if (
-        !_currentChatId.value ||
-        !messagesGroupedByDate.value ||
-        !chatInfo.value
-      )
-        return
+    function joinStaffPresenceChannelIfNot(chatId: number) {
+      if (!supportChatPresenceChannels.hasChannel(chatId)) {
+        // регистрирует presence channel на данный чат
+        const presenceChannel = supportChatPresenceChannels.register(
+          chatId,
+          echo
+        )
 
-      // подготовить кэш
-      const stringifiedMessages = JSON.stringify(messagesGroupedByDate.value)
-      const stringifiedChatInfo = JSON.stringify(chatInfo.value)
-      const data = {
-        chat_id: chatInfo.value.chat_id,
-        chat: stringifiedMessages,
-        chat_info: stringifiedChatInfo,
-        earliest_message_id: earliestMessageId.value,
-        latest_message_id: latestMessageId.value,
-        scroll_position: savedScrollPosition.value,
-      }
-
-      const cachedChatIndex = cachedChats.value.findIndex(
-        (cached) => cached.chat_id === _currentChatId.value
-      )
-      // если чат уже кэширован - перезаписать его
-      if (cachedChatIndex >= 0)
-        cachedChats.value.splice(cachedChatIndex, 1, data)
-      // иначе просто добавить в кэш
-      else cachedChats.value.push(data)
-
-      // количество кэшированных чатов не должно превышать лимит
-      if (cachedChats.value.length > __MAX_CACHED_CHATS__) {
-        const startIndex = cachedChats.value.length - __MAX_CACHED_CHATS__
-        cachedChats.value = cachedChats.value.slice(startIndex)
+        presenceChannel
+          // если кто-то присоединился в этот чат
+          .joining(() => {
+            // при этом этот чат открыт текущим пользователем сейчас (+ текущий пользователь в данный момент печатает)
+            if (isCurrentUserWriting.value && chatId === currentChatId.value)
+              // оповестить всех в чате о том, что текущий пользователь печатает
+              whisperWritingStatus(true, chatId)
+          })
+          // кто-то другой оповещает о том, что начал печатать
+          .listenForWhisper('typing-status', (data: ISupportChatWriter) => {
+            updateWriters(data)
+          })
       }
     }
 
-    /** Если чат есть в кэше - восстановит его. В ином случае сбросит все состояния */
-    function restoreCachedChatOrReset(restoredChatId: number) {
-      _currentChatId.value = restoredChatId
-      const foundCached: ICachedStaffSupportChat | undefined = getCachedChat(
-        _currentChatId.value
-      )
-
-      if (foundCached) {
-        chatInfo.value = JSON.parse(foundCached.chat_info)
-        messagesGroupedByDate.value = JSON.parse(foundCached.chat)
-        earliestMessageId.value = foundCached.earliest_message_id
-        latestMessageId.value = foundCached.latest_message_id
-        savedScrollPosition.value = foundCached.scroll_position
-      } else {
-        chatInfo.value = undefined
-        messagesGroupedByDate.value = []
-        earliestMessageId.value = undefined
-        latestMessageId.value = undefined
-        savedScrollPosition.value = undefined
-      }
+    /** @param readMessagesIds - список id сообщений, которым выставляется "прочитано". Если список не передан - отметка выставляется всем сообщениям в messages */
+    function setReadAt(readMessagesIds?: number[]) {
+      setReadAtToMessages(messages.value, readMessagesIds)
     }
 
     async function submitReadMessages(
@@ -211,21 +170,13 @@ export const useSupportChatStaffStore = defineStore(
             if (response.ok) {
               // если чат не менялся - поменять значения read_at только локально
               if (chat_id === currentChatId.value) {
-                setReadAtToMessages(
-                  messagesGroupedByDate.value,
-                  readMessagesIds
-                )
+                setReadAt(readMessagesIds)
               }
               // если чат менялся - поменять значения read_at внутри кэша
               else {
-                const foundCached = getCachedChat(chat_id)
-                if (foundCached) {
-                  const cachedChat = JSON.parse(
-                    foundCached.chat
-                  ) as ISupportChatMessagesDateGroup[]
-                  setReadAtToMessages(cachedChat, readMessagesIds)
-                  foundCached.chat = JSON.stringify(cachedChat)
-                }
+                const cachedChat = supportChatCache.getChat(chat_id)
+                if (cachedChat)
+                  setReadAtToMessages(cachedChat.messages, readMessagesIds)
               }
 
               updateChatInfo(response._data.data.chat_info)
@@ -237,32 +188,8 @@ export const useSupportChatStaffStore = defineStore(
       }
     }
 
-    async function refetchChatInfo() {
-      const updatingChatId = toValue(currentChatId)
-
-      try {
-        await $afFetch('/support-chat', {
-          credentials: 'include',
-          query: {
-            chat_id: updatingChatId,
-          },
-          onResponse({ response }) {
-            if (response.ok) {
-              const updatedChatInfo = response._data.data
-              updateChatInfo(updatedChatInfo)
-            }
-          },
-        })
-      } catch (err) {
-        console.error(err)
-      }
-    }
-
     return {
       currentChatId,
-      changeChat,
-      cachedChats,
-      getCachedChat,
       readMessage,
       messagesGroupedByDate,
       earliestMessageId,
@@ -271,12 +198,18 @@ export const useSupportChatStaffStore = defineStore(
       chatInfo,
       chatsList,
       updateChatInfo,
-      refetchChatInfo,
+      setReadAt,
       isFirstLoading,
-      currentWriters,
+      writersList,
+      updateWriters,
+      prependMessages,
+      appendMessages,
+      messages,
+      allEarlierMessagesLoaded,
+      allLaterMessagesLoaded,
+      joinStaffPresenceChannelIfNot,
       isCurrentUserWriting,
-      chatsListWriters,
-      updateWritingStatus,
+      whisperWritingStatus,
     }
   }
 )

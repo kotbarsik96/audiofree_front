@@ -19,8 +19,15 @@ import BreadCrumbs from '~/components/_UI/BreadCrumbs.vue'
 import { supportChatsListBreadcrumbs } from '~/domain/breadcrumbs/pages/support'
 import { useBreadcrumbs } from '~/domain/breadcrumbs/useBreadcrumbs'
 import SupportChatsList from '~/components/Support/SupportChatStaff/_Sections/SupportChatsList.vue'
+import { supportChatPresenceChannels } from '~/domain/support/chat/SupportChatPresenceChannels'
+
+const echo = useEcho()
 
 useBreadcrumbs(supportChatsListBreadcrumbs)
+
+onUnmounted(() => {
+  supportChatPresenceChannels.leaveAll(echo)
+})
 </script>
 
 <style lang="scss" scoped>

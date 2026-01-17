@@ -73,7 +73,7 @@ onUnmounted(() => {
 
 let setHiddenTimeout: ReturnType<typeof setTimeout>
 
-const onScroll = debounce(() => {
+const { fn: onScroll } = debounce(() => {
   hidden.value = false
   if (setHiddenTimeout) clearTimeout(setHiddenTimeout)
   setHiddenTimeout = setTimeout(() => {

@@ -40,7 +40,6 @@ import {
   supportChatStatusOptions,
 } from '~/domain/support/chat/interfaces/ESupportChatStatus'
 import type { ISupportChatListItem } from '~/domain/support/chat/interfaces/ISupportChatListItem'
-import type { ISupportChatWriter } from '~/domain/support/chat/interfaces/ISupportChatWriter'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 
 const spyElement = useTemplateRef<HTMLElement>('spyElement')
@@ -54,7 +53,6 @@ const status = computed(() =>
 const search = ref('')
 
 const supportChatStaffStore = useSupportChatStaffStore()
-const { updateWritingStatus } = supportChatStaffStore
 const { chatsList } = storeToRefs(supportChatStaffStore)
 
 const { error, reset, fullRefresh, isLastPage } =
@@ -76,7 +74,7 @@ if (error.value) {
   throw createError(error.value)
 }
 
-const refetch = debounce(reset, 500)
+const { fn: refetch } = debounce(reset, 500)
 watch(() => [search.value, status.value], refetch)
 
 const channelName = 'support-chats-list'
@@ -87,9 +85,6 @@ onMounted(() => {
     .listen('.support-chat-message-created', fullRefresh)
     .listen('.support-chat-read', fullRefresh)
     .listen('.support-chat-changed-info', fullRefresh)
-    .listen('.support-chat-writing-status', (data: ISupportChatWriter) => {
-      updateWritingStatus(data)
-    })
 })
 
 onUnmounted(() => {

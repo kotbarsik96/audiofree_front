@@ -13,6 +13,7 @@
         <div class="top-spy" ref="topSpyElement"></div>
         <SupportChatDatedGroup
           v-for="group in messagesGroupedByDate"
+          :key="group.date"
           :group="group"
           :current-sender-type="ESupportChatSenderType.Staff"
         />
@@ -40,10 +41,11 @@ import SupportChatBottomButton from '~/components/Support/SupportChat/_Blocks/Su
 import { storeToRefs } from 'pinia'
 import SupportChatInput from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatInput.vue'
 import SupportChatDatedGroup from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatDatedGroup.vue'
-import { useSupportChat } from '~/composables/useSupportChat'
 import { ESupportChatSenderType } from '~/domain/support/chat/interfaces/ESupportChatSenderType'
 import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
 import SupportChatStaffControls from '~/components/Support/SupportChat/_Blocks/SupportChat/SupportChatStaffControls.vue'
+import { useSupportChatBottomButton } from '~/domain/support/chat/composeables/useSupportChatBottomButton'
+import { useSupportChatGeneral } from '~/domain/support/chat/composeables/useSupportChatGeneral'
 
 const chatBodyElement = useTemplateRef<HTMLElement>('chatBodyElement')
 const topSpyElement = useTemplateRef<HTMLElement>('topSpyElement')
@@ -53,7 +55,7 @@ const route = useRoute()
 
 const chatId = computed(() => Number(route.params.id ?? 0))
 
-const { onMessageWritten, allEarlierMessagesLoaded } = await useSupportChat(
+const { onMessageWritten } = await useSupportChatGeneral(
   chatBodyElement,
   topSpyElement,
   bottomSpyElement,
@@ -61,7 +63,12 @@ const { onMessageWritten, allEarlierMessagesLoaded } = await useSupportChat(
 )
 
 const store = useSupportChatStaffStore()
-const { messagesGroupedByDate, chatInfo, isFirstLoading } = storeToRefs(store)
+const {
+  messagesGroupedByDate,
+  chatInfo,
+  isFirstLoading,
+  allEarlierMessagesLoaded,
+} = storeToRefs(store)
 
 const { isBtnVisible, onChatBodyScroll, onChatBottomBtnClick } =
   useSupportChatBottomButton(chatBodyElement)

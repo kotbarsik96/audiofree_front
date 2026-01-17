@@ -15,4 +15,5 @@ export default interface IUser {
   updated_at: string
   confirmations: IUserConfirmations
   permissions_list: Record<EUserPermissions, boolean>
+  support_chat_id?: number
 }

@@ -139,13 +139,18 @@ export function isResponseOk(status: number) {
 }
 
 export function debounce(fn: Function, wait: number) {
-  let timer: ReturnType<typeof setTimeout>;
-  return function (...args: any[]) {
-    if (timer) {
-      clearTimeout(timer);
-    }
-    timer = setTimeout(() => {
-      fn(...args)
-    }, wait);
-  };
+  let timer: ReturnType<typeof setTimeout>
+  return {
+    fn(...args: any[]) {
+      if (timer) {
+        clearTimeout(timer)
+      }
+      timer = setTimeout(() => {
+        fn(...args)
+      }, wait)
+    },
+    cancel: () => {
+      if (timer) clearTimeout(timer)
+    },
+  }
 }

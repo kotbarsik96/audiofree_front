@@ -31,11 +31,12 @@ const store =
   props.currentSenderType === ESupportChatSenderType.User
     ? useSupportChatUserStore()
     : useSupportChatStaffStore()
+const { writersList } = storeToRefs(store)
 
 const writers = computed(() => {
   let arr = []
 
-  const writers = store.currentWriters.filter(
+  const writers = writersList.value.filter(
     (wr) => wr.chat_id === props.chatInfo?.chat_id && wr.id !== user.value?.id
   )
 

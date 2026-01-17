@@ -20,9 +20,8 @@
 <script setup lang="ts">
 import IconSend from '~/assets/images/icons/send.svg?component'
 import type { ISupportChatMessage } from '~/domain/support/chat/interfaces/ISupportChatMessage'
-import { useSupportChatStaffStore } from '~/stores/supportChat/supportChatStaffStore'
-import { useSupportChatUserStore } from '~/stores/supportChat/supportChatUserStore'
-import { formatAndAppendMessages } from '~/domain/support/chat/utils'
+import { maxSupportChatTypingDuration } from '~/domain/support/chat/maxSupportChatTypingDuration'
+import { useSupportChatStore } from '~/stores/supportChat/useSupportChatStore'
 
 const props = defineProps<{
   chatId?: number
@@ -38,34 +37,34 @@ const { $afFetch } = useNuxtApp()
 
 const text = ref('')
 
-const store = props.chatId
-  ? useSupportChatStaffStore()
-  : useSupportChatUserStore()
-
-const {
-  messagesGroupedByDate,
-  latestMessageId,
-  chatInfo,
-  isCurrentUserWriting,
-} = storeToRefs(store)
+const store = useSupportChatStore(props.chatId)
+const { whisperWritingStatus } = store
+const { isCurrentUserWriting } = storeToRefs(store)
 
 const sending = ref(false)
 
 let isWritingTimeout: ReturnType<typeof setTimeout> | undefined
-const didntWriteFor = 3000
+let startedWritingAt: number | false
+
 async function onInput() {
-  // запустить таймаут на сброс: отработает, когда пользователь не печатал уже didntWriteFor милисекунд
-  const launch = () =>
-    setTimeout(async () => {
+  // запустить таймаут на сброс: отработает, когда пользователь не печатал уже maxSupportChatTypingDuration милисекунд
+  const launch = () => {
+    startedWritingAt = Date.now()
+    return setTimeout(async () => {
       await updateIsWritingStatus(false)
       clearTimeout(isWritingTimeout)
       isWritingTimeout = undefined
-    }, didntWriteFor)
+      startedWritingAt = false
+    }, maxSupportChatTypingDuration)
+  }
 
   // пользователь печатает - перезапустить таймаут
   if (isWritingTimeout) {
     clearTimeout(isWritingTimeout)
     isWritingTimeout = launch()
+    // обновить статус ещё раз, т.к. иначе через maxSupportChatTypingDuration он автоматически будет убран
+    if (startedWritingAt && Date.now() - 1000 > startedWritingAt)
+      updateIsWritingStatus(true)
   }
   // пользователь ещё не печатал - обновить состояние в true и запустить таймаут
   else if (text.value.trim()) {
@@ -74,31 +73,14 @@ async function onInput() {
   }
 }
 
-onMounted(() => {
-  window.addEventListener('unload', onWindowUnload)
-})
-
 onUnmounted(() => {
-  window.removeEventListener('unload', onWindowUnload)
-  onWindowUnload()
+  if (isWritingTimeout) clearTimeout(isWritingTimeout)
+  updateIsWritingStatus(false)
 })
 
-function onWindowUnload() {
-  if (isWritingTimeout) clearTimeout(isWritingTimeout)
-  updateIsWritingStatus(false, true)
-}
-
-async function updateIsWritingStatus(is_writing: boolean, keepalive = false) {
+async function updateIsWritingStatus(is_writing: boolean) {
   isCurrentUserWriting.value = is_writing
-  await $afFetch('/support-chat/update-writing-status', {
-    method: 'POST',
-    body: {
-      chat_id: props.chatId,
-      is_writing,
-    },
-    credentials: 'include',
-    keepalive,
-  })
+  whisperWritingStatus(isCurrentUserWriting.value, props.chatId)
 }
 
 async function onSubmit() {
@@ -124,12 +106,7 @@ async function send() {
         if (isWritingTimeout) clearTimeout(isWritingTimeout)
         updateIsWritingStatus(false)
         text.value = ''
-        messagesGroupedByDate.value = formatAndAppendMessages(
-          messagesGroupedByDate.value,
-          [message],
-          chatInfo,
-          latestMessageId
-        )
+        store.appendMessages([message])
         emit('message-written')
       },
       onResponseError({ response }) {

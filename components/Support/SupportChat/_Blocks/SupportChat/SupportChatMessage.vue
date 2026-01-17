@@ -10,7 +10,7 @@
       <div class="checkmarks">
         <CheckmarkIcon />
         <Transition name="fade-in">
-          <CheckmarkIcon v-if="props.message.read_at" class="second" />
+          <CheckmarkIcon v-if="message.read_at" class="second" />
         </Transition>
       </div>
     </div>
